@@ -1,0 +1,1755 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"enableImage",
+				"enableImageOverlay"
+			],
+			[
+				"back",
+				"backend_url"
+			],
+			[
+				"chat",
+				"chatroomRef"
+			],
+			[
+				"mess",
+				"messagesInChatroom"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/containers/Private_Chat/Private_Chat_fxn.js",
+			"settings":
+			{
+				"buffer_size": 8725,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					34,
+					1,
+					"insert",
+					{
+						"characters": "\n\n"
+					},
+					"BQAAABYaAAAAAAAAFxoAAAAAAAAAAAAAFxoAAAAAAAAYGgAAAAAAAAAAAAAYGgAAAAAAABkaAAAAAAAAAAAAABkaAAAAAAAAGhoAAAAAAAAAAAAAFxoAAAAAAAAXGgAAAAAAAAEAAAAJ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAWGgAAAAAAABYaAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					35,
+					1,
+					"paste",
+					null,
+					"AQAAABkaAAAAAAAATRsAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAZGgAAAAAAABkaAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					48,
+					1,
+					"insert",
+					{
+						"characters": "}"
+					},
+					"AQAAAE0bAAAAAAAAThsAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAABNGwAAAAAAAE0bAAAAAAAAAAAAAAAA8L8"
+				]
+			]
+		},
+		{
+			"contents": "Searching 344 files for \"getroomchatmessages\"\n\nC:\\Users\\josep\\Desktop\\Python_Tutors\\python_tutors\\frontend-react\\src\\containers\\Private_Chat\\Private_Chat.js:\n   10  import { errorToast, successToast } from \"../../Toaster.js\";\n   11  import { deleteCookie, delete_private_chat_Cookie, getCookie, set_cookie, set_cookie_private_chat } from \"../../Reusable/Cookie.js\";\n   12: import { getRoomChatMessages } from \"../Public_chat/public_chat_fxn.js\";\n   13  const Private_Chat = (params) => {\n   14  \n   ..\n   64  \n   65  \n   66: \tfunction getRoomChatMessages(){\n   67  \tvar pageNumber = document.getElementById(\"id_page_number\").innerHTML\n   68  \tif(pageNumber != \"-1\"){\n   ..\n  224  \t\t\t\tgetUserInfo()\n  225  \n  226: \t\t\t\tgetRoomChatMessages()\n  227  \t\t\t\tenableChatLogScrollListener()\n  228  \t\t\t}\n\nC:\\Users\\josep\\Desktop\\Python_Tutors\\python_tutors\\frontend-react\\src\\containers\\Private_Chat\\Private_Chat_fxn.js:\n  231  \t\tvar chatLog = document.getElementById(\"id_chat_log\")\n  232  \t\tif ((Math.abs(chatLog.scrollTop) + 2) >= (chatLog.scrollHeight - chatLog.offsetHeight)) {\n  233: \t\t\tgetRoomChatMessages()\n  234  \t\t}\n  235  \t}\n\nC:\\Users\\josep\\Desktop\\Python_Tutors\\python_tutors\\frontend-react\\src\\containers\\Public_chat\\Home.js:\n    3  import { UserContext } from \"../../Reusable/UserContext.js\"\n    4  \n    5: import { getRoomChatMessages, setupPublicChatWebSocket } from \"./public_chat_fxn.js\"\n    6  \n    7  import './Home.css'\n    .\n   37  \t\tchatLog.addEventListener(\"scroll\", function(e){\n   38  \t\t\tif ((Math.abs(chatLog.scrollTop) + 2) >= (chatLog.scrollHeight - chatLog.offsetHeight)) {\n   39: \t\t\t\tgetRoomChatMessages()\n   40  \t\t\t}\n   41  \t\t});\n\nC:\\Users\\josep\\Desktop\\Python_Tutors\\python_tutors\\frontend-react\\src\\containers\\Public_chat\\public_chat_fxn.js:\n   78  \t\t\t// WHen user joins here \n   79  \t\t\tif (data.join) {\n   80: \t\t\t\tgetRoomChatMessages()\n   81  \t\t\t\tconsole.log(\"Joining public room \" + data.join);\n   82  \t\t\t\t// TODO: Query previous chatroom messages\n   ..\n  304  \t\tRetrieve the chat room messages given the page number.\n  305  \t*/\n  306: \texport function getRoomChatMessages(){\n  307  \t\tvar pageNumber = document.getElementById(\"id_page_number\").innerHTML\n  308  \t\t\n  ...\n  334  \t// \tchatLog.addEventListener(\"scroll\", function(e){\n  335  \t// \t\tif ((Math.abs(chatLog.scrollTop) + 2) >= (chatLog.scrollHeight - chatLog.offsetHeight)) {\n  336: \t// \t\t\tgetRoomChatMessages()\n  337  \t// \t\t}\n  338  \t// \t});\n\n9 matches across 4 files\n",
+			"settings":
+			{
+				"buffer_size": 2448,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "import axios from \"axios\";\nimport { useContext, useEffect, useState } from \"react\";\nimport { backend_url } from \"../../Contants.js\";\nimport { preloadImage } from \"../../Reusable/Async_image_loader.js\";\nimport { displayChatroomLoadingSpinner } from \"../../Reusable/display_chatroom_loading_spinner.js\";\nimport { UserContext } from \"../../Reusable/UserContext.js\";\n\nimport { appendChatMessage, closeWebSocket, enableChatLogScrollListener, getUserInfo, handleMessagesPayload, retrieve_user_info_payload, setupWebSocket } from \"./Private_Chat_fxn.js\"\nimport { $ } from \"../../Reusable/Utilities/Util.js\"\nimport { errorToast, successToast } from \"../../Toaster.js\";\nimport { deleteCookie, delete_private_chat_Cookie, getCookie, set_cookie, set_cookie_private_chat } from \"../../Reusable/Cookie.js\";\nimport { getRoomChatMessages } from \"../Public_chat/public_chat_fxn.js\";\nconst Private_Chat = (params) => {\n\n\n\tvar chatSocket;\n\tvar roomId ;\n\tconst { authUser } = useContext(UserContext)\n\n\tconst [data, setData] = useState([])\n\n\n\tconst display_private_page = (userId) => {\n\n\t\t// Make a get request instead\n\t\taxios.get(`http://127.0.0.1:8000/private_chat`, {\n\t\t\theaders: {\n\t\t\t\tAuthorization: `Token ${sessionStorage.getItem('token')}`\n\t\t\t}\n\t\t}, { data: { userId: userId } }).then(\n\t\t\tres => {\n\n\t\t\t\tconsole.log(res);\n\t\t\t\tconsole.log(res.data.m_and_f);\n\n\n\t\t\t\tsetData(res.data.m_and_f)\n\n\t\t\t\tonStart()\n\t\t\t\tconsole.log(data)\n\n\n\n\t\t\t\t// Call this fxn here \n\n\n\n\t\t\t\t// setupChatDropdownHeader()\n\t\t\t}).catch(err => {\n\t\t\t\tconsole.log(err)\n\t\t\t})\n\n\t}\n\n/*\n\t\tRetrieve the user information of the user other in the chat.\n\t\t- userd to retrive user using user id\n\t*/\n\tfunction getUserInfo(){\n\t\tchatSocket.send(JSON.stringify({\n\t\t\t\"command\": \"get_user_info\",\n\t\t\t\"room_id\": roomId,\n\t\t}));\n\t}\n\n\n\tfunction getRoomChatMessages(){\n\tvar pageNumber = document.getElementById(\"id_page_number\").innerHTML\n\tif(pageNumber != \"-1\"){\n\t\tsetPageNumber(\"-1\") // loading in progress\n\t\tchatSocket.send(JSON.stringify({\n\t\t\t\"command\": \"get_room_chat_messages\",\n\t\t\t\"room_id\": roomId,\n\t\t\t\"page_number\": pageNumber,\n\t\t}));\n\t}\n}\n\n\nfunction setPageNumber(pageNumber){\n\t$(\"id_page_number\").innerHTML = pageNumber\n}\n\n\tfunction onSelectFriend(e,userId) {\n\t\te.preventDefault()\n\t\tcreateOrReturnPrivateChat(userId)\n\n\t\tclearHighlightedFriend()\n\t\thighlightFriend(userId)\n\t}\n\n\t// Using the user 2's id to fetch the data \n\tconst createOrReturnPrivateChat = (id) => {\n\n\n\t\tconst payload = {\n\t\t\t\"csrfmiddlewaretoken\": authUser.csrfToken,\n\t\t\t\"user2_id\": id,\n\t\t}\n\n\t\taxios({\n\t\t\tmethod: 'POST',\n\t\t\turl: `${backend_url}/private_chat/create_or_get_private_chat/`,\n\t\t\tdata: payload,\n\t\t\theaders: {\n\t\t\t\tAuthorization: \"Token \" + sessionStorage.getItem(\"token\"),\n\t\t\t\t'Content-type': 'application/json',\n\t\t\t\t'X-CSRFToken': authUser.csrfToken\n\t\t\t}\n\t\t}).then((res) => {\n\n\t\t\tconsole.log(res)\n\t\t\tif (res.data['response'].includes(\"Successfully got the chat\")) {\n\n\t\t\t\t// successToast(res.data['response'])\n\t\t\t\tsetupWebSocket(res.data['chatroom_id'])\n\t\t\t} else if (res.data['response'] != null) {\n\t\t\t\terrorToast(res.data['response'])\n\t\t\t}\n\t\t}).catch(err => {\n\n\t\t\tconsole.log(err);\n\t\t})\n\t}\n\tuseEffect(() => {\n\t\tconsole.log(\"prviate chat now fired\");\n\t\tdisplay_private_page()\n\n\t}, [])\n\n\tconst Found_Friends = data.map((x, id) => {\n\n\t\tconsole.log(x.friend);\n\t\tif (x.friend.id != authUser.userId) {\n\t\t\treturn (\n\n\n\n\t\t\t\t<div key={id} className=\"d-flex flex-row p-2 friend-container flex-grow-1\"\n\n\t\t\t\t\tonClick={(e) => onSelectFriend(e, x.friend.id)}\n\t\t\t\t\tid={`id_friend_container_${x.friend.id}`}\n\t\t\t\t>\n\t\t\t\t\t<img className=\"profile-image rounded-circle img-fluid\" id={`id_friend_img_${x.friend.id}`} src=\"http://localhost:8000/media/dummy_image.jpeg\" />\n\t\t\t\t\t<div className=\"d-flex flex-column\">\n\t\t\t\t\t\t<span className=\"username-span\">{x.friend.username}</span>\n\t\t\t\t\t\t<span className=\"friend-message-span\">{x.message}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t)\n\t\t}\n\t})\n\n\n\t// Wil set up the web socket here \n\tfunction setupWebSocket(room_id) {\n\n\t\tconsole.log(\"setupWebSocket: \" + room_id)\n\n\t\troomId = room_id\n\n\t\t// close previous socket if one is open\n\t\tcloseWebSocket()\t\n\n\t\t// Correctly decide between ws:// and wss://\n\t\tvar ws_scheme = window.location.protocol == \"https:\" ? \"wss\" : \"ws\";\n\t\t// {% if debug_mode %}\n\n\n\t\t// Is the path right?\n\t\tvar ws_path = ws_scheme + '://' + window.location.host + \"/private_chat/\" + roomId + \"/\"; // development\n\n\t\tvar ws_path = ws_scheme + '://' + \"localhost:8000\" + \"/private_chat/\" + roomId + \"/\"; // development\n\n\t\t// {% else %}\n\t\t// var ws_path = ws_scheme + '://' + window.location.host + \":8001/chat/\" + roomId + \"/\"; // production\n\t\t// {% endif %}\n\n\t\tconsole.log(ws_path);\n\n\t\t\n\t\t// Need this line to remove existing authorization cookie\n\t\tvar cookie_found = getCookie(\"authorization\");\n\t\tif (cookie_found !== undefined) {\n\t\t\tdelete_private_chat_Cookie(\"authorization\")\n\t\t\tconsole.log(\"cookie deleted\");\n\t\t}\n\n\n\t\tvar user_token = sessionStorage.getItem(\"token\")\n\t\tdocument.cookie = set_cookie(\"authorization\", \"private_chat\", user_token, 1)\n\t\tconsole.log(\"the cookie set is \", document.cookie);\n\n\t\t// console.log(\"Connecting to \" + ws_path);\n\t\tchatSocket = new WebSocket(ws_path);\n\n\n\t\t// Handle incoming messages\n\t\tchatSocket.onmessage = function (message) {\n\t\t\t// Decode the JSON\n\n\n\n\t\t\t// document.cookie = \"authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT\"\n\t\t\tconsole.log(\"Got chat websocket message \" + message.data);\n\t\t\tconsole.log(\"Got websocket message.\");\n\t\t\tvar data = JSON.parse(message.data);\n\n\t\t\t// display the progress bar?\n\t\t\tdisplayChatroomLoadingSpinner(data.display_progress_bar)\n\n\t\t\t// Handle errors (ClientError)\n\t\t\tif (data.error) {\n\t\t\t\tconsole.error(data.error + \": \" + data.message)\n\t\t\t\treturn;\n\t\t\t}\n\t\t\t// Handle joining (Client perspective)\n\t\t\tif (data.join) {\n\t\t\t\tsuccessToast(\"Joining room \" + data.join);\n\t\t\t\tconsole.log(\"Joining room \" + data.join);\n\n\n\t\t\t\t// When user joins get the user info\n\t\t\t\tgetUserInfo()\n\n\t\t\t\tgetRoomChatMessages()\n\t\t\t\tenableChatLogScrollListener()\n\t\t\t}\n\t\t\t// Handle leaving (client perspective)\n\t\t\tif (data.leave) {\n\t\t\t\t// do nothing\n\t\t\t\tconsole.log(\"Leaving room \" + data.leave);\n\n\t\t\t}\n\n\t\t\tif (data.user_info) {\n\t\t\t\tconsole.log(\"user information retrieved\");\n\t\t\t\tconsole.log(data.user_info);\n\t\t\t\tretrieve_user_info_payload(data.user_info)\n\t\t\t}\n\n\t\t\t// SO if a a standard new message, \n\t\t\t// true: is for maintaining position (so you don't go to the bottom)\n\t\t\tif (data.msg_type == 0 || data.msg_type == 1 || data.msg_type == 2) {\n\t\t\t\tappendChatMessage(data, false, true)\n\t\t\t}\n\n\t\t\t// THis is for handling when there is new messages coming in \n\n\t\t\tif (data.messages_payload) {\n\t\t\t\thandleMessagesPayload(data.messages, data.new_page_number)\n\t\t\t}\n\t\t};\n\n\t\tchatSocket.addEventListener(\"open\", function (e) {\n\t\t\tconsole.log(\"ChatSocket OPEN\")\n\n\t\t\tconsole.log('is singleton auth?', authUser.isAuthenticated);\n\t\t\t// join chat room\n\t\t\t// if(authUser.isAuthenticated){\n\t\t\tchatSocket.send(JSON.stringify({\n\t\t\t\t\"command\": \"join\",\n\t\t\t\t\"room\": roomId\n\t\t\t}));\n\t\t\t// }\n\t\t})\n\n\t\tchatSocket.onclose = function (e) {\n\t\t\tconsole.log('Chat socket closed.');\n\t\t};\n\n\t\tchatSocket.onOpen = function (e) {\n\t\t\tconsole.log(\"ChatSocket onOpen\", e)\n\t\t}\n\n\t\tchatSocket.onerror = function (e) {\n\t\t\tconsole.log('ChatSocket error', e)\n\t\t}\n\n\t\tif (chatSocket.readyState == WebSocket.OPEN) {\n\t\t\tconsole.log(\"ChatSocket OPEN\")\n\t\t} else if (chatSocket.readyState == WebSocket.CONNECTING) {\n\t\t\tconsole.log(\"ChatSocket connecting..\")\n\t\t}\n\n\n\t\t/*sd\n\t\tFor handling the user input when submitting and all that \n\t\t*/\n\n\t\tdocument.getElementById('id_chat_message_input').focus();\n\t\tdocument.getElementById('id_chat_message_input').onkeyup = function (e) {\n\t\t\tif (e.keyCode === 13 && e.shiftKey) {  // enter + return\n\t\t\t\t// Handled automatically by textarea\n\t\t\t}\n\t\t\telse if (e.keyCode === 13 && !e.shiftKey) { // enter + !return\n\t\t\t\tdocument.getElementById('id_chat_message_submit').click();\n\t\t\t}\n\t\t};\n\n\t\tdocument.getElementById('id_chat_message_submit').onclick = function (e) {\n\t\t\tconst messageInputDom = document.getElementById('id_chat_message_input');\n\t\t\tconst message = messageInputDom.value;\n\t\t\tchatSocket.send(JSON.stringify({\n\t\t\t\t\"command\": \"send\",\n\t\t\t\t\"message\": message,\n\t\t\t\t\"room\": roomId\n\t\t\t}));\n\t\t\tmessageInputDom.value = '';\n\t\t};\n\t}\n\n\n\t// Will load the actual user profile image once they are retrieved \n\tfunction onStart() {\n\n\t\t// id_friend_img_{{unique_id}}\n\t\t// Each image will have a unique id \n\t\tdata.forEach(x => {\n\n\t\t\t\n\t\t\t// preloadImage(\"{{x.friend.profile_image.url|safe}}\", \"id_friend_img_{{x.friend.id}}\")\n\t\t\t// console.log(`${x.friend}`);\n\n\t\t\tconsole.log(`${x.friend.profile_image}`);\n\n\t\t\tpreloadImage(`${x.friend.profile_image}`, `id_friend_img_${x.friend.id}`)\n\t\t})\n\t}\n\n\n\tfunction highlightFriend(userId){\n\t\t// select new friend\n\t\tdocument.getElementById(\"id_friend_container_\" + userId).style.background = \"#f2f2f2\"\n\t}\n\n\n\tfunction clearHighlightedFriend(){\n\n\t\tconsole.log(\"does this exist \", data)\n\t\tif (data){\n\t\t\tdata.forEach(x =>{\n\n\t\t\t\t\t\tconsole.log(x.friend.id)\n\t\t\t\tdocument.getElementById(`id_friend_container_${x.friend.id}`).style.background = \"\"\n\t\t\t})\n\n\t\t}\n\t\t// clear the profile image and username of current chat\n\t\tdocument.getElementById(\"id_other_user_profile_image\").classList.add(\"d-none\")\n\t\tdocument.getElementById(\"id_other_user_profile_image\").src = \"http://localhost:8000/media/dummy_image.jpeg\"\n\t\tdocument.getElementById(\"id_other_username\").innerHTML = \"\"\n\t}\n\n\n\n\treturn (\n\n\t\t<div className=\"container\">\n\t\t\t<div className=\"row\">\n\t\t\t\t<div className=\"col-sm-9 m-0 p-2\">\n\t\t\t\t\t<div className=\"card\" id=\"id_chatroom_card\">\n\n\t\t\t\t\t\t<div className=\"d-flex flex-row align-items-center card-header\" id=\"id_room_title\">\n\t\t\t\t\t\t\t<a className=\"d-flex flex-row\" target=\"_blank\" id=\"id_user_info_container\">\n\t\t\t\t\t\t\t\t<img className=\"profile-image rounded-circle img-fluid\" id=\"id_other_user_profile_image\"\n\t\t\t\t\t\t\t\t\tsrc=\"http://localhost:8000/media/dummy_image.jpeg\" />\n\t\t\t\t\t\t\t\t<h3 className=\"ml-2\" id=\"id_other_username\"></h3>\n\t\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"card-body p-1\">\n\t\t\t\t\t\t\t<div className=\"d-flex flex-column\" id=\"id_chat_log_container\">\n\n\t\t\t\t\t\t\t\t<div className=\"d-flex flex-row justify-content-center\" id=\"id_chatroom_loading_spinner_container\">\n\t\t\t\t\t\t\t\t\t<div className=\"spinner-border text-primary\" id=\"id_chatroom_loading_spinner\" role=\"status\"\n\t\t\t\t\t\t\t\t\t\tstyle={{ display: \"none\" }}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t<span className=\"sr-only\">Loading...</span>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div className=\"d-flex chat-log\" id=\"id_chat_log\">\n\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<span className=\"{% if not debug %}d-none{% endif %} page-number\" id=\"id_page_number\">1</span>\n\n\t\t\t\t\t\t\t\t<div className=\"d-flex flex-row chat-message-input-container\">\n\t\t\t\t\t\t\t\t\t<textarea className=\"flex-grow-1 chat-message-input\" id=\"id_chat_message_input\"></textarea>\n\t\t\t\t\t\t\t\t\t<button className=\"btn btn-primary chat-message-submit-button\">\n\t\t\t\t\t\t\t\t\t\t<span id=\"id_chat_message_submit\" className=\"material-icons\">send\n\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div className=\"col-sm-3 m-0 p-2\">\n\t\t\t\t\t<div className=\"card\">\n\t\t\t\t\t\t<div className=\"d-flex flex-row align-items-center card-header\">\n\t\t\t\t\t\t\t<h3 >Friends</h3>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"card-body p-1\">\n\t\t\t\t\t\t\t<div className=\"d-flex flex-column friends-list-container \">\n\n\n\t\t\t\t\t\t\t\t{Found_Friends}\n\n\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t)\n\n}\n\n\n\nexport default Private_Chat",
+			"file": "src/containers/Private_Chat/Private_Chat.js",
+			"file_size": 11426,
+			"file_write_time": 132699115669327438,
+			"settings":
+			{
+				"buffer_size": 11407,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					34,
+					1,
+					"insert",
+					{
+						"characters": "\n\nclg"
+					},
+					"CQAAAIQiAAAAAAAAhSIAAAAAAAAAAAAAhSIAAAAAAACGIgAAAAAAAAAAAACGIgAAAAAAAIciAAAAAAAAAAAAAIciAAAAAAAAiCIAAAAAAAAAAAAAiCIAAAAAAACKIgAAAAAAAAAAAACFIgAAAAAAAIUiAAAAAAAAAgAAAAkJiCIAAAAAAACJIgAAAAAAAAAAAACJIgAAAAAAAIoiAAAAAAAAAAAAAIoiAAAAAAAAiyIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACEIgAAAAAAAIQiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					35,
+					1,
+					"insert_completion",
+					{
+						"completion": "console.log(${1:object})",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "clg"
+					},
+					"AgAAAIgiAAAAAAAAiCIAAAAAAAADAAAAY2xniCIAAAAAAACbIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACLIgAAAAAAAIsiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					47,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIYiAAAAAAAAhiIAAAAAAAAVAAAACQljb25zb2xlLmxvZyhvYmplY3Qp",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACbIgAAAAAAAIYiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					50,
+					1,
+					"insert",
+					{
+						"characters": "\n\n"
+					},
+					"BgAAALkiAAAAAAAAuiIAAAAAAAAAAAAAuiIAAAAAAAC9IgAAAAAAAAAAAAC9IgAAAAAAAL4iAAAAAAAAAAAAAL4iAAAAAAAAvyIAAAAAAAAAAAAAvyIAAAAAAADDIgAAAAAAAAAAAAC6IgAAAAAAALoiAAAAAAAABAAAAAkJCQk",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAC5IgAAAAAAALkiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					51,
+					1,
+					"paste",
+					null,
+					"AQAAAL8iAAAAAAAA1CIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAC/IgAAAAAAAL8iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					56,
+					6,
+					"left_delete",
+					null,
+					"BgAAANIiAAAAAAAA0iIAAAAAAAABAAAAdNEiAAAAAAAA0SIAAAAAAAABAAAAY9AiAAAAAAAA0CIAAAAAAAABAAAAZc8iAAAAAAAAzyIAAAAAAAABAAAAas4iAAAAAAAAziIAAAAAAAABAAAAYs0iAAAAAAAAzSIAAAAAAAABAAAAbw",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADTIgAAAAAAANMiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					57,
+					1,
+					"insert",
+					{
+						"characters": "x."
+					},
+					"AgAAAM0iAAAAAAAAziIAAAAAAAAAAAAAziIAAAAAAADPIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADNIgAAAAAAAM0iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					58,
+					1,
+					"insert_completion",
+					{
+						"completion": "friend",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": true,
+						"trigger": "friend"
+					},
+					"AQAAAM8iAAAAAAAA1SIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADPIgAAAAAAAM8iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					59,
+					1,
+					"insert",
+					{
+						"characters": ".id"
+					},
+					"AwAAANUiAAAAAAAA1iIAAAAAAAAAAAAA1iIAAAAAAADXIgAAAAAAAAAAAADXIgAAAAAAANgiAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADVIgAAAAAAANUiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					72,
+					1,
+					"reindent",
+					null,
+					"AQAAAIYiAAAAAAAAiCIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACGIgAAAAAAAIYiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					73,
+					1,
+					"insert",
+					{
+						"characters": "\t"
+					},
+					"AQAAAIgiAAAAAAAAiSIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACIIgAAAAAAAIgiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					74,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIgiAAAAAAAAiCIAAAAAAAABAAAACQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACJIgAAAAAAAIkiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					75,
+					1,
+					"insert",
+					{
+						"characters": "clg"
+					},
+					"AwAAAIgiAAAAAAAAiSIAAAAAAAAAAAAAiSIAAAAAAACKIgAAAAAAAAAAAACKIgAAAAAAAIsiAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACIIgAAAAAAAIgiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					76,
+					1,
+					"insert_completion",
+					{
+						"completion": "console.log(${1:object})",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "clg"
+					},
+					"AgAAAIgiAAAAAAAAiCIAAAAAAAADAAAAY2xniCIAAAAAAACbIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACLIgAAAAAAAIsiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					77,
+					1,
+					"insert_snippet",
+					{
+						"contents": "\"${0:$SELECTION}\""
+					},
+					"AgAAAJQiAAAAAAAAlCIAAAAAAAAGAAAAb2JqZWN0lCIAAAAAAACcIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACUIgAAAAAAAJoiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					78,
+					1,
+					"insert",
+					{
+						"characters": "does"
+					},
+					"BQAAAJUiAAAAAAAAliIAAAAAAAAAAAAAliIAAAAAAACWIgAAAAAAAAYAAABvYmplY3SWIgAAAAAAAJciAAAAAAAAAAAAAJciAAAAAAAAmCIAAAAAAAAAAAAAmCIAAAAAAACZIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACVIgAAAAAAAJsiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					79,
+					1,
+					"insert",
+					{
+						"characters": " this"
+					},
+					"BQAAAJkiAAAAAAAAmiIAAAAAAAAAAAAAmiIAAAAAAACbIgAAAAAAAAAAAACbIgAAAAAAAJwiAAAAAAAAAAAAAJwiAAAAAAAAnSIAAAAAAAAAAAAAnSIAAAAAAACeIgAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACZIgAAAAAAAJkiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					80,
+					1,
+					"insert",
+					{
+						"characters": " exist"
+					},
+					"BgAAAJ4iAAAAAAAAnyIAAAAAAAAAAAAAnyIAAAAAAACgIgAAAAAAAAAAAACgIgAAAAAAAKEiAAAAAAAAAAAAAKEiAAAAAAAAoiIAAAAAAAAAAAAAoiIAAAAAAACjIgAAAAAAAAAAAACjIgAAAAAAAKQiAAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACeIgAAAAAAAJ4iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					81,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAKQiAAAAAAAApSIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACkIgAAAAAAAKQiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					83,
+					1,
+					"insert",
+					{
+						"characters": ","
+					},
+					"AQAAAKYiAAAAAAAApyIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACmIgAAAAAAAKYiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					84,
+					1,
+					"insert",
+					{
+						"characters": " data.m"
+					},
+					"BwAAAKciAAAAAAAAqCIAAAAAAAAAAAAAqCIAAAAAAACpIgAAAAAAAAAAAACpIgAAAAAAAKoiAAAAAAAAAAAAAKoiAAAAAAAAqyIAAAAAAAAAAAAAqyIAAAAAAACsIgAAAAAAAAAAAACsIgAAAAAAAK0iAAAAAAAAAAAAAK0iAAAAAAAAriIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACnIgAAAAAAAKciAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					85,
+					1,
+					"insert_completion",
+					{
+						"completion": "m_and_f",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "m_and_f"
+					},
+					"AgAAAK0iAAAAAAAArSIAAAAAAAABAAAAba0iAAAAAAAAtCIAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAACuIgAAAAAAAK4iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					110,
+					7,
+					"left_delete",
+					null,
+					"BwAAAMciAAAAAAAAxyIAAAAAAAABAAAAZsYiAAAAAAAAxiIAAAAAAAABAAAAX8UiAAAAAAAAxSIAAAAAAAABAAAAZMQiAAAAAAAAxCIAAAAAAAABAAAAbsMiAAAAAAAAwyIAAAAAAAABAAAAYcIiAAAAAAAAwiIAAAAAAAABAAAAX8EiAAAAAAAAwSIAAAAAAAABAAAAbQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADIIgAAAAAAAMgiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					111,
+					1,
+					"left_delete",
+					null,
+					"AQAAAMAiAAAAAAAAwCIAAAAAAAABAAAALg",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADBIgAAAAAAAMEiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					115,
+					8,
+					"left_delete",
+					null,
+					"CAAAANIiAAAAAAAA0iIAAAAAAAABAAAALtEiAAAAAAAA0SIAAAAAAAABAAAAZtAiAAAAAAAA0CIAAAAAAAABAAAAX88iAAAAAAAAzyIAAAAAAAABAAAAZM4iAAAAAAAAziIAAAAAAAABAAAAbs0iAAAAAAAAzSIAAAAAAAABAAAAYcwiAAAAAAAAzCIAAAAAAAABAAAAX8siAAAAAAAAyyIAAAAAAAABAAAAbQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAADTIgAAAAAAANMiAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					124,
+					4,
+					"left_delete",
+					null,
+					"BAAAAK8iAAAAAAAAryIAAAAAAAAFAAAAYW5kX2auIgAAAAAAAK4iAAAAAAAAAQAAAF+tIgAAAAAAAK0iAAAAAAAAAQAAAG2sIgAAAAAAAKwiAAAAAAAAAQAAAC4",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAC0IgAAAAAAAK8iAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					167,
+					1,
+					"insert_snippet",
+					{
+						"contents": "`$0`"
+					},
+					"AQAAADAjAAAAAAAAMiMAAAAAAAAAAAAA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAwIwAAAAAAADAjAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					169,
+					1,
+					"left_delete",
+					null,
+					"AQAAADEjAAAAAAAAMSMAAAAAAAABAAAAYA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAAAyIwAAAAAAADIjAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					172,
+					1,
+					"left_delete",
+					null,
+					"AQAAAEgjAAAAAAAASCMAAAAAAAABAAAAYA",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAABJIwAAAAAAAEkjAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					174,
+					1,
+					"left_delete",
+					null,
+					"AQAAAEgjAAAAAAAASCMAAAAAAAABAAAAKQ",
+					"AgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/AAAAAAEAAABJIwAAAAAAAEkjAAAAAAAAAAAAAAAA8L8"
+				],
+				[
+					24,
+					1,
+					"insert",
+					{
+						"characters": "handl"
+					},
+					"BQAAAIcDAAAAAAAAiAMAAAAAAAAAAAAAiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAIoDAAAAAAAAiwMAAAAAAAAAAAAAiwMAAAAAAACMAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					25,
+					1,
+					"insert_completion",
+					{
+						"completion": "handleMessagesPayload",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "handleMessagesPayload"
+					},
+					"AgAAAIcDAAAAAAAAhwMAAAAAAAAFAAAAaGFuZGyHAwAAAAAAAJwDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjAMAAAAAAACMAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					26,
+					21,
+					"left_delete",
+					null,
+					"FQAAAJsDAAAAAAAAmwMAAAAAAAABAAAAZJoDAAAAAAAAmgMAAAAAAAABAAAAYZkDAAAAAAAAmQMAAAAAAAABAAAAb5gDAAAAAAAAmAMAAAAAAAABAAAAbJcDAAAAAAAAlwMAAAAAAAABAAAAeZYDAAAAAAAAlgMAAAAAAAABAAAAYZUDAAAAAAAAlQMAAAAAAAABAAAAUJQDAAAAAAAAlAMAAAAAAAABAAAAc5MDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAZ5EDAAAAAAAAkQMAAAAAAAABAAAAYZADAAAAAAAAkAMAAAAAAAABAAAAc48DAAAAAAAAjwMAAAAAAAABAAAAc44DAAAAAAAAjgMAAAAAAAABAAAAZY0DAAAAAAAAjQMAAAAAAAABAAAATYwDAAAAAAAAjAMAAAAAAAABAAAAZYsDAAAAAAAAiwMAAAAAAAABAAAAbIoDAAAAAAAAigMAAAAAAAABAAAAZIkDAAAAAAAAiQMAAAAAAAABAAAAbogDAAAAAAAAiAMAAAAAAAABAAAAYYcDAAAAAAAAhwMAAAAAAAABAAAAaA",
+					"AQAAAAAAAAABAAAAnAMAAAAAAACcAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					27,
+					1,
+					"insert",
+					{
+						"characters": "get_"
+					},
+					"BAAAAIcDAAAAAAAAiAMAAAAAAAAAAAAAiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAIoDAAAAAAAAiwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					28,
+					4,
+					"left_delete",
+					null,
+					"BAAAAIoDAAAAAAAAigMAAAAAAAABAAAAX4kDAAAAAAAAiQMAAAAAAAABAAAAdIgDAAAAAAAAiAMAAAAAAAABAAAAZYcDAAAAAAAAhwMAAAAAAAABAAAAZw",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					29,
+					1,
+					"insert",
+					{
+						"characters": "set_"
+					},
+					"BAAAAIcDAAAAAAAAiAMAAAAAAAAAAAAAiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAIoDAAAAAAAAiwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					30,
+					1,
+					"insert_completion",
+					{
+						"completion": "set_cookie",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "set_cookie"
+					},
+					"AgAAAIcDAAAAAAAAhwMAAAAAAAAEAAAAc2V0X4cDAAAAAAAAkQMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					31,
+					10,
+					"left_delete",
+					null,
+					"CgAAAJADAAAAAAAAkAMAAAAAAAABAAAAZY8DAAAAAAAAjwMAAAAAAAABAAAAaY4DAAAAAAAAjgMAAAAAAAABAAAAa40DAAAAAAAAjQMAAAAAAAABAAAAb4wDAAAAAAAAjAMAAAAAAAABAAAAb4sDAAAAAAAAiwMAAAAAAAABAAAAY4oDAAAAAAAAigMAAAAAAAABAAAAX4kDAAAAAAAAiQMAAAAAAAABAAAAdIgDAAAAAAAAiAMAAAAAAAABAAAAZYcDAAAAAAAAhwMAAAAAAAABAAAAcw",
+					"AQAAAAAAAAABAAAAkQMAAAAAAACRAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					32,
+					1,
+					"insert",
+					{
+						"characters": "back"
+					},
+					"BAAAAIcDAAAAAAAAiAMAAAAAAAAAAAAAiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAIoDAAAAAAAAiwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					34,
+					1,
+					"insert_completion",
+					{
+						"completion": "backend_url",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "backend_url"
+					},
+					"AgAAAIcDAAAAAAAAhwMAAAAAAAAEAAAAYmFja4cDAAAAAAAAkgMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					35,
+					1,
+					"insert",
+					{
+						"characters": "\t"
+					},
+					"AQAAAJIDAAAAAAAAkwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkgMAAAAAAACSAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					36,
+					12,
+					"left_delete",
+					null,
+					"DAAAAJIDAAAAAAAAkgMAAAAAAAABAAAACZEDAAAAAAAAkQMAAAAAAAABAAAAbJADAAAAAAAAkAMAAAAAAAABAAAAco8DAAAAAAAAjwMAAAAAAAABAAAAdY4DAAAAAAAAjgMAAAAAAAABAAAAX40DAAAAAAAAjQMAAAAAAAABAAAAZIwDAAAAAAAAjAMAAAAAAAABAAAAbosDAAAAAAAAiwMAAAAAAAABAAAAZYoDAAAAAAAAigMAAAAAAAABAAAAa4kDAAAAAAAAiQMAAAAAAAABAAAAY4gDAAAAAAAAiAMAAAAAAAABAAAAYYcDAAAAAAAAhwMAAAAAAAABAAAAYg",
+					"AQAAAAAAAAABAAAAkwMAAAAAAACTAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					39,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AQAAAPwDAAAAAAAA/QMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA/AMAAAAAAAD8AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					40,
+					1,
+					"reindent",
+					null,
+					"AQAAAP0DAAAAAAAA/gMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA/QMAAAAAAAD9AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					41,
+					1,
+					"insert",
+					{
+						"characters": "\t"
+					},
+					"AQAAAP4DAAAAAAAA/wMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA/gMAAAAAAAD+AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					42,
+					1,
+					"left_delete",
+					null,
+					"AQAAAP4DAAAAAAAA/gMAAAAAAAABAAAACQ",
+					"AQAAAAAAAAABAAAA/wMAAAAAAAD/AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					43,
+					1,
+					"insert",
+					{
+						"characters": "To"
+					},
+					"AgAAAP4DAAAAAAAA/wMAAAAAAAAAAAAA/wMAAAAAAAAABAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA/gMAAAAAAAD+AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					44,
+					2,
+					"left_delete",
+					null,
+					"AgAAAP8DAAAAAAAA/wMAAAAAAAABAAAAb/4DAAAAAAAA/gMAAAAAAAABAAAAVA",
+					"AQAAAAAAAAABAAAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					45,
+					1,
+					"insert",
+					{
+						"characters": "make"
+					},
+					"BAAAAP4DAAAAAAAA/wMAAAAAAAAAAAAA/wMAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAEEAAAAAAAAAAAAAAEEAAAAAAAAAgQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA/gMAAAAAAAD+AwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					46,
+					1,
+					"insert_completion",
+					{
+						"completion": "makeToast",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "makeToast"
+					},
+					"AgAAAP4DAAAAAAAA/gMAAAAAAAAEAAAAbWFrZf4DAAAAAAAABwQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAgQAAAAAAAACBAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					47,
+					9,
+					"left_delete",
+					null,
+					"CQAAAAYEAAAAAAAABgQAAAAAAAABAAAAdAUEAAAAAAAABQQAAAAAAAABAAAAcwQEAAAAAAAABAQAAAAAAAABAAAAYQMEAAAAAAAAAwQAAAAAAAABAAAAbwIEAAAAAAAAAgQAAAAAAAABAAAAVAEEAAAAAAAAAQQAAAAAAAABAAAAZQAEAAAAAAAAAAQAAAAAAAABAAAAa/8DAAAAAAAA/wMAAAAAAAABAAAAYf4DAAAAAAAA/gMAAAAAAAABAAAAbQ",
+					"AQAAAAAAAAABAAAABwQAAAAAAAAHBAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					52,
+					1,
+					"insert",
+					{
+						"characters": "sub"
+					},
+					"BAAAAIcDAAAAAAAAiAMAAAAAAAAAAAAA/gMAAAAAAAD+AwAAAAAAAAEAAAAJiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					53,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIkDAAAAAAAAiQMAAAAAAAABAAAAYg",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					54,
+					1,
+					"insert",
+					{
+						"characters": "c"
+					},
+					"AQAAAIkDAAAAAAAAigMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					55,
+					3,
+					"left_delete",
+					null,
+					"AwAAAIkDAAAAAAAAiQMAAAAAAAABAAAAY4gDAAAAAAAAiAMAAAAAAAABAAAAdYcDAAAAAAAAhwMAAAAAAAABAAAAcw",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					56,
+					1,
+					"insert",
+					{
+						"characters": "makeToast"
+					},
+					"CQAAAIcDAAAAAAAAiAMAAAAAAAAAAAAAiAMAAAAAAACJAwAAAAAAAAAAAACJAwAAAAAAAIoDAAAAAAAAAAAAAIoDAAAAAAAAiwMAAAAAAAAAAAAAiwMAAAAAAACMAwAAAAAAAAAAAACMAwAAAAAAAI0DAAAAAAAAAAAAAI0DAAAAAAAAjgMAAAAAAAAAAAAAjgMAAAAAAACPAwAAAAAAAAAAAACPAwAAAAAAAJADAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					57,
+					9,
+					"left_delete",
+					null,
+					"CQAAAI8DAAAAAAAAjwMAAAAAAAABAAAAdI4DAAAAAAAAjgMAAAAAAAABAAAAc40DAAAAAAAAjQMAAAAAAAABAAAAYYwDAAAAAAAAjAMAAAAAAAABAAAAb4sDAAAAAAAAiwMAAAAAAAABAAAAVIoDAAAAAAAAigMAAAAAAAABAAAAZYkDAAAAAAAAiQMAAAAAAAABAAAAa4gDAAAAAAAAiAMAAAAAAAABAAAAYYcDAAAAAAAAhwMAAAAAAAABAAAAbQ",
+					"AQAAAAAAAAABAAAAkAMAAAAAAACQAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					62,
+					1,
+					"insert",
+					{
+						"characters": "\n\n"
+					},
+					"AgAAAIYDAAAAAAAAhwMAAAAAAAAAAAAAhwMAAAAAAACIAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhgMAAAAAAACGAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					63,
+					1,
+					"insert",
+					{
+						"characters": "enableI"
+					},
+					"BwAAAIgDAAAAAAAAiQMAAAAAAAAAAAAAiQMAAAAAAACKAwAAAAAAAAAAAACKAwAAAAAAAIsDAAAAAAAAAAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAI4DAAAAAAAAjwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					64,
+					1,
+					"insert",
+					{
+						"characters": "m"
+					},
+					"AQAAAI8DAAAAAAAAkAMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACPAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					66,
+					1,
+					"left_delete",
+					null,
+					"AQAAAI8DAAAAAAAAjwMAAAAAAAABAAAAbQ",
+					"AQAAAAAAAAABAAAAkAMAAAAAAACQAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					67,
+					1,
+					"insert",
+					{
+						"characters": "mage"
+					},
+					"BAAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAACRAwAAAAAAAJIDAAAAAAAAAAAAAJIDAAAAAAAAkwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACPAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					70,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIgDAAAAAAAAiAMAAAAAAAALAAAAZW5hYmxlSW1hZ2WIAwAAAAAAAJoDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkwMAAAAAAACTAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					73,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIgDAAAAAAAAiAMAAAAAAAASAAAAZW5hYmxlSW1hZ2VPdmVybGF5",
+					"AQAAAAAAAAABAAAAmgMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					74,
+					1,
+					"reindent",
+					null,
+					"AQAAAIgDAAAAAAAAiQMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					75,
+					1,
+					"insert",
+					{
+						"characters": "\t"
+					},
+					"AQAAAIkDAAAAAAAAigMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					76,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIkDAAAAAAAAiQMAAAAAAAABAAAACQ",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					77,
+					1,
+					"insert",
+					{
+						"characters": "enableImage"
+					},
+					"CwAAAIkDAAAAAAAAigMAAAAAAAAAAAAAigMAAAAAAACLAwAAAAAAAAAAAACLAwAAAAAAAIwDAAAAAAAAAAAAAIwDAAAAAAAAjQMAAAAAAAAAAAAAjQMAAAAAAACOAwAAAAAAAAAAAACOAwAAAAAAAI8DAAAAAAAAAAAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAACRAwAAAAAAAJIDAAAAAAAAAAAAAJIDAAAAAAAAkwMAAAAAAAAAAAAAkwMAAAAAAACUAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					79,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIkDAAAAAAAAiQMAAAAAAAALAAAAZW5hYmxlSW1hZ2WJAwAAAAAAAJsDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAlAMAAAAAAACUAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					80,
+					18,
+					"left_delete",
+					null,
+					"EgAAAJoDAAAAAAAAmgMAAAAAAAABAAAAeZkDAAAAAAAAmQMAAAAAAAABAAAAYZgDAAAAAAAAmAMAAAAAAAABAAAAbJcDAAAAAAAAlwMAAAAAAAABAAAAcpYDAAAAAAAAlgMAAAAAAAABAAAAZZUDAAAAAAAAlQMAAAAAAAABAAAAdpQDAAAAAAAAlAMAAAAAAAABAAAAT5MDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAZ5EDAAAAAAAAkQMAAAAAAAABAAAAYZADAAAAAAAAkAMAAAAAAAABAAAAbY8DAAAAAAAAjwMAAAAAAAABAAAASY4DAAAAAAAAjgMAAAAAAAABAAAAZY0DAAAAAAAAjQMAAAAAAAABAAAAbIwDAAAAAAAAjAMAAAAAAAABAAAAYosDAAAAAAAAiwMAAAAAAAABAAAAYYoDAAAAAAAAigMAAAAAAAABAAAAbokDAAAAAAAAiQMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAmwMAAAAAAACbAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					81,
+					1,
+					"insert",
+					{
+						"characters": "a"
+					},
+					"AQAAAIkDAAAAAAAAigMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					82,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIkDAAAAAAAAiQMAAAAAAAABAAAAYQ",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					83,
+					1,
+					"insert",
+					{
+						"characters": "enable"
+					},
+					"BgAAAIkDAAAAAAAAigMAAAAAAAAAAAAAigMAAAAAAACLAwAAAAAAAAAAAACLAwAAAAAAAIwDAAAAAAAAAAAAAIwDAAAAAAAAjQMAAAAAAAAAAAAAjQMAAAAAAACOAwAAAAAAAAAAAACOAwAAAAAAAI8DAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					84,
+					1,
+					"insert",
+					{
+						"characters": "image"
+					},
+					"BQAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAACRAwAAAAAAAJIDAAAAAAAAAAAAAJIDAAAAAAAAkwMAAAAAAAAAAAAAkwMAAAAAAACUAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACPAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					85,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIkDAAAAAAAAiQMAAAAAAAALAAAAZW5hYmxlaW1hZ2WJAwAAAAAAAJsDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAlAMAAAAAAACUAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					86,
+					18,
+					"left_delete",
+					null,
+					"EgAAAJoDAAAAAAAAmgMAAAAAAAABAAAAeZkDAAAAAAAAmQMAAAAAAAABAAAAYZgDAAAAAAAAmAMAAAAAAAABAAAAbJcDAAAAAAAAlwMAAAAAAAABAAAAcpYDAAAAAAAAlgMAAAAAAAABAAAAZZUDAAAAAAAAlQMAAAAAAAABAAAAdpQDAAAAAAAAlAMAAAAAAAABAAAAT5MDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAZ5EDAAAAAAAAkQMAAAAAAAABAAAAYZADAAAAAAAAkAMAAAAAAAABAAAAbY8DAAAAAAAAjwMAAAAAAAABAAAASY4DAAAAAAAAjgMAAAAAAAABAAAAZY0DAAAAAAAAjQMAAAAAAAABAAAAbIwDAAAAAAAAjAMAAAAAAAABAAAAYosDAAAAAAAAiwMAAAAAAAABAAAAYYoDAAAAAAAAigMAAAAAAAABAAAAbokDAAAAAAAAiQMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAmwMAAAAAAACbAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					92,
+					1,
+					"reindent",
+					null,
+					"AQAAAIoDAAAAAAAAiwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					93,
+					1,
+					"insert",
+					{
+						"characters": "enableImage"
+					},
+					"DAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAiAMAAAAAAACIAwAAAAAAAAEAAAAJiwMAAAAAAACMAwAAAAAAAAAAAACMAwAAAAAAAI0DAAAAAAAAAAAAAI0DAAAAAAAAjgMAAAAAAAAAAAAAjgMAAAAAAACPAwAAAAAAAAAAAACPAwAAAAAAAJADAAAAAAAAAAAAAJADAAAAAAAAkQMAAAAAAAAAAAAAkQMAAAAAAACSAwAAAAAAAAAAAACSAwAAAAAAAJMDAAAAAAAAAAAAAJMDAAAAAAAAlAMAAAAAAAAAAAAAlAMAAAAAAACVAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					94,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIoDAAAAAAAAigMAAAAAAAALAAAAZW5hYmxlSW1hZ2WKAwAAAAAAAJwDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAlQMAAAAAAACVAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					95,
+					19,
+					"left_delete",
+					null,
+					"EwAAAJsDAAAAAAAAmwMAAAAAAAABAAAAeZoDAAAAAAAAmgMAAAAAAAABAAAAYZkDAAAAAAAAmQMAAAAAAAABAAAAbJgDAAAAAAAAmAMAAAAAAAABAAAAcpcDAAAAAAAAlwMAAAAAAAABAAAAZZYDAAAAAAAAlgMAAAAAAAABAAAAdpUDAAAAAAAAlQMAAAAAAAABAAAAT5QDAAAAAAAAlAMAAAAAAAABAAAAZZMDAAAAAAAAkwMAAAAAAAABAAAAZ5IDAAAAAAAAkgMAAAAAAAABAAAAYZEDAAAAAAAAkQMAAAAAAAABAAAAbZADAAAAAAAAkAMAAAAAAAABAAAASY8DAAAAAAAAjwMAAAAAAAABAAAAZY4DAAAAAAAAjgMAAAAAAAABAAAAbI0DAAAAAAAAjQMAAAAAAAABAAAAYowDAAAAAAAAjAMAAAAAAAABAAAAYYsDAAAAAAAAiwMAAAAAAAABAAAAbooDAAAAAAAAigMAAAAAAAABAAAAZYkDAAAAAAAAiQMAAAAAAAABAAAACQ",
+					"AQAAAAAAAAABAAAAnAMAAAAAAACcAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					96,
+					1,
+					"insert",
+					{
+						"characters": "enableImage"
+					},
+					"CwAAAIkDAAAAAAAAigMAAAAAAAAAAAAAigMAAAAAAACLAwAAAAAAAAAAAACLAwAAAAAAAIwDAAAAAAAAAAAAAIwDAAAAAAAAjQMAAAAAAAAAAAAAjQMAAAAAAACOAwAAAAAAAAAAAACOAwAAAAAAAI8DAAAAAAAAAAAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAACRAwAAAAAAAJIDAAAAAAAAAAAAAJIDAAAAAAAAkwMAAAAAAAAAAAAAkwMAAAAAAACUAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					97,
+					11,
+					"left_delete",
+					null,
+					"CwAAAJMDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAZ5EDAAAAAAAAkQMAAAAAAAABAAAAYZADAAAAAAAAkAMAAAAAAAABAAAAbY8DAAAAAAAAjwMAAAAAAAABAAAASY4DAAAAAAAAjgMAAAAAAAABAAAAZY0DAAAAAAAAjQMAAAAAAAABAAAAbIwDAAAAAAAAjAMAAAAAAAABAAAAYosDAAAAAAAAiwMAAAAAAAABAAAAYYoDAAAAAAAAigMAAAAAAAABAAAAbokDAAAAAAAAiQMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAlAMAAAAAAACUAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					101,
+					1,
+					"reindent",
+					null,
+					"AQAAAIgDAAAAAAAAiQMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					102,
+					1,
+					"insert",
+					{
+						"characters": "enableIm"
+					},
+					"CAAAAIkDAAAAAAAAigMAAAAAAAAAAAAAigMAAAAAAACLAwAAAAAAAAAAAACLAwAAAAAAAIwDAAAAAAAAAAAAAIwDAAAAAAAAjQMAAAAAAAAAAAAAjQMAAAAAAACOAwAAAAAAAAAAAACOAwAAAAAAAI8DAAAAAAAAAAAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					103,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIkDAAAAAAAAiQMAAAAAAAAIAAAAZW5hYmxlSW2JAwAAAAAAAJsDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkQMAAAAAAACRAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					104,
+					15,
+					"left_delete",
+					null,
+					"DwAAAJoDAAAAAAAAmgMAAAAAAAABAAAAeZkDAAAAAAAAmQMAAAAAAAABAAAAYZgDAAAAAAAAmAMAAAAAAAABAAAAbJcDAAAAAAAAlwMAAAAAAAABAAAAcpYDAAAAAAAAlgMAAAAAAAABAAAAZZUDAAAAAAAAlQMAAAAAAAABAAAAdpQDAAAAAAAAlAMAAAAAAAABAAAAT5MDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAZ5EDAAAAAAAAkQMAAAAAAAABAAAAYZADAAAAAAAAkAMAAAAAAAABAAAAbY8DAAAAAAAAjwMAAAAAAAABAAAASY4DAAAAAAAAjgMAAAAAAAABAAAAZY0DAAAAAAAAjQMAAAAAAAABAAAAbIwDAAAAAAAAjAMAAAAAAAABAAAAYg",
+					"AQAAAAAAAAABAAAAmwMAAAAAAACbAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					105,
+					3,
+					"left_delete",
+					null,
+					"AwAAAIsDAAAAAAAAiwMAAAAAAAABAAAAYYoDAAAAAAAAigMAAAAAAAABAAAAbokDAAAAAAAAiQMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAjAMAAAAAAACMAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					109,
+					1,
+					"reindent",
+					null,
+					"AQAAAIoDAAAAAAAAiwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAigMAAAAAAACKAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					110,
+					1,
+					"insert",
+					{
+						"characters": "\tenableI"
+					},
+					"CQAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAiAMAAAAAAACIAwAAAAAAAAEAAAAJiwMAAAAAAACMAwAAAAAAAAAAAACMAwAAAAAAAI0DAAAAAAAAAAAAAI0DAAAAAAAAjgMAAAAAAAAAAAAAjgMAAAAAAACPAwAAAAAAAAAAAACPAwAAAAAAAJADAAAAAAAAAAAAAJADAAAAAAAAkQMAAAAAAAAAAAAAkQMAAAAAAACSAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					111,
+					1,
+					"insert",
+					{
+						"characters": "mageOverly"
+					},
+					"CgAAAJIDAAAAAAAAkwMAAAAAAAAAAAAAkwMAAAAAAACUAwAAAAAAAAAAAACUAwAAAAAAAJUDAAAAAAAAAAAAAJUDAAAAAAAAlgMAAAAAAAAAAAAAlgMAAAAAAACXAwAAAAAAAAAAAACXAwAAAAAAAJgDAAAAAAAAAAAAAJgDAAAAAAAAmQMAAAAAAAAAAAAAmQMAAAAAAACaAwAAAAAAAAAAAACaAwAAAAAAAJsDAAAAAAAAAAAAAJsDAAAAAAAAnAMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkgMAAAAAAACSAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					112,
+					1,
+					"left_delete",
+					null,
+					"AQAAAJsDAAAAAAAAmwMAAAAAAAABAAAAeQ",
+					"AQAAAAAAAAABAAAAnAMAAAAAAACcAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					113,
+					1,
+					"insert",
+					{
+						"characters": "ay"
+					},
+					"AgAAAJsDAAAAAAAAnAMAAAAAAAAAAAAAnAMAAAAAAACdAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAmwMAAAAAAACbAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					114,
+					1,
+					"insert_snippet",
+					{
+						"contents": "($0)"
+					},
+					"AQAAAJ0DAAAAAAAAnwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAnQMAAAAAAACdAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					116,
+					20,
+					"left_delete",
+					null,
+					"FAAAAJ4DAAAAAAAAngMAAAAAAAABAAAAKZ0DAAAAAAAAnQMAAAAAAAABAAAAKJwDAAAAAAAAnAMAAAAAAAABAAAAeZsDAAAAAAAAmwMAAAAAAAABAAAAYZoDAAAAAAAAmgMAAAAAAAABAAAAbJkDAAAAAAAAmQMAAAAAAAABAAAAcpgDAAAAAAAAmAMAAAAAAAABAAAAZZcDAAAAAAAAlwMAAAAAAAABAAAAdpYDAAAAAAAAlgMAAAAAAAABAAAAT5UDAAAAAAAAlQMAAAAAAAABAAAAZZQDAAAAAAAAlAMAAAAAAAABAAAAZ5MDAAAAAAAAkwMAAAAAAAABAAAAYZIDAAAAAAAAkgMAAAAAAAABAAAAbZEDAAAAAAAAkQMAAAAAAAABAAAASZADAAAAAAAAkAMAAAAAAAABAAAAZY8DAAAAAAAAjwMAAAAAAAABAAAAbI4DAAAAAAAAjgMAAAAAAAABAAAAYo0DAAAAAAAAjQMAAAAAAAABAAAAYYwDAAAAAAAAjAMAAAAAAAABAAAAbosDAAAAAAAAiwMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAnwMAAAAAAACfAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					119,
+					1,
+					"insert",
+					{
+						"characters": "char"
+					},
+					"BAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAI4DAAAAAAAAjwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					120,
+					1,
+					"left_delete",
+					null,
+					"AQAAAI4DAAAAAAAAjgMAAAAAAAABAAAAcg",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACPAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					121,
+					1,
+					"insert",
+					{
+						"characters": "tS"
+					},
+					"AgAAAI4DAAAAAAAAjwMAAAAAAAAAAAAAjwMAAAAAAACQAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjgMAAAAAAACOAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					122,
+					1,
+					"insert_completion",
+					{
+						"completion": "chatSocket",
+						"format": "text",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "chatSocket"
+					},
+					"AgAAAIsDAAAAAAAAiwMAAAAAAAAFAAAAY2hhdFOLAwAAAAAAAJUDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkAMAAAAAAACQAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					123,
+					12,
+					"left_delete",
+					null,
+					"DAAAAJQDAAAAAAAAlAMAAAAAAAABAAAAdJMDAAAAAAAAkwMAAAAAAAABAAAAZZIDAAAAAAAAkgMAAAAAAAABAAAAa5EDAAAAAAAAkQMAAAAAAAABAAAAY5ADAAAAAAAAkAMAAAAAAAABAAAAb48DAAAAAAAAjwMAAAAAAAABAAAAU44DAAAAAAAAjgMAAAAAAAABAAAAdI0DAAAAAAAAjQMAAAAAAAABAAAAYYwDAAAAAAAAjAMAAAAAAAABAAAAaIsDAAAAAAAAiwMAAAAAAAABAAAAY4oDAAAAAAAAigMAAAAAAAABAAAACYkDAAAAAAAAiQMAAAAAAAABAAAACQ",
+					"AQAAAAAAAAABAAAAlQMAAAAAAACVAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					124,
+					1,
+					"insert",
+					{
+						"characters": " \timpo"
+					},
+					"BgAAAIkDAAAAAAAAigMAAAAAAAAAAAAAigMAAAAAAACLAwAAAAAAAAAAAACLAwAAAAAAAIwDAAAAAAAAAAAAAIwDAAAAAAAAjQMAAAAAAAAAAAAAjQMAAAAAAACOAwAAAAAAAAAAAACOAwAAAAAAAI8DAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQMAAAAAAACJAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					125,
+					1,
+					"insert",
+					{
+						"characters": "rt"
+					},
+					"AgAAAI8DAAAAAAAAkAMAAAAAAAAAAAAAkAMAAAAAAACRAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACPAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					126,
+					6,
+					"left_delete",
+					null,
+					"BgAAAJADAAAAAAAAkAMAAAAAAAABAAAAdI8DAAAAAAAAjwMAAAAAAAABAAAAco4DAAAAAAAAjgMAAAAAAAABAAAAb40DAAAAAAAAjQMAAAAAAAABAAAAcIwDAAAAAAAAjAMAAAAAAAABAAAAbYsDAAAAAAAAiwMAAAAAAAABAAAAaQ",
+					"AQAAAAAAAAABAAAAkQMAAAAAAACRAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					127,
+					1,
+					"insert",
+					{
+						"characters": "f"
+					},
+					"AQAAAIsDAAAAAAAAjAMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					128,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIsDAAAAAAAAiwMAAAAAAAABAAAAZg",
+					"AQAAAAAAAAABAAAAjAMAAAAAAACMAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					129,
+					1,
+					"insert",
+					{
+						"characters": "c"
+					},
+					"AQAAAIsDAAAAAAAAjAMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					130,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIsDAAAAAAAAiwMAAAAAAAABAAAAYw",
+					"AQAAAAAAAAABAAAAjAMAAAAAAACMAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					131,
+					1,
+					"insert",
+					{
+						"characters": "enableImage"
+					},
+					"CwAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAI4DAAAAAAAAjwMAAAAAAAAAAAAAjwMAAAAAAACQAwAAAAAAAAAAAACQAwAAAAAAAJEDAAAAAAAAAAAAAJEDAAAAAAAAkgMAAAAAAAAAAAAAkgMAAAAAAACTAwAAAAAAAAAAAACTAwAAAAAAAJQDAAAAAAAAAAAAAJQDAAAAAAAAlQMAAAAAAAAAAAAAlQMAAAAAAACWAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiwMAAAAAAACLAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					136,
+					2,
+					"left_delete",
+					null,
+					"AgAAAIgDAAAAAAAAiAMAAAAAAAAOAAAACiAJZW5hYmxlSW1hZ2WHAwAAAAAAAIcDAAAAAAAAAQAAAAo",
+					"AQAAAAAAAAABAAAAlgMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					141,
+					1,
+					"reindent",
+					null,
+					"AQAAAIcDAAAAAAAAiAMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwMAAAAAAACHAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					142,
+					1,
+					"insert",
+					{
+						"characters": "enableImage"
+					},
+					"CwAAAIgDAAAAAAAAiQMAAAAAAAAAAAAAiQMAAAAAAACKAwAAAAAAAAAAAACKAwAAAAAAAIsDAAAAAAAAAAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAI4DAAAAAAAAjwMAAAAAAAAAAAAAjwMAAAAAAACQAwAAAAAAAAAAAACQAwAAAAAAAJEDAAAAAAAAAAAAAJEDAAAAAAAAkgMAAAAAAAAAAAAAkgMAAAAAAACTAwAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					143,
+					1,
+					"insert_completion",
+					{
+						"completion": "enableImageOverlay",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "enableImageOverlay"
+					},
+					"AgAAAIgDAAAAAAAAiAMAAAAAAAALAAAAZW5hYmxlSW1hZ2WIAwAAAAAAAJoDAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAkwMAAAAAAACTAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					144,
+					18,
+					"left_delete",
+					null,
+					"EgAAAJkDAAAAAAAAmQMAAAAAAAABAAAAeZgDAAAAAAAAmAMAAAAAAAABAAAAYZcDAAAAAAAAlwMAAAAAAAABAAAAbJYDAAAAAAAAlgMAAAAAAAABAAAAcpUDAAAAAAAAlQMAAAAAAAABAAAAZZQDAAAAAAAAlAMAAAAAAAABAAAAdpMDAAAAAAAAkwMAAAAAAAABAAAAT5IDAAAAAAAAkgMAAAAAAAABAAAAZZEDAAAAAAAAkQMAAAAAAAABAAAAZ5ADAAAAAAAAkAMAAAAAAAABAAAAYY8DAAAAAAAAjwMAAAAAAAABAAAAbY4DAAAAAAAAjgMAAAAAAAABAAAASY0DAAAAAAAAjQMAAAAAAAABAAAAZYwDAAAAAAAAjAMAAAAAAAABAAAAbIsDAAAAAAAAiwMAAAAAAAABAAAAYooDAAAAAAAAigMAAAAAAAABAAAAYYkDAAAAAAAAiQMAAAAAAAABAAAAbogDAAAAAAAAiAMAAAAAAAABAAAAZQ",
+					"AQAAAAAAAAABAAAAmgMAAAAAAACaAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					145,
+					1,
+					"insert",
+					{
+						"characters": "display"
+					},
+					"BwAAAIgDAAAAAAAAiQMAAAAAAAAAAAAAiQMAAAAAAACKAwAAAAAAAAAAAACKAwAAAAAAAIsDAAAAAAAAAAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAI4DAAAAAAAAjwMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					151,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIgDAAAAAAAAiAMAAAAAAAAHAAAAZGlzcGxheQ",
+					"AQAAAAAAAAABAAAAjwMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					152,
+					1,
+					"insert",
+					{
+						"characters": "delete"
+					},
+					"BgAAAIgDAAAAAAAAiQMAAAAAAAAAAAAAiQMAAAAAAACKAwAAAAAAAAAAAACKAwAAAAAAAIsDAAAAAAAAAAAAAIsDAAAAAAAAjAMAAAAAAAAAAAAAjAMAAAAAAACNAwAAAAAAAAAAAACNAwAAAAAAAI4DAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiAMAAAAAAACIAwAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					153,
+					7,
+					"left_delete",
+					null,
+					"BwAAAI0DAAAAAAAAjQMAAAAAAAABAAAAZYwDAAAAAAAAjAMAAAAAAAABAAAAdIsDAAAAAAAAiwMAAAAAAAABAAAAZYoDAAAAAAAAigMAAAAAAAABAAAAbIkDAAAAAAAAiQMAAAAAAAABAAAAZYgDAAAAAAAAiAMAAAAAAAABAAAAZIcDAAAAAAAAhwMAAAAAAAABAAAACQ",
+					"AQAAAAAAAAABAAAAjgMAAAAAAACOAwAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"contents": "  \nimport React from 'react';\nimport WebSocketInstance from '../websocket';\nimport{ useState ,useEffect, useRef} from \"react\"\n// import ColumnGroup from 'antd/lib/table/ColumnGroup';\n\nimport { useHistory } from 'react-router-dom'\n\n\nconst Chat = (props) => {\n\n    // To listen to the url changes \n    const history = useHistory() \n    var messagesEndRef = useRef()\n\n    var messageRef = useRef()\n    // The messages page \n\n    // For sending the single message\n\n\n    // For retrieving the messages f\n    var [state, setState] = useState({message:\"\",\n    messages: []});\n\n    const [name, setName] = useState(\"josephzh\")\n    /* Check if a new url is navigated to chatID changed \n     If changed, disconnect socket and move to new chat\n     */\n\n     useEffect(()=>{\n\n        initializeChat();\n     },[])\n    useEffect(() => {\n        // this.state = {message: ''}\n        \n           console.log(\"joseph\")\n           console.log(props.match.params.chatID)\n     \n    \n        // if(props.match.params.chatID!== newProps.match.params.chatID){\n        //     WebSocketInstance.disconnect()\n        // }\n\n\n        scrollToBottom();\n        return () => {\n            \n            WebSocketInstance.disconnect();\n            waitForSocketConnection(() => {\n                WebSocketInstance.fetchMessages(\n                  name,\n                  props.match.params.chatID\n                );\n              });\n              WebSocketInstance.connect(props.match.params.chatID);\n        }\n    },[props.match.params.chatID]);\n\n\n // Working principle\n        // This is so to make sure connection = steady \n        // Before sending things, this works using recursion\n        // so waitForSocketConnection() is continuously called with setTimeout()\n\n    const initializeChat=()=> {\n\n        \n    \n        // A 3 step process added to callbacks \n        // setMessages.bind(this)       we are setting the message\n        // addMessage.bind(this)        add the message \n        // Fetch the user messages\n        waitForSocketConnection(() => {\n            WebSocketInstance.addCallbacks(setMessages.bind(this), addMessage.bind(this))\n            \n            // Need to be changed later \n             //Note props.username need to be hardcoded for now \n          WebSocketInstance.fetchMessages(\n              name,\n              props.match.params.chatID\n          )\n          });\n\n       \n  \n          WebSocketInstance.connect(props.match.params.chatID)\n        //   console.log()\n    }\n    const waitForSocketConnection= (callback=>{\n        const component = this;\n        setTimeout(\n            function () {\n\n                //Check ths state of socket \n            if (WebSocketInstance.state() === 1) {\n                console.log(\"Connection is made\");\n                callback();\n                return;\n            } else {\n                console.log(\"wait for connection...\");\n                waitForSocketConnection(callback);\n            }\n        }, 100);\n    })\n    \n\n    // ComponentWillReceiveProps() \n\n    const addMessage= (message)=> {\n        console.log(\"the value is \",state.messages);\n        setState({messages: [...state.messages, message]})\n\n    }\n    \n    const setMessages=(messages) =>{\n        console.log(\"first value is \"+state.messages);\n        setState({messages:messages.reverse()})\n    \n    }\n\n    const messageChangeHandler = (event) =>  {\n           setState({message:event.target.value})\n    }\n\n    const sendMessageHandler = (e) => {\n        e.preventDefault();\n        const messageObject = {\n            from: \"josephzh\",\n            content: state.message,\n            chatId: props.match.params.chatID\n        };\n        WebSocketInstance.newChatMessage(messageObject);\n        messageRef.current.value = \"\"\n        setState({ message: '' });\n    }\n      \n    \n    const renderTimestamp = timestamp => {\n        let prefix = ''; \n        const timeDiff = Math.round((new Date().getTime() - new Date(timestamp).getTime())/60000);\n        if (timeDiff < 1) { // less than one minute ago\n            prefix = 'just now...';\n        } else if (timeDiff < 60 && timeDiff > 1) { // less than sixty minutes ago\n            prefix = `${timeDiff} minutes ago`;\n        } else if (timeDiff < 24*60 && timeDiff > 60) { // less than 24 hours ago\n            prefix = `${Math.round(timeDiff/60)} hours ago`;\n        } else if (timeDiff < 31*24*60 && timeDiff > 24*60) { // less than 7 days ago\n            prefix = `${Math.round(timeDiff/(60*24))} days ago`;\n        } else {\n            prefix = `${new Date(timestamp)}`;\n        }\n        return prefix\n    }\n    \n\n    const scrollToBottom = () => {\n        messagesEndRef.scrollIntoView({ behavior: \"smooth\" });\n    }\n\n\n    \n    \n    const renderMessages = (messages) => {\n        \n        const currentUser ='admin';\n        return messages.map((message, i, arr) => (\n            <li \n                key={message.id} \n                style={{marginBottom: arr.length - 1 === i ? '300px' : '15px'}}\n                className={message.author === currentUser ? 'sent' : 'replies'}>\n                <img src=\"http://emilcarlsson.se/assets/mikeross.png\" />\n                <p>{message.content}\n                    <br />\n                    <small>\n                        {renderTimestamp(message.timestamp)}\n                    </small>\n                </p>\n            </li>\n        ));\n    }\n\n\n    const messages = state.messages\n    return (\n            \n                    <div    style={{overflow: \"scroll\"}}>\n                  <div className=\"messages\">\n                        <ul id=\"chat-log\">\n                        { \n                            messages && \n                           renderMessages(messages) \n                        }\n                         <div style={{ float:\"left\", clear: \"both\" }}\n                        ref={(el) => { messagesEndRef= el; }}>\n                    </div>\n                        </ul>\n                    </div>\n                    <div className=\"message-input\">\n                        <form onSubmit={sendMessageHandler}>\n                            <div className=\"wrap\">\n                                <input \n                                    onChange={messageChangeHandler}\n                                    // value={message}\n                                    required \n                                    id=\"chat-message-input\" \n                                    type=\"text\" \n                                    ref = {messageRef}\n                                    placeholder=\"Write your message...\" />\n                                <i className=\"fa fa-paperclip attachment\" aria-hidden=\"true\"></i>\n                                <button id=\"chat-message-submit\" className=\"submit\">\n                                    <i className=\"fa fa-paper-plane\" aria-hidden=\"true\"></i>\n                                </button>\n                            </div>\n                        </form>\n                    </div>\n                    </div>\n        );\n    };\n\n  \nexport default Chat;",
+			"file": "src/containers/chat.js",
+			"file_size": 7041,
+			"file_write_time": 132698053619346672,
+			"settings":
+			{
+				"buffer_size": 7041,
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					3,
+					1,
+					"insert",
+					{
+						"characters": "\nsetI,ag"
+					},
+					"CAAAAAIBAAAAAAAAAwEAAAAAAAAAAAAAAwEAAAAAAAAEAQAAAAAAAAAAAAAEAQAAAAAAAAUBAAAAAAAAAAAAAAUBAAAAAAAABgEAAAAAAAAAAAAABgEAAAAAAAAHAQAAAAAAAAAAAAAHAQAAAAAAAAgBAAAAAAAAAAAAAAgBAAAAAAAACQEAAAAAAAAAAAAACQEAAAAAAAAKAQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAgEAAAAAAAACAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					4,
+					3,
+					"left_delete",
+					null,
+					"AwAAAAkBAAAAAAAACQEAAAAAAAABAAAAZwgBAAAAAAAACAEAAAAAAAABAAAAYQcBAAAAAAAABwEAAAAAAAABAAAALA",
+					"AQAAAAAAAAABAAAACgEAAAAAAAAKAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					5,
+					1,
+					"insert",
+					{
+						"characters": "mage"
+					},
+					"BAAAAAcBAAAAAAAACAEAAAAAAAAAAAAACAEAAAAAAAAJAQAAAAAAAAAAAAAJAQAAAAAAAAoBAAAAAAAAAAAAAAoBAAAAAAAACwEAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAABwEAAAAAAAAHAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					6,
+					1,
+					"insert_completion",
+					{
+						"completion": "setImageCropProperties",
+						"format": "snippet",
+						"keep_prefix": false,
+						"must_insert": false,
+						"trigger": "setImageCropProperties"
+					},
+					"AgAAAAMBAAAAAAAAAwEAAAAAAAAIAAAAc2V0SW1hZ2UDAQAAAAAAABkBAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAACwEAAAAAAAALAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					7,
+					23,
+					"left_delete",
+					null,
+					"FwAAABgBAAAAAAAAGAEAAAAAAAABAAAAcxcBAAAAAAAAFwEAAAAAAAABAAAAZRYBAAAAAAAAFgEAAAAAAAABAAAAaRUBAAAAAAAAFQEAAAAAAAABAAAAdBQBAAAAAAAAFAEAAAAAAAABAAAAchMBAAAAAAAAEwEAAAAAAAABAAAAZRIBAAAAAAAAEgEAAAAAAAABAAAAcBEBAAAAAAAAEQEAAAAAAAABAAAAbxABAAAAAAAAEAEAAAAAAAABAAAAcg8BAAAAAAAADwEAAAAAAAABAAAAUA4BAAAAAAAADgEAAAAAAAABAAAAcA0BAAAAAAAADQEAAAAAAAABAAAAbwwBAAAAAAAADAEAAAAAAAABAAAAcgsBAAAAAAAACwEAAAAAAAABAAAAQwoBAAAAAAAACgEAAAAAAAABAAAAZQkBAAAAAAAACQEAAAAAAAABAAAAZwgBAAAAAAAACAEAAAAAAAABAAAAYQcBAAAAAAAABwEAAAAAAAABAAAAbQYBAAAAAAAABgEAAAAAAAABAAAASQUBAAAAAAAABQEAAAAAAAABAAAAdAQBAAAAAAAABAEAAAAAAAABAAAAZQMBAAAAAAAAAwEAAAAAAAABAAAAcwIBAAAAAAAAAgEAAAAAAAABAAAACg",
+					"AQAAAAAAAAABAAAAGQEAAAAAAAAZAQAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"contents": "Package Control Messages\n========================\n\nImportJS\n--------\n\n  Thanks for installing ImportJS! Before you can start using the plugin, you also\n  need to install the `importjs` binary.\n\n     `npm install import-js -g`\n\n  You also might have to configure import-js\n\n     See https://github.com/Galooshi/import-js for more information\n\n  Open the root of your project as a folder (Project -> Add Folder to Project…)\n\n  When you are done with that, it's time to start importing files! Whenever you\n  have undefined variables, open the Command Palette (CTRL+SHIFT+P/CMD+SHIFT+P)\n  and select \"ImportJS: fix all imports\", or \"ImportJS: import word under cursor\".\n\n  It will be helpful to bind `import_js` to easy-to-use bindings, such as:\n\n  ```\n  { \"keys\": [\"super+alt+i\"], \"command\": \"import_js\", \"args\": { \"command\": \"fix\" } },\n  { \"keys\": [\"super+alt+j\"], \"command\": \"import_js\", \"args\": { \"command\": \"word\" } },\n  { \"keys\": [\"super+alt+g\"], \"command\": \"import_js\", \"args\": { \"command\": \"goto\" } },\n  ```",
+			"settings":
+			{
+				"buffer_size": 1011,
+				"line_ending": "Windows",
+				"name": "Package Control Messages",
+				"read_only": true,
+				"scratch": true
+			},
+			"undo_stack":
+			[
+				[
+					1,
+					1,
+					"insert",
+					{
+						"characters": "Package Control Messages\n========================\n\nImportJS\n--------\n\n  Thanks for installing ImportJS! Before you can start using the plugin, you also\n  need to install the `importjs` binary.\n\n     `npm install import-js -g`\n\n  You also might have to configure import-js\n\n     See https://github.com/Galooshi/import-js for more information\n\n  Open the root of your project as a folder (Project -> Add Folder to Project…)\n\n  When you are done with that, it's time to start importing files! Whenever you\n  have undefined variables, open the Command Palette (CTRL+SHIFT+P/CMD+SHIFT+P)\n  and select \"ImportJS: fix all imports\", or \"ImportJS: import word under cursor\".\n\n  It will be helpful to bind `import_js` to easy-to-use bindings, such as:\n\n  ```\n  { \"keys\": [\"super+alt+i\"], \"command\": \"import_js\", \"args\": { \"command\": \"fix\" } },\n  { \"keys\": [\"super+alt+j\"], \"command\": \"import_js\", \"args\": { \"command\": \"word\" } },\n  { \"keys\": [\"super+alt+g\"], \"command\": \"import_js\", \"args\": { \"command\": \"goto\" } },\n  ```"
+					},
+					"LgAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAGAAAAAAAAAAZAAAAAAAAAAAAAAAZAAAAAAAAADEAAAAAAAAAAAAAADEAAAAAAAAAMgAAAAAAAAAAAAAAMgAAAAAAAAAzAAAAAAAAAAAAAAAzAAAAAAAAADsAAAAAAAAAAAAAADsAAAAAAAAAPAAAAAAAAAAAAAAAPAAAAAAAAABEAAAAAAAAAAAAAABEAAAAAAAAAEUAAAAAAAAAAAAAAEUAAAAAAAAARgAAAAAAAAAAAAAARgAAAAAAAACXAAAAAAAAAAAAAACXAAAAAAAAAJgAAAAAAAAAAAAAAJgAAAAAAAAAwAAAAAAAAAAAAAAAwAAAAAAAAADBAAAAAAAAAAAAAADBAAAAAAAAAMIAAAAAAAAAAAAAAMIAAAAAAAAA4QAAAAAAAAAAAAAA4QAAAAAAAADiAAAAAAAAAAAAAADiAAAAAAAAAOMAAAAAAAAAAAAAAOMAAAAAAAAADwEAAAAAAAAAAAAADwEAAAAAAAAQAQAAAAAAAAAAAAAQAQAAAAAAABEBAAAAAAAAAAAAABEBAAAAAAAAVAEAAAAAAAAAAAAAVAEAAAAAAABVAQAAAAAAAAAAAABVAQAAAAAAAFYBAAAAAAAAAAAAAFYBAAAAAAAApQEAAAAAAAAAAAAApQEAAAAAAACmAQAAAAAAAAAAAACmAQAAAAAAAKcBAAAAAAAAAAAAAKcBAAAAAAAA9gEAAAAAAAAAAAAA9gEAAAAAAAD3AQAAAAAAAAAAAAD3AQAAAAAAAEYCAAAAAAAAAAAAAEYCAAAAAAAARwIAAAAAAAAAAAAARwIAAAAAAACZAgAAAAAAAAAAAACZAgAAAAAAAJoCAAAAAAAAAAAAAJoCAAAAAAAAmwIAAAAAAAAAAAAAmwIAAAAAAADlAgAAAAAAAAAAAADlAgAAAAAAAOYCAAAAAAAAAAAAAOYCAAAAAAAA5wIAAAAAAAAAAAAA5wIAAAAAAADsAgAAAAAAAAAAAADsAgAAAAAAAO0CAAAAAAAAAAAAAO0CAAAAAAAAQQMAAAAAAAAAAAAAQQMAAAAAAABCAwAAAAAAAAAAAABCAwAAAAAAAJcDAAAAAAAAAAAAAJcDAAAAAAAAmAMAAAAAAAAAAAAAmAMAAAAAAADtAwAAAAAAAAAAAADtAwAAAAAAAO4DAAAAAAAAAAAAAO4DAAAAAAAA8wMAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"file": "src/Reusable/Utilities/croppingEditor.js",
+			"settings":
+			{
+				"buffer_size": 6961,
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+			]
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"package",
+				"Package Control: List Packages"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/assets",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/Components",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/containers",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/containers/Private_Chat",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/Reusable",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend-react/src/Reusable/Utilities"
+	],
+	"file_history":
+	[
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend/src/App.js",
+		"/C/Users/josep/Desktop/Python_Tutors/python_tutors/frontend/src/Pages/LoginPage.js",
+		"/C/Users/josep/Desktop/Mac Python/frontend/package.json",
+		"/C/Users/josep/Desktop/Mac Python/frontend/src/index.js",
+		"/C/Users/josep/Desktop/Mac Python/frontend/src/App.js",
+		"/C/Users/josep/Desktop/Complete_Tutor_App/tutor-app-frontend/src/Pages/ChatroomPage.js",
+		"/C/Users/josep/Desktop/Complete_Tutor_App/tutor-app-frontend/src/Pages/ChatroomPage.js.orig",
+		"/C/Users/josep/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 50.4
+	},
+	"find_in_files":
+	{
+		"height": 135.2,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"foreach",
+			"map",
+			"foreach",
+			".foreach",
+			"data.m",
+			"clearhigh",
+			"getroomchatmessages",
+			"getroomchat"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/containers/Private_Chat/Private_Chat_fxn.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8725,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6990,
+								6990
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6628.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2448,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										382,
+										401
+									],
+									[
+										535,
+										554
+									],
+									[
+										717,
+										736
+									],
+									[
+										1079,
+										1098
+									],
+									[
+										1316,
+										1335
+									],
+									[
+										1601,
+										1620
+									],
+									[
+										1835,
+										1854
+									],
+									[
+										2075,
+										2094
+									],
+									[
+										2369,
+										2388
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								539,
+								539
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 224.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/containers/Private_Chat/Private_Chat.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11407,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								903,
+								903
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/containers/chat.js",
+					"selected": true,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7041,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								258,
+								258
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1011,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								226,
+								226
+							]
+						],
+						"settings":
+						{
+							"auto_indent": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_width": 2,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 224.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/Reusable/Utilities/croppingEditor.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6961,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								312,
+								312
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6092.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 37.6
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "fff.sublime-project",
+	"replace":
+	{
+		"height": 72.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 278.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

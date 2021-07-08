@@ -1,0 +1,5 @@
+.idea
+.vscode
+.frontend-react/node_modules/
+*.pyc
+venv/

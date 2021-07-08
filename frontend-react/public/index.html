@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link  href="https://cdn.rawgit.com/fengyuanchen/cropper/v2.0.1/dist/cropper.min.css" rel="stylesheet">
+<script src="https://cdn.rawgit.com/fengyuanchen/cropper/v2.0.1/dist/cropper.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+ 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+
+
+    <!-- THe mark down section here  -->
+
+     <!-- Markdown-it -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/11.0.1/markdown-it.min.js" ></script>
+     <link rel="stylesheet"
+     href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+    <link rel="stylesheet" href="./src/assets/style.css"/>
+    <script src="./src/index.js" type="text/babel"></script>
+        <!-- Cropperjs -->
+
+      <link rel="stylesheet" href="../cropperjs/dist/cropper.css"/>
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+  
+  </head>
+  <body>
+       
+    <script  src="../copperjs/dist/cropper.js"></script>
+  
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root" style="width: 90%;"></div>
+
+    <div class="container" id="id_loading_spinner" style="display: none">
+      <div class="d-flex flex-row mx-auto flex-grow-1 justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Body -->
+ 
+    <style type="text/css">
+      .main{
+        min-height: 100vh;
+        height: 100%;
+      }
+    </style>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+
+
+    -->
+
+
+ 
+    <!-- <script> -->
+      
+
+
+      <script type="text/javascript">
+
+var cropper;
+	var imageFile;
+	var base64ImageString;
+	var cropX;
+	var cropX;
+	var cropWidth;
+	var cropHeight;
+        function displayLoadingSpinner(isDisplayed){
+          var spinner = document.getElementById("id_loading_spinner")
+          if(isDisplayed){
+            spinner.style.display = "block"
+          }
+          else{
+            spinner.style.display = "none"
+          }
+        }
+
+//      export function readURL(e) {
+
+// var input = e.target
+
+// // THis means sth is selected
+//     if (input.files && input.files[0]) {
+//         var reader = new FileReader();
+
+//         reader.onload = function (e) {
+//           disableImageOverlay()
+//           var image = e.target.result
+//           var imageField = document.getElementById('id_profile_image_display')
+//             imageField.src = image
+//     cropper = new Cropper(imageField, {
+//       aspectRatio: 1/1,
+//       crop(event) {
+//         // console.log("CROP START")
+//         // console.log("x: " + event.detail.x);
+//         // console.log("y: " + event.detail.y);
+//         // console.log("width: " + event.detail.width);
+//         // console.log("height: " + event.detail.height);
+//         // setImageCropProperties(
+//         // 	image,
+//         // 	event.detail.x,
+//         // 	event.detail.y,
+//         // 	event.detail.width,
+//         // 	event.detail.height
+//         // )
+//       },
+//     });
+//         };
+//         reader.readAsDataURL(input.files[0]);
+//     }
+// };
+
+
+/*
+		Build a <p> for messages using markdown
+		https://github.com/markdown-it/markdown-it
+	*/
+	function validateText(str)
+	{
+		var md = window.markdownit({
+			highlight: function (str, lang) {
+				if (lang && hljs.getLanguage(lang)) {
+					try {
+						return '<pre class="hljs"><code>' +
+							hljs.highlight(lang, str, true).value +
+							'</code></pre>';
+					} catch (__) {}
+				}
+				return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+            },
+            
+            // THis is important 
+            // Allow link to be posted and then add 
+			linkify: true,
+		});
+		var result = md.render(str);
+		return result
+	}
+        
+	
+
+
+      </script>
+      <!-- <script type="module" src = "/frontend-react/src/Reusable/mark_down.js"></script> -->
+  </body>
+</html>
+

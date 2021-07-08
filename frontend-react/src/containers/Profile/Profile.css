@@ -1,0 +1,32 @@
+.userBox{
+    display:block;
+    width: 320px;
+    padding: 10px;
+    border-radius: 25px;
+    border: 5px solid gray;
+    margin: 20px;
+}
+
+.userBox img{
+        max-width:100px;
+        max-height:100px;
+}
+
+.round-box{
+
+    width: 320px;
+    padding: 10px;
+    border-radius: 25px;
+    border: 5px dashed gray;
+    margin: 20px;
+
+}
+.userProfile img{
+    border-radius: 25px;
+    max-width:100px;
+    max-height:100px;
+}
+
+.thick{
+   font-weight: bold;
+}
