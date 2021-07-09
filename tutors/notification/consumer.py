@@ -1,39 +1,53 @@
+
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.core.paginator import Paginator
+from django.core.serializers import serialize
+from channels.db import database_sync_to_async
+from django.contrib.contenttypes.models import ContentType
+
+import json
+from channels.db import database_sync_to_async
+
+from friend.models import FriendRequest, BuddyList
+from notification.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE
+from notification.models import Notification
+from notification.utils import LazyNotificationEncoder
+from private_chat.exceptions import ClientError
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
-    """
-    Passing data to and from header.html. Notifications are displayed as "drop-downs" in the nav bar.
-    There is two major categories of notifications:
-        1. General Notifications
-            1. FriendRequest
-            2. FriendList
-        1. Chat Notifications
-            1. UnreadChatRoomMessages
-    """
+	"""
+	Passing data to and from header.html. Notifications are displayed as "drop-downs" in the nav bar.
+	There is two major categories of notifications:
+		1. General Notifications
+			1. FriendRequest
+			2. FriendList
+		1. Chat Notifications
+			1. UnreadChatRoomMessages
+	"""
 
-    async def connect(self):
-        """
-        Called when the websocket is handshaking as part of initial connection.
-        """
-        print("NotificationConsumer: connect: " + str(self.scope["user"]))
-        await self.accept()
+	async def connect(self):
+		"""
+		Called when the websocket is handshaking as part of initial connection.
+		"""
+		print("NotificationConsumer: connect: " + str(self.scope["user"]))
+		await self.accept()
 
-    async def disconnect(self, code):
-        """
-        Called when the WebSocket closes for any reason.
-        """
-        print("NotificationConsumer: disconnect")
+	async def disconnect(self, code):
+		"""
+		Called when the WebSocket closes for any reason.
+		"""
+		print("NotificationConsumer: disconnect")
 
-    async def receive_json(self, content):
-        """
-        Called when we get a text frame. Channels will JSON-decode the payload
-        for us and pass it as the first argument.
-        """
-        command = content.get("command", None)
-        print("NotificationConsumer: receive_json. Command: " + command)
+	async def receive_json(self, content):
+		"""
+		Called when we get a text frame. Channels will JSON-decode the payload
+		for us and pass it as the first argument.
+		"""
+		command = content.get("command", None)
+		print("NotificationConsumer: receive_json. Command: " + command)
 
-        try:
+		try:
 			if command == "get_general_notifications":
 				payload = await get_general_notifications(self.scope["user"], content.get("page_number", None))
 				if payload == None:
@@ -45,16 +59,16 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 			print("EXCEPTION: receive_json: " + str(e))
 			pass
 
-    async def display_progress_bar(self, shouldDisplay):
-        print("NotificationConsumer: display_progress_bar: " + str(shouldDisplay))
-        await self.send_json(
-            {
-                "progress_bar": shouldDisplay,
-            },
-        )
+	async def display_progress_bar(self, shouldDisplay):
+		print("NotificationConsumer: display_progress_bar: " + str(shouldDisplay))
+		await self.send_json(
+			{
+				"progress_bar": shouldDisplay,
+			},
+		)
 
 
-    async def send_general_notifications_payload(self, notifications, new_page_number):
+	async def send_general_notifications_payload(self, notifications, new_page_number):
 		"""
 		Called by receive_json when ready to send a json array of the notifications
 		"""
@@ -79,7 +93,7 @@ def get_general_notifications(user, page_number):
 	"""
 	if user.is_authenticated:
 		friend_request_ct = ContentType.objects.get_for_model(FriendRequest)
-		friend_list_ct = ContentType.objects.get_for_model(FriendList)
+		friend_list_ct = ContentType.objects.get_for_model(BuddyList)
 		notifications = Notification.objects.filter(target=user, content_type__in=[friend_request_ct, friend_list_ct]).order_by('-timestamp')
 		p = Paginator(notifications, DEFAULT_NOTIFICATION_PAGE_SIZE)
 

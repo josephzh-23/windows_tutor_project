@@ -4,7 +4,18 @@
 //createFriendListElement
 //createFriendRequestElement
 
+import { preloadImage } from "../../Reusable/Async_image_loader"
 
+
+var card
+var span
+var img
+var div2
+var pos_action
+var neg_action
+var notificationContainer
+
+var notificationSocket
     /*
 		Initialize the general notification menu
 		Called when page loads.
@@ -12,12 +23,14 @@
 	export function setupGeneralNotificationsMenu(){
 		var notificationContainer = document.getElementById("id_general_notifications_container")
 
+
 		if(notificationContainer != null){
 			card = createGeneralNotificationCard("id_no_general_notifications")
 
 			var div = document.createElement("div")
 			div.classList.add("d-flex", "flex-row", "align-items-start")
 
+			console.log("No notification");
 			span = document.createElement("span")
 			span.classList.add("align-items-start", "pt-1", "m-auto")
 			span.innerHTML = "You have no notifications."
@@ -153,7 +166,7 @@
 			pos_action.innerHTML = "Accept"
 			pos_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				sendAcceptFriendRequestToSocket(notification['notification_id'])
+				// sendAcceptFriendRequestToSocket(notification['notification_id'])
 			})
 			pos_action.id = assignGeneralPosActionId(notification)
 			div2.appendChild(pos_action)
@@ -164,7 +177,7 @@
 			neg_action.innerHTML = "Decline"
 			neg_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				sendDeclineFriendRequestToSocket(notification['notification_id'])
+				// sendDeclineFriendRequestToSocket(notification['notification_id'])
 			})
 			neg_action.id = assignGeneralNegActionId(notification)
 			div2.appendChild(neg_action)
@@ -202,7 +215,7 @@
 	*/
 	export function handleGeneralNotificationsData(notifications, new_page_number){
 		if(notifications.length > 0){
-			clearNoGeneralNotificationsCard()
+			// clearNoGeneralNotificationsCard()
 			notifications.forEach(notification => {
 
 				appendBottomGeneralNotification(notification)
@@ -240,19 +253,9 @@
 
 
 
-	/*
-	This will always fire first. 
-		Retrieve the first page of notifications.
-		Called when page loads.
-	*/
-	export function getFirstGeneralNotificationsPage(){
-		if("{{request.user.is_authenticated}}"){
-			notificationSocket.send(JSON.stringify({
-				"command": "get_general_notifications",
-				"page_number": "1",
-			}));
-		}
-	}
+	
+
+
 
 
 	function generalRedirect(url){

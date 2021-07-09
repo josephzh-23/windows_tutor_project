@@ -11,20 +11,17 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
+from notification.consumer import NotificationConsumer
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tutors.settings')
 
-# application = ProtocolTypeRouter({
-#     "http": get_asgi_application(),
-#    "websocket": QueryAuthMiddleware(
-#        URLRouter([
-#          path("public_chat/<room_id>/", PublicChatConsumer.as_asgi()),
-#        ]))
-# })
+
 
 application = ProtocolTypeRouter({
 	'websocket': QueryAuthMiddleware(
 		AuthMiddlewareStack(
 		 URLRouter([
+
+			 path('', NotificationConsumer.as_asgi()),
             #    re_path(r'public_chat/(?P<room_name>\w+)/$', PublicChatConsumer.as_asgi()),
              path("public_chat/<room_id>/", PublicChatConsumer.as_asgi()),
 

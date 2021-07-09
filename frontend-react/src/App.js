@@ -25,7 +25,7 @@ import { UserContext, UserContextProvider } from './Reusable/UserContext';
 import { FriendRequests } from './containers/FriendRequests.js';
 import { getCookie } from './Reusable/Utilities/Util';
 import Home from './containers/Public_chat/Home.js';
-import Private_Chat from './containers/Private_Chat/Private_Chat';
+import Private_Chat from './containers/Private_chat/Private_chat';
 import Header from './containers/Header/Header';
 
 
@@ -45,7 +45,7 @@ function App() {
   const {authUser} = useContext(UserContext)
 
   console.log(authUser.csrfToken);
-  const top_section = ()=>{
+  const Top_section = ()=>{
     
     return(    
  
@@ -97,15 +97,15 @@ function App() {
   return (
     <div >
   
-  <div>
-      <top_section/>
-      </div>
 
       <div>
       <Header/>
       </div>
     <BrowserRouter>
- 
+    <div>
+      <Top_section/>
+      </div>
+
       <div>
             
 

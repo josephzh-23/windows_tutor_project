@@ -34,7 +34,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
-   
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,11 +49,10 @@ INSTALLED_APPS = [
     'tutor',
     'listings', 
     'contacts',
+    'notification',
     'friend',
     'public_chat',
-    'private_chat',
-
-     'channels',
+    'private_chat'
 ]
 
 MIDDLEWARE = [
