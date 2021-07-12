@@ -65,7 +65,7 @@ def sendFriendRequest(request, *args, **kwargs):
                 # find if any of them are active (pending)
 				try:
 					for request in buddyRequests:
-						if request.isActive:
+						if request.is_active:
 							raise Exception("A studying buddy request has already been sent here ")
 					
                     
@@ -175,7 +175,7 @@ def cancel_friend_request(request):
 		if user_id:
 			receiver = Account.objects.get(pk=user_id)
 			try:
-				friend_requests = FriendRequest.objects.filter(sender=user, receiver=receiver, isActive=True)
+				friend_requests = FriendRequest.objects.filter(sender=user, receiver=receiver, is_active=True)
 			except FriendRequest.DoesNotExist:
 				err = "Nothing to cancel. Friend request does not exist."
 
@@ -283,7 +283,7 @@ def friendRequests(request, *args):
 		# if looking at own profile
 		# You can see the friend requests sent to you
 		if user == account:
-			friendRequestList = FriendRequest.objects.filter(receiver= account, isActive = True)
+			friendRequestList = FriendRequest.objects.filter(receiver= account, is_active = True)
 			
 			# SHow all the senders of the fxn
 			senders =[]

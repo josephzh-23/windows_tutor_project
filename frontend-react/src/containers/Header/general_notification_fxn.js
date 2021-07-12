@@ -7,6 +7,9 @@
 import { preloadImage } from "../../Reusable/Async_image_loader"
 
 
+// If no notification, need to call clearNoGeneralNotificationCard()
+
+var updatedDiv
 var card
 var span
 var img
@@ -14,8 +17,8 @@ var div2
 var pos_action
 var neg_action
 var notificationContainer
+var divs
 
-var notificationSocket
     /*
 		Initialize the general notification menu
 		Called when page loads.
@@ -30,7 +33,6 @@ var notificationSocket
 			var div = document.createElement("div")
 			div.classList.add("d-flex", "flex-row", "align-items-start")
 
-			console.log("No notification");
 			span = document.createElement("span")
 			span.classList.add("align-items-start", "pt-1", "m-auto")
 			span.innerHTML = "You have no notifications."
@@ -164,9 +166,11 @@ var notificationSocket
 			pos_action.classList.add("btn", "btn-primary", "mr-2")
 			pos_action.href = "#"
 			pos_action.innerHTML = "Accept"
+
+			// Here sending that id 
 			pos_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				// sendAcceptFriendRequestToSocket(notification['notification_id'])
+				window.sendAcceptFriendRequestToSocket(notification['notification_id'])
 			})
 			pos_action.id = assignGeneralPosActionId(notification)
 			div2.appendChild(pos_action)
@@ -177,7 +181,7 @@ var notificationSocket
 			neg_action.innerHTML = "Decline"
 			neg_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				// sendDeclineFriendRequestToSocket(notification['notification_id'])
+				window.sendDeclineFriendRequestToSocket(notification['notification_id'])
 			})
 			neg_action.id = assignGeneralNegActionId(notification)
 			div2.appendChild(neg_action)
@@ -207,6 +211,30 @@ var notificationSocket
 
 
 
+	/*
+		Update a div with new notification data.
+
+
+		Called when the session user accepts/declines a friend request.
+	*/
+	export function updateGeneralNotificationDiv(notification){
+		notificationContainer = document.getElementById("id_general_notifications_container")
+
+		if(notificationContainer != null){
+			divs = notificationContainer.childNodes
+
+
+			// This allows us to find that notification that needs to be udpated 
+			divs.forEach(function(element){
+				if(element.id == ("id_notification_" + notification['notification_id'])){
+					
+					// Replace current div with updated one
+					updatedDiv = createFriendRequestElement(notification)
+					element.replaceWith(updatedDiv)
+				}
+			})
+		}
+	}
 		/*
 		Received a payload from socket containing notifications.
 		Called:
@@ -215,7 +243,7 @@ var notificationSocket
 	*/
 	export function handleGeneralNotificationsData(notifications, new_page_number){
 		if(notifications.length > 0){
-			// clearNoGeneralNotificationsCard()
+			clearNoGeneralNotificationsCard()
 			notifications.forEach(notification => {
 
 				appendBottomGeneralNotification(notification)
@@ -224,6 +252,17 @@ var notificationSocket
 		}
 	}
 
+
+
+	/*
+		Remove the element that says "There are no notifications".
+	*/
+	function clearNoGeneralNotificationsCard(){
+		var element = document.getElementById("id_no_general_notifications")
+		if(element != null && element != "undefined"){
+			document.getElementById("id_general_notifications_container").removeChild(element)
+		}
+	}
 
 	/*
 	- Based on diff type of notification then add the notification

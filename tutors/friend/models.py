@@ -5,7 +5,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from notification.models import Notification
+from notifications.models import Notification
+from notifications.utils import LazyNotificationEncoder
 from private_chat.utils import find_or_create_private_chat
 
 from django.contrib.contenttypes.models import ContentType
@@ -96,7 +97,7 @@ class BuddyList(models.Model):
 
 		#Another notification created for removee
 		# Create notification for removee
-		BuddyList.notifications.create(
+		removee_friend_list.notifications.create(
 			target=removee,
 			from_user=self.user,
 			redirect_url=f"{settings.BASE_URL}/account/{self.user.pk}/",
@@ -113,26 +114,23 @@ class BuddyList(models.Model):
 			content_type=content_type,
 		)
 
-	#Check if this friend is in the friend List of the function 
-	def is_mutual_friend(self, friend):
-		if friend in self.buddies.all():
-			return True
-		return False 
-
 
 	@property
 	def get_cname(self):
 		return "FriendList"
+	#Check if this friend is in the friend List of the function 
+	def is_mutual_friend(self, friend):
+		if friend in self.buddies.all():
+			return True
+		return False
 
 
 class FriendRequest(models.Model):
 	sender 				= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sender")
 	receiver 			= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="receiver")
 
-
-
 	# This is used to check if the request is active or not 
-	isActive			= models.BooleanField(blank=False, null=False, default=True)
+	is_active			= models.BooleanField(blank=False, null=False, default=True)
 
 	timestamp 			= models.DateTimeField(auto_now_add=True)
 	notifications = GenericRelation(Notification)
@@ -179,7 +177,7 @@ class FriendRequest(models.Model):
 					verb=f"{self.receiver.username} accepted your friend request.",
 					content_type=content_type,
 				)
-				self.isActive = False
+				self.is_active = False
 				self.save()
 			return receiver_notification  # we will need this later to update the realtime notifications
 				
@@ -217,7 +215,7 @@ class FriendRequest(models.Model):
 		return receiver_notification
 
 	def cancel(self):
-		self.isActive = False
+		self.is_active = False
 		self.save()
 
 	@property
@@ -231,12 +229,13 @@ class FriendRequest(models.Model):
 #When friend request is sent, so does notification will happen here
 
 @receiver(post_save, sender = FriendRequest)
-
 #Instnace= the friend request here
 def create_notification(sender, instance, created, **kwargs):
 
+
 	if created:
-		instance.notification.create(
+		print("notification created")
+		instance.notifications.create(
 			target = instance.receiver,
 			from_user = instance.sender,
 
@@ -245,7 +244,6 @@ def create_notification(sender, instance, created, **kwargs):
 			content_type=instance,
 
 		)
-
 
 
 

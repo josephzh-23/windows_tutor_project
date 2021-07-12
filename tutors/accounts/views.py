@@ -302,7 +302,7 @@ def account_view(request, *args, **kwargs):
             try: 
                 requests = []
                 friendRequests = FriendRequest.objects.filter(receiver= user,
-                isActive = True).values()
+                is_active = True).values()
                 print(friendRequests)
                 for request in friendRequests:
                     print(request)
@@ -363,7 +363,7 @@ def account_view(request, *args, **kwargs):
         else:
             try:
                 friendRequests = FriendRequests.objects.filter(receiver= user,
-                isActive = True)
+                is_active = True)
             except Exception as e:
                 raise e
 

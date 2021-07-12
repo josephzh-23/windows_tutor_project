@@ -9,9 +9,9 @@ import json
 from channels.db import database_sync_to_async
 
 from friend.models import FriendRequest, BuddyList
-from notification.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE
-from notification.models import Notification
-from notification.utils import LazyNotificationEncoder
+from notifications.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE
+from notifications.models import Notification
+from notifications.utils import LazyNotificationEncoder
 from private_chat.exceptions import ClientError
 
 
@@ -51,10 +51,36 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 			if command == "get_general_notifications":
 				payload = await get_general_notifications(self.scope["user"], content.get("page_number", None))
 				if payload == None:
+					print("currently no data here")
 					pass
 				else:
 					payload = json.loads(payload)
 					await self.send_general_notifications_payload(payload['notifications'], payload['new_page_number'])
+
+			elif command == "accept_friend_request":
+
+				notification_id = content['notification_id']
+
+				payload = await accept_friend_request(self.scope['user'], notification_id)
+				if payload ==None:
+
+					raise ClientError("Something went wrong. Try refreshing the browser.")
+				else:
+					json_payload = json.load(payload)
+					await self.send_updated_friend_request_notification(json_payload['notification'])
+
+			elif command == "decline_friend_request":
+				notification_id = content['notification_id']
+
+
+				# Get notification and decline friend request
+				payload = await decline_friend_request(self.scope['user'], notification_id)
+				if payload == None:
+					raise ClientError("Something went wrong. Try refreshing the browser.")
+				else:
+					payload = json.loads(payload)
+					await self.send_updated_friend_request_notification(payload['notification'])
+
 		except Exception as e:
 			print("EXCEPTION: receive_json: " + str(e))
 			pass
@@ -72,7 +98,8 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 		"""
 		Called by receive_json when ready to send a json array of the notifications
 		"""
-		#print("NotificationConsumer: send_general_notifications_payload")
+		
+		print("NotificationConsumer: send_general_notifications_payload")
 		await self.send_json(
 			{
 				"general_msg_type": GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD,
@@ -81,6 +108,19 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 			},
 		)
 
+	async def send_updated_friend_request_notification(self, notification):
+		"""
+		After a friend request is accepted or declined, send the updated notification to template
+		payload contains 'notification' and 'response':
+		1. payload['notification']
+		2. payload['response']
+		"""
+		await self.send_json(
+			{
+				"general_msg_type": GENERAL_MSG_TYPE_UPDATED_NOTIFICATION,
+				"notification": notification,
+			},
+		)
 
 @database_sync_to_async
 def get_general_notifications(user, page_number):
@@ -91,24 +131,88 @@ def get_general_notifications(user, page_number):
 	1. FriendRequest
 	2. FriendList
 	"""
+	print("user is " ,user.is_authenticated)
 	if user.is_authenticated:
 		friend_request_ct = ContentType.objects.get_for_model(FriendRequest)
 		friend_list_ct = ContentType.objects.get_for_model(BuddyList)
+
 		notifications = Notification.objects.filter(target=user, content_type__in=[friend_request_ct, friend_list_ct]).order_by('-timestamp')
+
+		print("the notif is ", notifications)
 		p = Paginator(notifications, DEFAULT_NOTIFICATION_PAGE_SIZE)
 
+		print(p)
 		payload = {}
 		if len(notifications) > 0:
 			if int(page_number) <= p.num_pages:
 				s = LazyNotificationEncoder()
+				# print(s)
 				serialized_notifications = s.serialize(p.page(page_number).object_list)
 				payload['notifications'] = serialized_notifications
+		
 				new_page_number = int(page_number) + 1
 				payload['new_page_number'] = new_page_number
 		else:
 			return None
 	else:
-		raise ClientError("User must be authenticated to get notifications.")
+
+		raise ClientError(500, "User must be authenticated to get notifications.")
 
 	return json.dumps(payload)
+
+
+@database_sync_to_async
+def accept_friend_request(user, notification_id):
+# Accept a friend request
+	payload = {}
+	if user.is_authenticated:
+		try:
+			notification = Notification.objects.get(pk= notification_id)
+
+			friend_request = notification.content_object
+			if friend_request.receiver == user:
+
+				new_notification= friend_request.accept()
+				s = LazyNotificationEncoder()
+
+				#Serialize a queryset into django object
+				payload['notification'] = s.serialize([new_notification])[0]
+				return json.dumps(payload)
+
+		except Notification.DoesNotExist:
+			raise ClientError(422, "An error occured with that notification. Try refreshing this ")
+		return None
+
+
+@database_sync_to_async
+def decline_friend_request(user, notification_id):
+	"""
+	Decline a friend request
+	"""
+	payload = {}
+	if user.is_authenticated:
+		try:
+			notification = Notification.objects.get(pk=notification_id)
+
+			# Get type of notification
+			friend_request = notification.content_object
+
+			# confirm this is the correct user
+			if friend_request.receiver == user:
+				# accept the request and get the updated notification
+				updated_notification = friend_request.decline()
+
+				# return the notification associated with this FriendRequest
+				s = LazyNotificationEncoder()
+				payload['notification'] = s.serialize([updated_notification])[0]
+				return json.dumps(payload)
+		except Notification.DoesNotExist:
+			raise ClientError("An error occurred with that notification. Try refreshing the browser.")
+	return None
+
+
+
+
+
+
 

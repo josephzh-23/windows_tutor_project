@@ -50,16 +50,9 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 		 // Try configuring the web socket this way
 		public_chat_socket = new WebSocket(ws_path);
 	
-		// Need this line to authenticate the user
-		document.cookie = ""
 
-		// Expire the previous authorization cookie
-		document.cookie = "authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
-		var user_token = sessionStorage.getItem("token")
-		console.log("the user token is ", user_token);
-
-		document.cookie = set_cookie("authorization","private_chat", user_token, 1)
-		
+		setup_cookie_in_socket()
+	
 
 	
 		// Handle incoming messages
@@ -388,6 +381,20 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 		
 
 		$('id_connected_users').innerHTML = count
+	
+	}
+
+	function setup_cookie_in_socket(){
+
+	// Need this line to authenticate the user
+	document.cookie = ""
+
+	// Expire the previous authorization cookie
+	document.cookie = "authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+	var user_token = sessionStorage.getItem("token")
+	console.log("the user token is ", user_token);
+
+	document.cookie = set_cookie("authorization","private_chat", user_token, 1)
 	
 	}
 	

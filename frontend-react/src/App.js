@@ -107,7 +107,6 @@ function App() {
       </div>
 
       <div>
-            
 
             <Switch>
                     <Route path ="/search/" >
@@ -126,7 +125,6 @@ function App() {
                 <Route path="/login" component={LoginPage} exact />
                 <Route path="/account/friendRequests" component={FriendRequests} exact />
                 
-
                 <Route path="/public_chat" component ={Home} exact/>
                 <Route path="/account/friend_list_view" 
                 render= {()=><FriendList user={authUser} />}exact />

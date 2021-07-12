@@ -1,10 +1,13 @@
 import 'bootstrap/dist/js/bootstrap.bundle';
 import React, { useContext, useEffect } from 'react';
+import { set_cookie } from '../../Reusable/Cookie.js';
 import { UserContext } from '../../Reusable/UserContext.js';
 import Form from '../Form.js';
 import { handleGeneralNotificationsData ,setupGeneralNotificationsMenu,
-getFirstGeneralNotificationsPage} from './general_notification_fxn.js';
+getFirstGeneralNotificationsPage,
+updateGeneralNotificationDiv} from './general_notification_fxn.js';
 import './Header.css';
+import { build_promise } from './../../Reusable/Async_await/Promise';
 
 // Id of the notification span: id_general_notifications_container
 // Used to set up the notificatino websocket 
@@ -16,61 +19,6 @@ export const Header =()=> {
 var span1,span2
 
 
-	var setup_notification_socket = function(){
-		// Correctly decide between ws:// and wss://
-		var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-	// var ws_path = ws_scheme + '://' + window.location.host + ":8001/"; // PRODUCTION
-
-
-	var ws_path = ws_scheme + '://' + window.location.host + "/";
-	// console.log("Connecting to " + ws_path);
-
-
-	var ws_path = ws_scheme + '://' + "localhost:8000/"
-	console.log("notification path is ", ws_path);
-	notificationSocket = new WebSocket(ws_path);
-
-	
-	// Handle incoming messages
-	notificationSocket.onmessage = function (message) {
-		console.log("Got notification websocket message.");
-		var data = JSON.parse(message.data);
-
-			/*
-			GENERAL NOTIFICATIONS
-		*/
-		// new 'general' notifications data payload
-		if(data.general_msg_type == 0){
-			handleGeneralNotificationsData(data['notifications'], data['new_page_number'])
-		}
-	}
-
-	notificationSocket.onclose = function (e) {
-		console.error('Notification Socket closed unexpectedly');
-	};
-
-	notificationSocket.onopen = function (e) {
-		console.log("Notification Socket on open: " + e)
-
-		setupGeneralNotificationsMenu()
-		getFirstGeneralNotificationsPage()
-	}
-
-	notificationSocket.onerror = function (e) {
-		console.log('Notification Socket error', e)
-	}
-
-	if (notificationSocket.readyState == WebSocket.OPEN) {
-		console.log("Notification Socket OPEN complete.")
-
-		setupGeneralNotificationsMenu()
-		getFirstGeneralNotificationsPage()
-	}
-	else if (notificationSocket.readyState == WebSocket.CONNECTING) {
-		console.log("Notification Socket connecting..")
-	}
-
-}
 
 
 	/*
@@ -101,7 +49,7 @@ return (
 	<div className="d-flex flex-column flex-lg-row p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
 
 		{/* <!-- MEDIUM+ SCREENS --> */}
-		<div className="d-none d-md-flex flex-row my-auto flex-grow-1 align-items-center">
+		<div className="d-none d-sm-flex flex-row my-auto flex-grow-1 align-items-center">
 			<h5 className="mr-3 font-weight-normal justify-content-start">
 				<a className="p-2 text-dark" href="{% url 'home' %}">Home</a>
 			</h5>
@@ -116,7 +64,7 @@ return (
 					{/* Conditinoal rendering here  */}
 					{(authUser.isAuthenticated) ?
 						<div className="dropdown dropleft show p-2">
-							<div className="d-flex flex-row">
+						<div className="d-flex flex-row">
 
 								<div className="btn-group dropleft">
 									<div className="d-flex notifications-icon-container rounded-circle align-items-center mr-3" id="id_chat_notification_dropdown_toggle" data-toggle="dropdown">
@@ -160,7 +108,7 @@ return (
 		{/* // <!-- END MEDIUM+ SCREENS --> */}
 
 		{/* // <!-- SMALL SCREENS --> */}
-		<div className="d-flex d-md-none flex-column my-auto align-items-center">
+		<div className="d-flex d-sm-none flex-column my-auto align-items-center">
 			<h5 className="font-weight-normal">
 				<a className="p-2 text-dark" href="{% url 'home' %}">Home</a>
 			</h5>
@@ -204,6 +152,9 @@ function executeQuery() {
 }
 
 
+
+	/*
+
 	/*
 		Add a header to the dropdown so users can visit /chat/
 	*/
@@ -236,6 +187,25 @@ function executeQuery() {
 		window.location.href = url
 	}
 
+ function setup_cookie_in_socket() {
+// Need this line to authenticate the user
+document.cookie = ""
+	
+// Expire the previous authorization cookie
+document.cookie = "authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+var user_token = sessionStorage.getItem("token")
+console.log("the user token is ", user_token);
+
+// private_path is the path of the cookie
+document.cookie = set_cookie("authorization", "", user_token, 1)
+		
+
+	
+	}
+
 };
 
+
+// Exportting fxns and the component here 
+// export {sendAcceptFriendRequestToSocket, sendDeclineFriendRequestToSocket}
 export default Header;

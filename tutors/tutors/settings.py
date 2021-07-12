@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'tutor',
     'listings', 
     'contacts',
-    'notification',
+    'notifications',
     'friend',
     'public_chat',
     'private_chat'
