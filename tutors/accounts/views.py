@@ -209,9 +209,10 @@ def get_redirect_if_exists(request):
             redirect = str(request.GET.get("next"))
     return redirect
 
+
+#The account page returned as per individual user
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
-#The account page returned as per individual user 
 def account_view(request, *args, **kwargs):
 
     # User 	-> 	logged in user

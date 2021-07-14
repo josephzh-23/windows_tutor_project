@@ -1,7 +1,7 @@
 
     // the callback here is to set the image to 
     // what we are interested in 
-	function preloadCallback(src, elementId){
+	export function preloadCallback(src, elementId){
 		var img = document.getElementById(elementId)
 		
 		var replaced_url = src.replace("3000", "8000")

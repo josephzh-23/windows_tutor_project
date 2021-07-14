@@ -94,7 +94,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 
 				elif command == "get_room_chat_messages":
 					await self.display_progress_bar(True)
-					room_id = await get_room_or_error(content['room_id'])
+					# room_id = await get_room_or_error(content['room_id'])
 					payload = await get_room_chat_messages(
 						room_id, content['page_number'])
 					
@@ -158,6 +158,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 		except ClientError as e:
 			await self.handle_client_error(e)
 
+		print("the room is ", room)
 		# Add user to "users" list for room
 		if is_auth:
 			await connect_user(room, self.scope["user"])
@@ -333,6 +334,11 @@ def get_room_or_error(room_id):
 
 	try:
 		room = PublicChatRoom.objects.get(pk=room_id)
+		if room is None and room_id==1:
+			#Forcefully create a id=1 chatroom
+			await create_public_room_chat_message(room, self.scope['user'],
+												  "joseph")
+
 	except PublicChatRoom.DoesNotExist:
 		raise ClientError("ROOM_INVALID", "Invalid room.")
 	return room

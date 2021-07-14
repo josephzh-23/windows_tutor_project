@@ -27,6 +27,7 @@ import { getCookie } from './Reusable/Utilities/Util';
 import Home from './containers/Public_chat/Home.js';
 import Private_Chat from './containers/Private_chat/Private_chat';
 import Header from './containers/Header/Header';
+import ClientErrorModal from './containers/Public_chat/clientErrorModal';
 
 
 
@@ -103,6 +104,7 @@ function App() {
       </div>
     <BrowserRouter>
     <div>
+      <ClientErrorModal/>
       <Top_section/>
       </div>
 

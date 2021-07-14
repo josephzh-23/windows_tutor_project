@@ -44,10 +44,14 @@ const RegisterPage = (props) => {
         }
        })
       .then(res => {
+        if(res.data.error){
+          makeToast("error", res.data.error)
+        }else{
         makeToast("success", res.data.message);
         console.log(res.data);
         console.log(res.data.email);
         sessionStorage.setItem("token", res.data.token)
+        }
       })
       .catch((err) => {
         // console.log(err);
