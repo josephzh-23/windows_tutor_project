@@ -114,7 +114,7 @@ return (
 
 								<div className="btn-group dropleft">
 									<img className="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.profile_image.url}}"
-										alt="codingwithmitch logo" width="40" height="40" />
+									width="40" height="40" />
 									<div className="dropdown-menu" aria-labelledby="id_profile_links">
 										<a className="dropdown-item" href="{% url 'account:view' user_id=request.user.id %}">Account</a>
 										<a className="dropdown-item" href="{% url 'logout' %}">Logout</a>
@@ -148,7 +148,7 @@ return (
 							<div className="d-flex flex-row">
 								<div className="btn-group dropleft">
 									<img className="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-										src="{{request.user.profile_image.url}}" alt="codingwithmitch logo" width="40" height="40" />
+										src="{{request.user.profile_image.url}}" width="40" height="40" />
 									<div className="dropdown-menu" aria-labelledby="id_profile_links">
 										<a className="dropdown-item" href="{% url 'account:view' user_id=request.user.id %}">Account</a>
 									</div>
