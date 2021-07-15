@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from asgiref.sync import sync_to_async
 
 from private_chat.exceptions import ClientError
+from private_chat.models import PrivateChatRoom
 from public_chat.serializer import LazyRoomChatMessageEncoder
 from django.utils import timezone
 from channels.db import database_sync_to_async
@@ -94,7 +95,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 
 				elif command == "get_room_chat_messages":
 					await self.display_progress_bar(True)
-					# room_id = await get_room_or_error(content['room_id'])
+					room_id = await get_room_or_error(content['room_id'],self.scope["user"])
 					payload = await get_room_chat_messages(
 						room_id, content['page_number'])
 					
@@ -151,14 +152,27 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 # 	Called by receive_json when someone sent a join command.
 	async def join_room(self, room_id):
 		
-		print("PublicChatConsumer: join_room")
+		print(f"PublicChatConsumer: join_room ${room_id}")
 		is_auth = is_authenticated(self.scope["user"])
 		try:
-			room = await get_room_or_error(room_id)
+			user = self.scope['user']
+
+			# modified for edge
+			room = await get_room_or_error(room_id, user )
+
+			# If no public room with id 1 is found,
+			# need to then create one for the first time
+
+			if room is None and room_id == 1:
+				print("No public chat room found")
+				# Forcefully create a id=1 chatroom
+				room = await create_public_room_chat_message(room, self.scope['user'],
+													  "joseph")
+
 		except ClientError as e:
 			await self.handle_client_error(e)
 
-		print("the room is ", room)
+		# print("the room is ", room)
 		# Add user to "users" list for room
 		if is_auth:
 			await connect_user(room, self.scope["user"])
@@ -195,7 +209,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 		"""
 		print("PublicChatConsumer: leave_room")
 		is_auth = is_authenticated(self.scope["user"])
-		room = await get_room_or_error(room_id)
+		room = await get_room_or_error(room_id,self.scope["user"] )
 
 		#IF the user is found then
 		# Remove user from "users" list
@@ -239,7 +253,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 				raise ClientError("ROOM_ACCESS_DENIED", "Room access denied")
 
 			print('user is ', self.scope['user'])
-			room = await get_room_or_error(room_id)
+			room = await get_room_or_error(room_id,self.scope["user"])
 			await create_public_room_chat_message(room, self.scope['user'],
 			message)
 			if not is_authenticated(self.scope["user"]):
@@ -249,7 +263,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 
 		#If they are in the room 
 		# Get the room and send to the group about it
-		room = await get_room_or_error(room_id)
+		room = await get_room_or_error(room_id,self.scope["user"])
 
 		await self.channel_layer.group_send(
 			room.group_name,
@@ -328,19 +342,25 @@ def disconnect_user(room, user):
 	return room.disconnect_user(user)
 
 
+#Been modified
 #Get a room for the user here 
 @database_sync_to_async
-def get_room_or_error(room_id):
-
+def get_room_or_error(room_id, user):
+	room =None
 	try:
 		room = PublicChatRoom.objects.get(pk=room_id)
-		if room is None and room_id==1:
-			#Forcefully create a id=1 chatroom
-			await create_public_room_chat_message(room, self.scope['user'],
-												  "joseph")
+	except:
+		print("room not found")
+	if room is None and room_id == 1:
+		print("No public chat room found")
 
-	except PublicChatRoom.DoesNotExist:
-		raise ClientError("ROOM_INVALID", "Invalid room.")
+		# Forcefully create a id=1 chatroom
+		room = PublicChatRoom.objects.create(title= "joseph")
+
+		room.users.add(user)
+
+	# except PublicChatRoom.DoesNotExist:
+	# 	raise ClientError("ROOM_INVALID", "Invalid room.")
 	return room
 class ClientError(Exception):
 	"""

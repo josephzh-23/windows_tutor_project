@@ -1,4 +1,4 @@
-export var $ = function( id ) { return document.getElementById( id ); };
+export const $ = function( id ) { return document.getElementById( id ); };
 
 
 export const getCookie= (name)=> {

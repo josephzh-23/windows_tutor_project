@@ -3,6 +3,8 @@ import React, { useContext, useEffect } from 'react';
 import { set_cookie } from '../../Reusable/Cookie.js';
 import { UserContext } from '../../Reusable/UserContext.js';
 import Form from '../Form.js';
+
+import $ from '../../Reusable/Utilities/Util.js'
 import { handleGeneralNotificationsData ,setupGeneralNotificationsMenu,
 getFirstGeneralNotificationsPage,
 updateGeneralNotificationDiv,
@@ -26,6 +28,7 @@ import { preloadImage } from '../../Reusable/Async_image_loader.js';
 export const Header =()=> {
 
 
+	var $ = function( id ) { return document.getElementById( id ); };
 
 	var notificationSocket
 	const { authUser } = useContext(UserContext)
@@ -253,6 +256,7 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
 			console.log("Got notification websocket message.");
 			var data = JSON.parse(message.data);
 
+			console.log("received socket message is",data);
 			/*
 			GENERAL NOTIFICATIONS
 		*/
@@ -324,7 +328,20 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
 
 
 		if (notificationContainer != null) {
+
+			// Ensure that only 1 card exists 
+			// with innerhtml = "you have no notifications"
+
+			var no_notify_card_exists = true
+			notificationContainer.childNodes.forEach(e=>{
+				if(e.innerHTML == "you have no notifications"){
+					no_notify_card_exists= false
+					console.log("no-notify-card found");
+				}
+			})
+			if(no_notify_card_exists){
 			card = createGeneralNotificationCard("id_no_general_notifications")
+
 
 			var div = document.createElement("div")
 			div.classList.add("d-flex", "flex-row", "align-items-start")
@@ -335,6 +352,8 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
 			div.appendChild(span)
 			card.appendChild(div)
 			notificationContainer.appendChild(card)
+
+			}
 		}
 	}
 
@@ -346,7 +365,9 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
 		if (cardId != "undefined") {
 			card.id = cardId
 		}
-		card.classList.add("d-flex", "flex-column", "align-items-start", "general-card", "p-4")
+		// Modified
+		card.classList.add("d-flex", "flex-column", "align-items-start", "general-card", "p-4"
+		,"joseph-no-notifycard")
 		return card
 	}
 
@@ -498,7 +519,7 @@ function createFriendRequestElement(notification){
 		// Here sending that id 
 		pos_action.addEventListener("click", function(e){
 			e.stopPropagation();
-			window.sendAcceptFriendRequestToSocket(notification['notification_id'])
+			sendAcceptFriendRequestToSocket(notification['notification_id'])
 		})
 		pos_action.id = assignGeneralPosActionId(notification)
 		div2.appendChild(pos_action)
@@ -509,7 +530,7 @@ function createFriendRequestElement(notification){
 		neg_action.innerHTML = "Decline"
 		neg_action.addEventListener("click", function(e){
 			e.stopPropagation();
-			window.sendDeclineFriendRequestToSocket(notification['notification_id'])
+			sendDeclineFriendRequestToSocket(notification['notification_id'])
 		})
 		neg_action.id = assignGeneralNegActionId(notification)
 		div2.appendChild(neg_action)
@@ -557,5 +578,5 @@ function preloadCallback(src, elementId){
 	img.src = replaced_url
 	
 }
-
+export var notificationSocket
 export default Header;

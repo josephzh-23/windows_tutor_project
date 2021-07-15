@@ -51,6 +51,8 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 			if command == "get_general_notifications":
 				payload = await get_general_notifications(self.scope["user"], content.get("page_number", None))
 				if payload == None:
+
+					# Here no sending of the data
 					print("currently no data here")
 					pass
 				else:
@@ -66,7 +68,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
 					raise ClientError("Something went wrong. Try refreshing the browser.")
 				else:
-					json_payload = json.load(payload)
+					json_payload = json.loads(payload)
 					await self.send_updated_friend_request_notification(json_payload['notification'])
 
 			elif command == "decline_friend_request":
@@ -170,6 +172,8 @@ def accept_friend_request(user, notification_id):
 			notification = Notification.objects.get(pk= notification_id)
 
 			friend_request = notification.content_object
+
+			#Make sure this is the correct user
 			if friend_request.receiver == user:
 
 				new_notification= friend_request.accept()

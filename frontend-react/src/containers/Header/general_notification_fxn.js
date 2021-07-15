@@ -1,6 +1,8 @@
 
 // If no notification, need to call clearNoGeneralNotificationCard()
 
+import { notificationSocket } from "./Header"
+
 var updatedDiv
 var card
 var span
@@ -206,7 +208,7 @@ function appendBottomGeneralNotification(notification) {
 			// Here sending that id 
 			pos_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				window.sendAcceptFriendRequestToSocket(notification['notification_id'])
+				sendAcceptFriendRequestToSocket(notification['notification_id'])
 			})
 			pos_action.id = assignGeneralPosActionId(notification)
 			div2.appendChild(pos_action)
@@ -217,7 +219,7 @@ function appendBottomGeneralNotification(notification) {
 			neg_action.innerHTML = "Decline"
 			neg_action.addEventListener("click", function(e){
 				e.stopPropagation();
-				window.sendDeclineFriendRequestToSocket(notification['notification_id'])
+				sendDeclineFriendRequestToSocket(notification['notification_id'])
 			})
 			neg_action.id = assignGeneralNegActionId(notification)
 			div2.appendChild(neg_action)
@@ -296,4 +298,26 @@ function appendBottomGeneralNotification(notification) {
 
 	export function assignGeneralCardId(notification){
 		return "id_notification_" + notification['notification_id']
+	}
+
+	/*
+	Use this function here and notification_socket can be set here
+	When user clicks on accepting a friend request 	
+	Accept a Friend request
+	*/
+	function sendAcceptFriendRequestToSocket(notification_id) {
+		notificationSocket.send(JSON.stringify({
+			"command": "accept_friend_request",
+			"notification_id": notification_id,
+		}));
+	}
+
+		/*
+		Decline a friend request
+	*/
+	function sendDeclineFriendRequestToSocket(notification_id) {
+		notificationSocket.send(JSON.stringify({
+			"command": "decline_friend_request",
+			"notification_id": notification_id,
+		}));
 	}

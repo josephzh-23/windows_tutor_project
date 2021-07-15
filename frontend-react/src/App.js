@@ -84,6 +84,8 @@ function App() {
 
   React.useEffect(()=>{
     console.log("the changed value is ", authUser.isAuthenticated);
+
+    // The id stored when signed in 
     authUser.userId =  sessionStorage.getItem("auth_userId")
   },[authUser])
   
