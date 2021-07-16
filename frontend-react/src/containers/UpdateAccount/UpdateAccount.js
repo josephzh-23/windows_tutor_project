@@ -150,7 +150,7 @@ const UpdateAccount = (params) => {
 		  		</div>
             <div className="image-container" id="id_image_container">
 	  				<img className="border border-dark rounded-circle img-fluid mx-auto profileimage" id="id_profile_image_display"
-                       src={`http://localhost:8000${profile.account.profile_image}`}  alt="codingwithmitch logo"/>
+                       src={`http://localhost:8000${profile.account.profile_image}`} />
 				
                 
                 	<div className="middle" id="id_middle_container">

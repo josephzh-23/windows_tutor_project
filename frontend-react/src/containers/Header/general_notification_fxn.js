@@ -166,9 +166,88 @@ function appendBottomGeneralNotification(notification) {
 		}
 	}
 
+	// 	/*
+	// 	If a newer timestamp comes in 
+	// 	Keep track of the 'general' newest notification in view. 
+	// 	When 'getNewGeneralNotifications' is called, it retrieves all the notifications newer than this date.
+	// */
+	// function setGeneralNewestTimestamp(timestamp){
+	// 	element = document.getElementById("id_general_newest_timestamp")
+	// 	current = element.innerHTML
+	// 	if(Date.parse(timestamp) > Date.parse(current)){
+	// 		element.innerHTML = timestamp
+	// 	}
+	// 	else if(current == ""){
+	// 		element.innerHTML = timestamp
+	// 	}
+	// }
+	 
 
 
 
+// /*
+// If an older time stamp comes in 
+// 		Keep track of the 'general' oldest notification in view. 
+// 		When 'refreshGeneralNotifications' is called, it refreshes all the notifications newer than this date but newer than 'id_general_newest_timestamp.
+// 	*/
+// 	function setGeneralOldestTimestamp(timestamp){
+// 		element = document.getElementById("id_general_oldest_timestamp")
+// 		current = element.innerHTML
+
+// 		// Replace the most current oldest timestamp
+// 		if(Date.parse(timestamp) < Date.parse(current)){
+// 			element.innerHTML = timestamp
+// 		}
+// 	}
+
+
+/*
+// 		Set the inital timestamp value for id_general_oldest_timestamp.
+// 		This timestamp is used to determine what constitutes a "NEW" notification or an "OLD" notification.
+// 	*/
+// 	function setInitialTimestamp(){
+// 		// ('%Y-%m-%d %H:%M:%S.%f')
+// 		var today = new Date();
+// 		var month = today.getMonth()+1
+// 		if(month.toString().length == 1){
+// 			month = "0" + month
+// 		}
+// 		var day = today.getDate()
+// 		if(day.toString().length == 1){
+// 			day = "0" + day
+// 		}
+// 		var hours = today.getHours()
+// 		if(hours.toString().length == 1){
+// 			hours = "0" + hours
+// 		}
+// 		var minutes = today.getMinutes()
+// 		if(minutes.toString().length == 1){
+// 			minutes = "0" + minutes
+// 		}
+// 		var seconds = today.getSeconds()
+// 		if(seconds.toString().length == 1){
+// 			seconds = "0" + seconds
+// 		}
+// 		var ms = "000000"
+// 		var date = today.getFullYear()+'-'+month+'-'+day + " " + hours + ":" + minutes + ":" + seconds + "." + ms
+// 		document.getElementById("id_general_oldest_timestamp").innerHTML = date
+// 	}
+
+
+		/* // Part of the pagination 
+		Retrieve the next page of notifications
+		Called when the user scrolls to the bottom of the popup menu.
+	*/
+	export function getNextGeneralNotificationsPage(){
+		var pageNumber = document.getElementById("id_general_page_number").innerHTML
+		// -1 means exhausted or a query is currently in progress
+		if("{{request.user.is_authenticated}}" && pageNumber != "-1"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_general_notifications",
+				"page_number": pageNumber,
+			}));
+		}
+	}
 	function createFriendRequestElement(notification){
 		card = createGeneralNotificationCard()
 	

@@ -93,7 +93,8 @@ class SignupView(APIView):
                     token = Token.objects.get(user=user).key
 
                     #Also show that the message user created successfully
-                    data['token'] = token 
+                    data['token'] = token
+                    data.update({'success':'user successfully created'})
                     user.save()
                     return Response(data)
         else:
@@ -210,9 +211,21 @@ def get_redirect_if_exists(request):
     return redirect
 
 
-#The account page returned as per individual user
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
+#The account page returned as per individual user
+def testing_android(request, *args, **kwargs):
+
+    data = {}
+    data["joseph"] = 0
+    
+    #Make sure this is seialized
+    return JsonResponse(json.dumps(data), safe= False)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+#The account page returned as per individual user 
 def account_view(request, *args, **kwargs):
 
     # User 	-> 	logged in user
@@ -315,7 +328,7 @@ def account_view(request, *args, **kwargs):
         # Need to seriazlie the friends data here before passing back
         friends_serialized= AccountSerializer(friends, many= True)
 
-        print('the request is ', requests)
+        # print('the request is ', requests)
         # Need to add seriazliers here since we now have friends 
         print(friends_serialized.data)
         print('cool')

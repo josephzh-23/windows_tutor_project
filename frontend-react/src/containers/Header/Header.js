@@ -18,16 +18,18 @@ createGeneralProfileImageThumbnail,
 assignGeneralVerbId,
 assignGeneralDiv2Id,
 assignGeneralPosActionId,
-assignGeneralTimestampId} from './general_notification_fxn.js';
+assignGeneralTimestampId,
+getNextGeneralNotificationsPage} from './general_notification_fxn.js';
 import './Header.css';
 import { build_promise } from './../../Reusable/Async_await/Promise';
 import { preloadImage } from '../../Reusable/Async_image_loader.js';
+import ImportScript from '../../Reusable/ImportScript.js';
 
 // Id of the notification span: id_general_notifications_container
 // Used to set up the notificatino websocket 
 export const Header =()=> {
 
-
+	
 	var $ = function( id ) { return document.getElementById( id ); };
 
 	var notificationSocket
@@ -63,10 +65,17 @@ var divs
 	}
 
 
+
+	  
 useEffect(() => {
+	
+
 	setupChatDropdownHeader()
 	console.log(authUser.isAuthenticated);
 	setup_notification_socket()
+	setOnGeneralNotificationScrollListener()
+	
+	// setInitialTimestamp()
 })
 return (
 
@@ -164,9 +173,47 @@ return (
 			</div>
 		</div>
 		{/* <!-- END SMALL SCREENS --> */}
+
+{/* Used for settting the page number  */}
+		<p className="d-none" id="id_general_page_number">1</p>
+
 	</div>
 
+		
 )
+
+/*
+		Called when pagination is exhausted and there is no more notifications.
+	*/
+	function setGeneralPaginationExhausted(){
+		console.log("general pagination exhausted.")
+		setGeneralPageNumber("-1")
+	}
+
+	/*
+		Sets the pagination page number.
+	*/
+	function setGeneralPageNumber(pageNumber){
+		document.getElementById("id_general_page_number").innerHTML = pageNumber
+	}
+
+
+    /*
+		Sets the scroll listener for when user scrolls to bottom of notification menu.
+		It will retrieve the next page of results.
+	*/
+	function setOnGeneralNotificationScrollListener(){
+		var menu = document.getElementById("id_general_notifications_container")
+		if(menu != null ){
+			menu.addEventListener("scroll", function(e){
+
+				if ((menu.scrollTop) >= (menu.scrollHeight - menu.offsetHeight)) {
+					getNextGeneralNotificationsPage()
+				}
+			});
+		}
+		
+	}
 function executeQuery() {
 	var query = ""
 	query = document.getElementById('id_q_small').value;
@@ -266,6 +313,13 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
 			}
 
 
+		// "General" Pagination exhausted. No more results.
+		if(data.general_msg_type == 1){
+			setGeneralPaginationExhausted()
+		}
+
+
+
 			// THis allows you to update the notification based on what's coming in 
 
 			if (data.general_msg_type == 5) {
@@ -314,6 +368,7 @@ document.cookie = set_cookie("authorization", "", user_token, 1)
  				appendBottomGeneralNotification(notification)
 
 			})
+			setGeneralPageNumber(new_page_number)
 		}
 	}
 
@@ -569,6 +624,10 @@ function createFriendRequestElement(notification){
 		timestamp.id = assignGeneralTimestampId(notification)
 		return timestamp
 	}
+
+
+
+
 };
 function preloadCallback(src, elementId){
 	var img = document.getElementById(elementId)
@@ -577,6 +636,7 @@ function preloadCallback(src, elementId){
 // console.log(replaced_url);
 	img.src = replaced_url
 	
+
 }
 export var notificationSocket
 export default Header;

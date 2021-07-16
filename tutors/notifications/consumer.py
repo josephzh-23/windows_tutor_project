@@ -9,7 +9,8 @@ import json
 from channels.db import database_sync_to_async
 
 from friend.models import FriendRequest, BuddyList
-from notifications.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE
+from notifications.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE, \
+	GENERAL_MSG_TYPE_UPDATED_NOTIFICATION, GENERAL_MSG_TYPE_PAGINATION_EXHAUSTED
 from notifications.models import Notification
 from notifications.utils import LazyNotificationEncoder
 from private_chat.exceptions import ClientError
@@ -53,7 +54,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 				if payload == None:
 
 					# Here no sending of the data
-					print("currently no data here")
+					await self.general_pagination_exhausted()
 					pass
 				else:
 					payload = json.loads(payload)
@@ -123,6 +124,18 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 				"notification": notification,
 			},
 		)
+
+	async def general_pagination_exhausted(self):
+		"""
+		Called by receive_json when pagination is exhausted for general notifications
+		"""
+		#print("General Pagination DONE... No more notifications.")
+		await self.send_json(
+			{
+				"general_msg_type": GENERAL_MSG_TYPE_PAGINATION_EXHAUSTED,
+			},
+		)
+
 
 @database_sync_to_async
 def get_general_notifications(user, page_number):

@@ -215,7 +215,7 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 		profileImage.classList.add("profile-image")
 		profileImage.classList.add("rounded-circle")
 		profileImage.classList.add("img-fluid")
-		profileImage.src = "{% static 'codingwithmitch/dummy_image.png' %}"
+		profileImage.src = ""
 		var profile_image_id = "id_profile_image_" + msg_id
 		profileImage.id = profile_image_id
 		newMessageDiv.appendChild(profileImage)

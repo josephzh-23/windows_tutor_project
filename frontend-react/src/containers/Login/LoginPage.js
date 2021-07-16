@@ -65,6 +65,7 @@ const LoginPage = (props) => {
         console.log('the user id is then ', res.data.userId);
         sessionStorage.setItem("auth_userId",res.data.userId )
         // history.push("/updateAccount")
+        window.location.reload();
         }
       })
       .catch((err) => {

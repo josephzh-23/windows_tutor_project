@@ -337,6 +337,52 @@ function setPageNumber(pageNumber){
 	}
 
 
+		/*
+		Get the next page of chat messages when scrolls to bottom
+	*/
+	function chatLogScrollListener(e) {
+		var chatLog = document.getElementById("id_chat_log")
+		if ((Math.abs(chatLog.scrollTop) + 2) >= (chatLog.scrollHeight - chatLog.offsetHeight)) {
+			getRoomChatMessages()
+		}
+	}
+	
+	function clearChatLog(){
+		$('id_chat_log').innerHTML = ""
+	}
+	function closeWebSocket(){
+		if(chatSocket != null){
+			chatSocket.close()
+			chatSocket = null
+			clearChatLog()
+			setPageNumber("1")
+	
+			disableChatLogScrollListener()
+		}
+	}
+// When clicking on the new user, disable chat log
+	//scroll listener
+
+	function disableChatLogScrollListener(){
+
+		$("id_chat_log").removeEventListener("scroll", chatLogScrollListener)
+	}
+	function enableChatLogScrollListener(){
+
+		$("id_chat_log").addEventListener("scroll", chatLogScrollListener)
+	}
+	function getRoomChatMessages(){
+		var pageNumber = document.getElementById("id_page_number").innerHTML
+		if(pageNumber != "-1"){
+			setPageNumber("-1") // loading in progress
+			chatSocket.send(JSON.stringify({
+				"command": "get_room_chat_messages",
+				"room_id": roomId,
+				"page_number": pageNumber,
+			}));
+		}}
+	
+
 	function clearHighlightedFriend(){
 
 		console.log("does this exist ", data)

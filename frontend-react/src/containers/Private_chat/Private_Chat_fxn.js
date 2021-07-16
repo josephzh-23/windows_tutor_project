@@ -33,7 +33,7 @@ function $(element) {
 		profileImage.classList.add("img-fluid")
 
 
-		profileImage.src = "{% static 'codingwithmitch/dummy_image.png' %}"
+		profileImage.src = ""
 		var profile_image_id = "id_profile_image_" + msg_id
 		profileImage.id = profile_image_id
 		newMessageDiv.appendChild(profileImage)
@@ -142,7 +142,7 @@ function $(element) {
 		profileImage.classList.add("profile-image", "rounded-circle", "img-fluid")
 		// profileImage.classList.add("rounded-circle")
 		// profileImage.classList.add("img-fluid")
-		profileImage.src = "{% static 'codingwithmitch/dummy_image.png' %}"
+		profileImage.src = ""
 		var profile_image_id = "id_profile_image_" + msg_id
 		profileImage.id = profile_image_id
 		newMessageDiv.appendChild(profileImage)
@@ -159,10 +159,6 @@ function $(element) {
 
 		preloadImage(profile_image, profile_image_id)
  	}
-
-
-
-	 
 
 
 
@@ -212,55 +208,6 @@ function setupChatDropdownHeader() {
 	}
 }
 
-export function closeWebSocket(){
-	if(chatSocket != null){
-		chatSocket.close()
-		chatSocket = null
-		clearChatLog()
-		setPageNumber("1")
-
-		disableChatLogScrollListener()
-	}
-}
-
-
-	/*
-		Get the next page of chat messages when scrolls to bottom
-	*/
-	function chatLogScrollListener(e) {
-		var chatLog = document.getElementById("id_chat_log")
-		if ((Math.abs(chatLog.scrollTop) + 2) >= (chatLog.scrollHeight - chatLog.offsetHeight)) {
-			getRoomChatMessages()
-		}
-	}
-
-	function getRoomChatMessages(){
-	var pageNumber = document.getElementById("id_page_number").innerHTML
-	if(pageNumber != "-1"){
-		setPageNumber("-1") // loading in progress
-		chatSocket.send(JSON.stringify({
-			"command": "get_room_chat_messages",
-			"room_id": roomId,
-			"page_number": pageNumber,
-		}));
-	}}
-
-	export function enableChatLogScrollListener(){
-
-		$("id_chat_log").addEventListener("scroll", chatLogScrollListener)
-	}
-
-	// When clicking on the new user, disable chat log
-	//scroll listener
-
-	function disableChatLogScrollListener(){
-
-		$("id_chat_log").removeEventListener("scroll", chatLogScrollListener)
-	}
-function clearChatLog(){
-	$('id_chat_log').innerHTML = ""
-}
-
 
 function setPageNumber(pageNumber){
 	$("id_page_number").innerHTML = pageNumber
@@ -298,6 +245,10 @@ export function handleMessagesPayload(messages, new_page_number){
 		setPaginationExhausted() // no more messages
 	}
 }
+
+
+
+
 
 // This will retrive the user information
 // And display it on the left 

@@ -14,7 +14,8 @@ from django.shortcuts import redirect, render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 import cv2
-# import requests
+import requests
+
 
 
 #This wil be called using an ajax function 
