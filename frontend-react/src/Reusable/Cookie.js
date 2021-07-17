@@ -31,3 +31,11 @@ export function delete_private_chat_Cookie(cName) {
     "expires=Thu, 01 Jan 1970 00:00:01 GMT"; 
 
 }
+
+export function delete_public_chat_Cookie(cName) { 
+    
+    
+    document.cookie = cName + "=" +"; path=/public_chat;" + 
+    "expires=Thu, 01 Jan 1970 00:00:01 GMT"; 
+
+}

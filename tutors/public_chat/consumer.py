@@ -74,7 +74,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 			"""
 			# Messages will have a "command" key we can switch on
 			command = content.get("command", None)
-			print("PublicChatConsumer: receive_json: " + str(command))
+			# print("PublicChatConsumer: receive_json: " + str(command))
 			
 			try:
 				if command == "send":
@@ -253,6 +253,8 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 				raise ClientError("ROOM_ACCESS_DENIED", "Room access denied")
 
 			print('user is ', self.scope['user'])
+
+			# Here we can't use the scope user 
 			room = await get_room_or_error(room_id,self.scope["user"])
 			await create_public_room_chat_message(room, self.scope['user'],
 			message)
@@ -319,7 +321,7 @@ class PublicChatConsumer(AsyncJsonWebsocketConsumer):
 		2. is_displayed = False
 		- Hide the progress bar on UI
 		"""
-		print("DISPLAY PROGRESS BAR: " + str(is_displayed))
+		# print("DISPLAY PROGRESS BAR: " + str(is_displayed))
 		await self.send_json(
 			{
 				"display_progress_bar": is_displayed

@@ -19,6 +19,8 @@ const Private_Chat = (params) => {
 	const [data, setData] = useState([])
 
 
+	// To use the context we need to deconstuct here 
+	
 	const display_private_page = (userId) => {
 
 		// Make a get request instead

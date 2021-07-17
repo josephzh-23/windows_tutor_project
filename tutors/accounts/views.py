@@ -125,10 +125,13 @@ def login_view(request, *args, **kwargs):
             if user:
                 login(request, user)
                 token = Token.objects.get(user=user).key
+                print(email)
+                username = Account.objects.get(email = email).username
                 userId = user.id
                 # if destionation:
                 # 	return redirect(destination)
-                return Response({'token': token, 'userId': userId})
+                return Response({'token': token, 'userId': userId,
+                                 'username': username})
                 # In case there is a destination
                 # if destination:
                 # 	return redirect(destination)

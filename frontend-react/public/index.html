@@ -41,13 +41,17 @@
 		crossorigin="anonymous"></script>
 	<!-- THe mark down section here  -->
 
+
+
 	<!-- Markdown-it -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/11.0.1/markdown-it.min.js"></script>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css">
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
 
 	<script>hljs.initHighlightingOnLoad();</script>
+	<script src="../copperjs/dist/cropper.js"></script>
 
+	<script src="collections-master/collections.min.js"></script>
 
 	<link rel="stylesheet" href="./src/assets/style.css" />
 	<script src="./src/index.js" type="text/babel"></script>
@@ -124,8 +128,6 @@
 	<!-- <script type="module" src = "/frontend-react/src/Reusable/mark_down.js"></script> -->
 </body>
 
-<script src="../copperjs/dist/cropper.js"></script>
-
 
 // Use it like this
 
@@ -133,6 +135,7 @@
 
 
 
+var generalCachedNotifList = new List([])
 
 	
 	function displayLoadingSpinner(isDisplayed) {

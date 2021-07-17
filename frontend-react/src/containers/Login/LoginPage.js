@@ -59,13 +59,18 @@ const LoginPage = (props) => {
         setUser({...authUser, isAuthenticated:true})
         setUser({...authUser, userId: res.data.userId})
         
-        console.log('the value is ',authUser.isAuthenticated);
+        setUser({...authUser, username: res.data.username })
+        console.log('the username is ',authUser.username);
         sessionStorage.setItem("token", res.data.token);
-        console.log(sessionStorage.getItem("token"));
-        console.log('the user id is then ', res.data.userId);
+        sessionStorage.setItem("username", res.data.username);
+
         sessionStorage.setItem("auth_userId",res.data.userId )
+
         // history.push("/updateAccount")
-        window.location.reload();
+
+        // setTimeout(()=>{
+        // window.location.reload();
+        // },2000)
         }
       })
       .catch((err) => {

@@ -24,7 +24,7 @@ import UpdateAccount from './containers/UpdateAccount/UpdateAccount.js'
 import { UserContext, UserContextProvider } from './Reusable/UserContext';
 import { FriendRequests } from './containers/FriendRequests.js';
 import { getCookie } from './Reusable/Utilities/Util';
-import Home from './containers/Public_chat/Home.js';
+import Public_Chat from './containers/Public_chat/Public_Chat.js';
 import Private_Chat from './containers/Private_chat/Private_chat';
 import Header from './containers/Header/Header';
 import ClientErrorModal from './containers/Public_chat/clientErrorModal';
@@ -94,6 +94,16 @@ function App() {
 		https://github.com/markdown-it/markdown-it
   */
 
+
+    	//Should change when there is a refresh
+	const display_user= ()=>{
+
+		return(
+		<div className="user-name" style={{color: "green"}}>
+				<p className="mr-5"><b>LOGGED IN USER</b>: {authUser.username}</p>
+				</div>
+		)
+	}
 	
 
   // Switch makes sure only 1 component shown at any time. 
@@ -103,6 +113,8 @@ function App() {
 
       <div>
       <Header/>
+      {display_user()}
+      
       </div>
     <BrowserRouter>
     <div>
@@ -129,7 +141,7 @@ function App() {
                 <Route path="/login" component={LoginPage} exact />
                 <Route path="/account/friendRequests" component={FriendRequests} exact />
                 
-                <Route path="/public_chat" component ={Home} exact/>
+                <Route path="/public_chat" component ={Public_Chat} exact/>
                 <Route path="/account/friend_list_view" 
                 render= {()=><FriendList user={authUser} />}exact />
                 

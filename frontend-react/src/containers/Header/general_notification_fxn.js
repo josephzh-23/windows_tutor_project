@@ -3,6 +3,12 @@
 
 import { notificationSocket } from "./Header"
 
+
+var oldestTimestamp
+var newestTimestamp
+var element
+var current
+
 var updatedDiv
 var card
 var span
@@ -13,6 +19,118 @@ var neg_action
 var notificationContainer
 var divs
 
+
+/* This file is broken into part 1 and 2, 
+part 1 for the basic notifications and part 2 for the real time notifications. 
+*/
+const GENERAL_NOTIFICATION_INTERVAL = 4000
+const GENERAL_NOTIFICATION_TIMEOUT = 5000
+
+// Keep track of what notifications are currently visible to the user.
+
+// Will govern what we have as well 
+// Here we will use the list from the collections library 
+// var generalCachedNotifList = new List([])
+
+ var generalCachedNotifList= window.generalCachedNotifList
+
+
+
+ 	/*
+		Sets the pagination page number.
+	*/
+	function setGeneralPageNumber(pageNumber){
+		document.getElementById("id_general_page_number").innerHTML = pageNumber
+	}
+/*
+		Refresh the notifications that are currently visible
+		called by refreshGeneralnotificationsData
+	*/
+	function refreshGeneralNotifications(){
+		oldestTimestamp = document.getElementById("id_general_oldest_timestamp").innerHTML
+		newestTimestamp = document.getElementById("id_general_newest_timestamp").innerHTML
+		if("{{request.user.is_authenticated}}"){
+			notificationSocket.send(JSON.stringify({
+				"command": "refresh_general_notifications",
+				"oldest_timestamp": oldestTimestamp,
+				"newest_timestamp": newestTimestamp,
+			}));
+		}
+	}
+
+	/*
+		Received a payload from socket containing notifications currently in view.
+		Called every GENERAL_NOTIFICATION_INTERVAL
+	*/
+	function refreshGeneralNotificationsData(notifications){
+		console.log(notifications)
+		if(notifications.length > 0){
+			clearNoGeneralNotificationsCard()
+			notifications.forEach(notification => {
+
+				submitGeneralNotificationToCache(notification)
+
+				setGeneralOldestTimestamp(notification['timestamp'])
+				setGeneralNewestTimestamp(notification['timestamp'])
+			})
+		}
+	}
+
+		/*
+		If a newer timestamp comes in 
+		Keep track of the 'general' newest notification in view. 
+		When 'getNewGeneralNotifications' is called, it retrieves all the notifications newer than this date.
+	*/
+	function setGeneralNewestTimestamp(timestamp){
+		element = document.getElementById("id_general_newest_timestamp")
+		current = element.innerHTML
+		if(Date.parse(timestamp) > Date.parse(current)){
+			element.innerHTML = timestamp
+		}
+		else if(current == ""){
+			element.innerHTML = timestamp
+		}
+	}
+	 
+/*
+	Append to bottom. 
+	Used for
+		1. Page load
+		2. pagination
+		3. Refresh
+	Called by 'handleGeneralNotificationsData' &  'refreshGeneralNotificationsData'
+*/
+function submitGeneralNotificationToCache(notification){
+	var result = generalCachedNotifList.filter(function(n){ 
+		return n['notification_id'] === notification['notification_id']
+	})
+	// This notification does not already exist in the list
+	if(result.length == 0){
+		generalCachedNotifList.push(notification)
+
+		// append to bottom of list
+		appendBottomGeneralNotification(notification)
+	}
+	// This notification already exists in the list
+	else{
+		// find the div and update it.
+		refreshGeneralNotificationsList(notification)
+	}
+}
+
+/*
+		Start the functions that will be executed constantly
+	*/
+	function startGeneralNotificationService(){
+		if("{{request.user.is_authenticated}}" == "True"){
+			setInterval(refreshGeneralNotifications, GENERAL_NOTIFICATION_INTERVAL)
+		}
+	}
+
+	startGeneralNotificationService()
+
+
+	// Below is part 1 of notification before the real time functions 
   /*
 		Build general notification
 	*/
@@ -79,10 +197,6 @@ var divs
 
 
 
-
-	
-
-
 	/*
 		Update a div with new notification data.
 
@@ -112,15 +226,20 @@ var divs
 		Called:
 			1. When page loads
 			2. pagination
+
+			3. THe whole package. 
 	*/
 	export function handleGeneralNotificationsData(notifications, new_page_number){
 		if(notifications.length > 0){
 			clearNoGeneralNotificationsCard()
 			notifications.forEach(notification => {
 
-				appendBottomGeneralNotification(notification)
+				submitGeneralNotificationToCache(notification)
 
+				setGeneralOldestTimestamp(notification['timestamp'])
+				setGeneralNewestTimestamp(notification['timestamp'])
 			})
+			setGeneralPageNumber(new_page_number)
 		}
 	}
 
@@ -166,41 +285,123 @@ function appendBottomGeneralNotification(notification) {
 		}
 	}
 
-	// 	/*
-	// 	If a newer timestamp comes in 
-	// 	Keep track of the 'general' newest notification in view. 
-	// 	When 'getNewGeneralNotifications' is called, it retrieves all the notifications newer than this date.
-	// */
-	// function setGeneralNewestTimestamp(timestamp){
-	// 	element = document.getElementById("id_general_newest_timestamp")
-	// 	current = element.innerHTML
-	// 	if(Date.parse(timestamp) > Date.parse(current)){
-	// 		element.innerHTML = timestamp
-	// 	}
-	// 	else if(current == ""){
-	// 		element.innerHTML = timestamp
-	// 	}
-	// }
-	 
+	
 
 
 
-// /*
-// If an older time stamp comes in 
-// 		Keep track of the 'general' oldest notification in view. 
-// 		When 'refreshGeneralNotifications' is called, it refreshes all the notifications newer than this date but newer than 'id_general_newest_timestamp.
-// 	*/
-// 	function setGeneralOldestTimestamp(timestamp){
-// 		element = document.getElementById("id_general_oldest_timestamp")
-// 		current = element.innerHTML
+/*
+If an older time stamp comes in 
+		Keep track of the 'general' oldest notification in view. 
+		When 'refreshGeneralNotifications' is called, it refreshes all the notifications newer than this date but newer than 'id_general_newest_timestamp.
+	*/
+	function setGeneralOldestTimestamp(timestamp){
+		element = document.getElementById("id_general_oldest_timestamp")
+		current = element.innerHTML
 
-// 		// Replace the most current oldest timestamp
-// 		if(Date.parse(timestamp) < Date.parse(current)){
-// 			element.innerHTML = timestamp
-// 		}
-// 	}
+		// Replace the most current oldest timestamp
+		if(Date.parse(timestamp) < Date.parse(current)){
+			element.innerHTML = timestamp
+		}
+	}
 
 
+
+	/*
+		Search for the notification in the list using it's id. Then update its properties.
+		I do not update the image_url since that makes the notifications "flicker".
+
+		- send sth to the backend 
+		- also handle incoming message as well 
+	*/
+	function refreshGeneralNotificationsList(notification){
+		notificationContainer = document.getElementById("id_general_notifications_container")
+
+		if(notificationContainer != null){
+
+
+			divs = notificationContainer.childNodes
+
+			divs.forEach(function(card){
+				// card
+				if(card.id == ("id_notification_" + notification['notification_id'])){
+					
+					switch(notification['notification_type']) {
+
+						case "FriendRequest":
+							refreshFriendRequestCard(card, notification)
+							break;
+
+						case "FriendList":
+							refreshFriendListCard(card, notification)
+							break;
+
+						default:
+							// code block
+					}
+				}
+			})
+		}
+	}
+
+/*
+		Refresh a FriendRequest card with current data
+	*/
+	function refreshFriendRequestCard(card, notification){
+		card.childNodes.forEach(function(element){
+
+			// DIV1
+			if(element.id == ("id_general_div1_" + notification['notification_id'])){
+				element.childNodes.forEach(function(child){
+					if(child.id == ("id_general_verb_" + notification['notification_id'])){
+						// found verb
+						child.innerHTML = notification['verb']
+					}
+				})
+			}
+				
+			// DIV2
+
+			// Remove the element that's no longer active 
+			if (element.id == ("id_general_div2_" + notification['notification_id'])){
+				if(notification['is_active'] == "True"){
+						// do nothing
+				}
+				else{
+					// remove buttons b/c it has been answered
+					card.removeChild(element)
+				}
+			}
+
+			// TIMESTAMP
+			if (element.id == ("id_timestamp_" + notification['notification_id'])){
+				element.innerHTML = notification['natural_timestamp']
+			}
+		})
+	}
+
+	/*
+		Refresha a FriendList card with current data
+		- we only change the verb here not anything else 
+	*/
+	function refreshFriendListCard(card, notification){
+		card.childNodes.forEach(function(element){
+
+			// DIV1
+			if(element.id == ("id_general_div1_" + notification['notification_id'])){
+				element.childNodes.forEach(function(child){
+					if(child.id == ("id_general_verb_" + notification['notification_id'])){
+						// found verb
+						child.innerHTML = notification['verb']
+					}
+				})
+			}
+
+			// TIMESTAMP
+			if (element.id == ("id_timestamp_" + notification['notification_id'])){
+				element.innerHTML = notification['natural_timestamp']
+			}
+		})
+	}
 /*
 // 		Set the inital timestamp value for id_general_oldest_timestamp.
 // 		This timestamp is used to determine what constitutes a "NEW" notification or an "OLD" notification.

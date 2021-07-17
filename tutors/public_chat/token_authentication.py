@@ -60,17 +60,27 @@ class QueryAuthMiddleware:
 
         # print(scope)
 
-
+        # scope type is actually a <class 'list'>
         #Get the header information
         headers = dict(scope["headers"])
+
+
         # print(headers[b"cookie"])
 
-        print("The header is ", headers)
+        # print("The header is ", headers)
+
+        # print("The header is ", scope["headers"])
+
+
+        print("The auth cookie is ",dict(scope["headers"]).get(b"cookie").decode())
         # print(headers)
         if b"authorization" in headers[b"cookie"]:
             print('still good here')
             cookies = headers[b"cookie"].decode()
-            
+
+
+
+            print("the value is " ,dict(scope["headers"]).get(b"cookie").decode())
             token_key_2= ()
             # Here there will be 2 authentication key-value pairs we want the second one 
             # print(cookies)
@@ -95,6 +105,11 @@ class QueryAuthMiddleware:
             #     print(" The websocket user is ", scope["user"])
             # scope['user'] = await get_user(int(scope["query_string"]))
 
+            #Once we are done with the authorization cookie we need to set it to an empty string value
+            dict(scope["headers"]).update({b"cookie":"  "})
+
+            updated_token = re.search("authorization=(.*)(;)?", cookies).group(1)
+            # print("the updated header is ",updated_token)
         return await self.app(scope, receive, send)
 
 # The following is very useful

@@ -1,5 +1,8 @@
 //async /await / fetch
 
+
+// THis how you use useEffect with async
+useEffect(()=>{
 async function fetchUsers(){
     const res = await fetch('https://jsonplaceholder.typicode.com/users');
 
@@ -7,3 +10,4 @@ async function fetchUsers(){
     console.log(data);
 }
 fetchUsers()
+})

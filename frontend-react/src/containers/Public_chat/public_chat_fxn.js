@@ -4,7 +4,7 @@
 
 import { preloadImage } from "../../Reusable/Async_image_loader.js"
 import auth_user from "../../Reusable/auth_user.js"
-import { set_cookie } from "../../Reusable/Cookie.js";
+import { delete_public_chat_Cookie, getCookie, set_cookie } from "../../Reusable/Cookie.js";
 
 
 	function $(element) {
@@ -28,6 +28,7 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 	export function setupPublicChatWebSocket(user){
 
 		console.log(user);
+
 		// The currently logged in user 
 		authUser.user_id= sessionStorage.getItem("auth_userId")
 		console.log("auth id " +authUser.user_id);
@@ -49,11 +50,8 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 	
 		 // Try configuring the web socket this way
 		public_chat_socket = new WebSocket(ws_path);
-	
 
 		setup_cookie_in_socket()
-	
-
 	
 		// Handle incoming messages
 		public_chat_socket.onmessage = function(message) {
@@ -155,7 +153,8 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 				"message": message,
 				"X-CSRFToken": user.csrfToken,
 				// "token": sessionStorage.getItem("token"),
-				"room_id":room_id
+				"room_id":room_id,
+				"user_id": user_id
 			}));
 			messageInputDom.value = '';
 		};
@@ -390,11 +389,16 @@ import { set_cookie } from "../../Reusable/Cookie.js";
 	document.cookie = ""
 
 	// Expire the previous authorization cookie
-	document.cookie = "authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+	// Need this line to remove existing authorization cookie
+	var cookie_found = getCookie("authorization");
+	if (cookie_found !== undefined) {
+		delete_public_chat_Cookie("authorization")
+		console.log("public cookie deleted");
+	}
 	var user_token = sessionStorage.getItem("token")
 	console.log("the user token is ", user_token);
 
-	document.cookie = set_cookie("authorization","private_chat", user_token, 1)
+	// document.cookie = set_cookie("authorization","public_chat", user_token, 1)
 	
 	}
 	

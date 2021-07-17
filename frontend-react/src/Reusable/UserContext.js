@@ -9,10 +9,12 @@ export const UserContext = createContext()
 export const UserContextProvider = (props) =>{
 
 
-    // Value will be changed when logged in 
+    // This will be passed around 
+    // setUser used as a callback 
     const[authUser, setUser] = useState(
         {
             friendRequests: {},
+            // username: sessionStorage.getItem("username"),
              userId: sessionStorage.getItem("auth_userId"),
              csrfToken: getCookie("csrftoken"),
              isAuthenticated: true})
