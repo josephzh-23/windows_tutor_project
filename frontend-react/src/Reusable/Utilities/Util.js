@@ -1,5 +1,3 @@
-export const $ = function( id ) { return document.getElementById( id ); };
-
 
 export const getCookie= (name)=> {
     var cookieValue = null;

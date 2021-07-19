@@ -31,6 +31,9 @@ import ClientErrorModal from './containers/Public_chat/clientErrorModal';
 
 
 
+
+
+
  // Wrap components with loginStateContext.
  // So user can be shared between all components 
     // value: all state we want to share between components
@@ -83,12 +86,29 @@ function App() {
     )}
 
   React.useEffect(()=>{
+
+    const scriptTag = document.createElement('script');
+
+    
+        scriptTag.src = "../collections-master/collections.min.js";
+        scriptTag.async = true;
+
+       
+        document.body.appendChild(scriptTag);
     console.log("the changed value is ", authUser.isAuthenticated);
 
     // The id stored when signed in 
     authUser.userId =  sessionStorage.getItem("auth_userId")
+
+    
+        
+    return () => {
+      document.body.removeChild(scriptTag);
+  }
   },[authUser])
   
+
+
 /*
 		Build a <p> for messages using markdown
 		https://github.com/markdown-it/markdown-it
@@ -112,7 +132,7 @@ function App() {
   
 
       <div>
-      <Header/>
+      <Header />
       {display_user()}
       
       </div>

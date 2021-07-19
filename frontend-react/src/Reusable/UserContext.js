@@ -17,7 +17,11 @@ export const UserContextProvider = (props) =>{
             // username: sessionStorage.getItem("username"),
              userId: sessionStorage.getItem("auth_userId"),
              csrfToken: getCookie("csrftoken"),
-             isAuthenticated: true})
+            //  isAuthenticated:sessionStorage.getItem("isAuthenticated"),
+            isAuthenticated:true,
+
+            username: sessionStorage.getItem("username")
+            })
 
             
     // Need to wrap around children components 

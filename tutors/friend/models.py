@@ -155,7 +155,6 @@ class FriendRequest(models.Model):
             receiver_notification.redirect_url = f"{settings.BASE_URL}/account/{self.sender.pk}/"
             receiver_notification.verb = f"You accepted {self.sender.username}'s friend request."
 
-            receiver_notification.read = True
             receiver_notification.timestamp = timezone.now()
             receiver_notification.save()
 
@@ -173,8 +172,9 @@ class FriendRequest(models.Model):
                     redirect_url=f"{settings.BASE_URL}/account/{self.receiver.pk}/",
                     verb=f"{self.receiver.username} accepted your friend request.",
                     content_type=content_type,
-					read = False
+
                 )
+                senderFriendList.addFriend(self.receiver)
                 self.is_active = False
                 self.save()
             return receiver_notification  # we will need this later to update the realtime notifications

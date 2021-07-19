@@ -63,6 +63,7 @@ const LoginPage = (props) => {
         console.log('the username is ',authUser.username);
         sessionStorage.setItem("token", res.data.token);
         sessionStorage.setItem("username", res.data.username);
+        sessionStorage.setItem("isAuthenticated", true);
 
         sessionStorage.setItem("auth_userId",res.data.userId )
 

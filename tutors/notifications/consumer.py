@@ -11,7 +11,8 @@ from channels.db import database_sync_to_async
 
 from friend.models import FriendRequest, BuddyList
 from notifications.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE, \
-	GENERAL_MSG_TYPE_UPDATED_NOTIFICATION, GENERAL_MSG_TYPE_PAGINATION_EXHAUSTED
+	GENERAL_MSG_TYPE_UPDATED_NOTIFICATION, GENERAL_MSG_TYPE_PAGINATION_EXHAUSTED, \
+	GENERAL_MSG_TYPE_NOTIFICATIONS_REFRESH_PAYLOAD
 from notifications.models import Notification
 from notifications.utils import LazyNotificationEncoder
 from private_chat.exceptions import ClientError
@@ -51,6 +52,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
 		try:
 			if command == "get_general_notifications":
+				print("username is ", self.scope["user"])
 				payload = await get_general_notifications(self.scope["user"], content.get("page_number", None))
 				if payload == None:
 
@@ -86,6 +88,8 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 					await self.send_updated_friend_request_notification(payload['notification'])
 			elif command == "refresh_general_notifications":
 				payload = await refresh_general_notifications(self.scope["user"], content['oldest_timestamp'],
+															  content['newest_timestamp'])
+				print(self.scope["user"], content['oldest_timestamp'],
 															  content['newest_timestamp'])
 				if payload == None:
 					raise ClientError("Something went wrong. Try refreshing the browser.")
@@ -256,14 +260,22 @@ def refresh_general_notifications(user, oldest_timestamp, newest_timestamp):
 	payload = {}
 	if user.is_authenticated:
 		oldest_ts = oldest_timestamp[0:oldest_timestamp.find("+")] # remove timezone because who cares
+
+		# print("oldest time is ", oldest_ts)
 		oldest_ts = datetime.strptime(oldest_ts, '%Y-%m-%d %H:%M:%S.%f')
+
+
 		newest_ts = newest_timestamp[0:newest_timestamp.find("+")] # remove timezone because who cares
+
+		print("newest time is ", newest_timestamp)
 		newest_ts = datetime.strptime(newest_ts, '%Y-%m-%d %H:%M:%S.%f')
+
 		friend_request_ct = ContentType.objects.get_for_model(FriendRequest)
 		friend_list_ct = ContentType.objects.get_for_model(BuddyList)
 
 		notifications = Notification.objects.filter(target=user, content_type__in=[friend_request_ct, friend_list_ct], timestamp__gte=oldest_ts, timestamp__lte=newest_ts).order_by('-timestamp')
 
+		print(notifications)
 		s = LazyNotificationEncoder()
 		payload['notifications'] = s.serialize(notifications)
 	else:

@@ -6,8 +6,8 @@ import Form from '../Form.js';
 
 import $ from '../../Reusable/Utilities/Util.js'
 import {
-	handleGeneralNotificationsData, setupGeneralNotificationsMenu,
-	getFirstGeneralNotificationsPage,
+
+
 	updateGeneralNotificationDiv,
 	assignGeneralCardId,
 	createFriendListElement,
@@ -20,25 +20,43 @@ import {
 	assignGeneralDiv2Id,
 	assignGeneralPosActionId,
 	assignGeneralTimestampId,
-	getNextGeneralNotificationsPage
+	getNextGeneralNotificationsPage,
+	refreshGeneralNotifications,
+	setInitialTimestamp,
+	setGeneralOldestTimestamp,
+	submitGeneralNotificationToCache,
+	refreshGeneralNotificationsList
 } from './general_notification_fxn.js';
 import './Header.css';
 import { build_promise } from './../../Reusable/Async_await/Promise';
 import { preloadImage } from '../../Reusable/Async_image_loader.js';
 import ImportScript from '../../Reusable/ImportScript.js';
-
+var List = require("collections/list");
 // Id of the notification span: id_general_notifications_container
 // Used to set up the notificatino websocket 
-export const Header = () => {
+export const Header = (props) => {
+	const GENERAL_NOTIFICATION_INTERVAL = 10000
+	const GENERAL_NOTIFICATION_TIMEOUT = 5000
 
 
-	var $ = function (id) { return document.getElementById(id); };
+	// Will govern what we have as well 
+// Here we will use the list from the collections library 
+var generalCachedNotifList = new List ([])
 
-	var notificationSocket
+
+
+
+
+	var $ = function( id ) { return document.getElementById( id ); };
+	var oldestTimestamp
+	var newestTimestamp
+
 	const { authUser } = useContext(UserContext)
 	var card, span, notificationContainer
 	var span1, span2
 
+	var element
+	var current
 	var updatedDiv
 	var card
 	var span
@@ -49,38 +67,67 @@ export const Header = () => {
 	var divs
 
 
+	
 
-	/*
-	This will always fire first. 
-		Retrieve the first page of notifications.
-		Called when page loads.
-	*/
-	function getFirstGeneralNotificationsPage() {
-		// console.log("the notification sent");
-		if ("{{request.user.is_authenticated}}") {
-			notificationSocket.send(JSON.stringify({
-				"command": "get_general_notifications",
-				"page_number": "1",
-			}));
+	var notificationSocket
+
+	function setInitialTimestamp(){
+		// ('%Y-%m-%d %H:%M:%S.%f')
+		var today = new Date();
+		var month = today.getMonth()+1
+		if(month.toString().length == 1){
+			month = "0" + month
 		}
+		var day = today.getDate()
+		if(day.toString().length == 1){
+			day = "0" + day
+		}
+		var hours = today.getHours()
+	
+		if(hours.toString().length == 1){
+			hours = "0" + hours
+		}
+		var minutes = today.getMinutes()
+		console.log('hours is ', minutes)
+		if(minutes.toString().length == 1){
+			minutes = "0" + minutes
+		}
+		var seconds = today.getSeconds()
+		if(seconds.toString().length == 1){
+			seconds = "0" + seconds
+		}
+		var ms = "000000"
+		var date = today.getFullYear()+'-'+month+'-'+day + " " + hours + ":" + minutes + ":" + seconds + "." + ms
+		document.getElementById("id_general_oldest_timestamp").innerHTML = date
+		
+		// document.getElementById("id_general_newest_timestamp").innerHTML = date
+		console.log(document.getElementById("id_general_oldest_timestamp").innerHTML)
 	}
 
-
-
-
 	useEffect(() => {
-
-
-		setupChatDropdownHeader()
-		console.log(authUser.isAuthenticated);
-		setup_notification_socket()
 		setOnGeneralNotificationScrollListener()
+		startGeneralNotificationService()
 
+		setInitialTimestamp()
+		// console.log("notify list is ", this.generalCachedNotifList);
+		setupChatDropdownHeader()	
+		
 
-		// setInitialTimestamp()
-	},[authUser])
+		setup_notification_socket()
 
+		
+			
+	
 
+		console.log("the list is", generalCachedNotifList)
+		
+	
+		console.log("user is logged?", authUser.isAuthenticated);
+	
+	
+	}, [authUser])
+
+	
 
 	return (
 
@@ -89,8 +136,12 @@ export const Header = () => {
 		// <!-- Header -->
 		<div className="d-flex flex-column flex-lg-row p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
 
-	
-	
+
+
+			{/* Used for settting the page number  */}
+			<p className="d-none" id="id_general_page_number">1</p>
+			<p className="d-none" id="id_general_oldest_timestamp"></p>
+			<p className="d-none" id="id_general_newest_timestamp"></p>
 			{/* <!-- MEDIUM+ SCREENS --> */}
 			<div className="d-none d-sm-flex flex-row my-auto flex-grow-1 align-items-center">
 				<h5 className="mr-3 font-weight-normal justify-content-start">
@@ -105,7 +156,7 @@ export const Header = () => {
 
 
 						{/* Conditinoal rendering here  */}
-						{(authUser.isAuthenticated) ?
+						{/* {(authUser.isAuthenticated) ? */}
 							<div className="dropdown dropleft show p-2">
 								<div className="d-flex flex-row">
 
@@ -144,7 +195,7 @@ export const Header = () => {
 								<a className="p-2 text-dark" href="{% url 'login' %}">Login</a>
 								<a className="btn btn-outline-primary" href="{% url 'register' %}">Register</a>
 							</div>
-						}
+						{/* } */}
 					</nav>
 				</div>
 			</div>
@@ -181,10 +232,6 @@ export const Header = () => {
 				</div>
 			</div>
 			{/* <!-- END SMALL SCREENS --> */}
-
-			{/* Used for settting the page number  */}
-			<p className="d-none" id="id_general_page_number">1</p>
-
 		</div>
 
 
@@ -286,12 +333,23 @@ export const Header = () => {
 		console.log("notification path is ", ws_path);
 		notificationSocket = new WebSocket(ws_path);
 
+
+		
+		
 		setup_cookie_in_socket()
 
 
 
 		// Handle incoming messages
 		notificationSocket.onmessage = function (message) {
+
+
+
+			//This need to be declared here 
+			// Otherwise not defined within scope as socket continnue
+			// to be passed around
+			
+			console.log("this is ", window);
 			console.log("Got notification websocket message.");
 			var data = JSON.parse(message.data);
 
@@ -301,7 +359,13 @@ export const Header = () => {
 		*/
 			// new 'general' notifications data payload
 			if (data.general_msg_type == 0) {
-				handleGeneralNotificationsData(data['notifications'], data['new_page_number'])
+
+				
+				// Put in a safe guard here 
+				// if(generalCachedNotifList!==undefined){
+				handleGeneralNotificationsData(data['notifications'], data['new_page_number']
+				)
+				// }
 			}
 
 
@@ -311,7 +375,13 @@ export const Header = () => {
 			}
 
 
-
+			// Refresh [newest_timestamp >= NOTIFICATIONS >= oldest_timestamp]
+			if (data.general_msg_type == 2) {
+				// if(generalCachedNotifList!==undefined){
+				// THis also needs the notificationCacheList 
+				refreshGeneralNotificationsData(data['notifications'])
+				// }
+			}
 			// THis allows you to update the notification based on what's coming in 
 
 			if (data.general_msg_type == 5) {
@@ -345,24 +415,119 @@ export const Header = () => {
 	}
 
 
+		/*
+		Update a div with new notification data.
 
-	/*
+
+		Called when the session user accepts/declines a friend request.
+	*/
+	 function updateGeneralNotificationDiv(notification){
+		notificationContainer = document.getElementById("id_general_notifications_container")
+
+		if(notificationContainer != null){
+			divs = notificationContainer.childNodes
+
+
+			// This allows us to find that notification that needs to be udpated 
+			divs.forEach(function(element){
+				if(element.id == ("id_notification_" + notification['notification_id'])){
+					
+					// Replace current div with updated one
+					updatedDiv = createFriendRequestElement(notification)
+					element.replaceWith(updatedDiv)
+				}
+			})
+		}
+	}
+		/*
 		Received a payload from socket containing notifications.
 		Called:
 			1. When page loads
 			2. pagination
+
+			3. THe whole package. 
 	*/
-	function handleGeneralNotificationsData(notifications, new_page_number) {
-		if (notifications.length > 0) {
+	function handleGeneralNotificationsData(notifications, new_page_number){
+		
+		// THis will find the newest timestamp of each notification coming in
+		// THe newest one will be the newest_time stamp
+	
+		if(notifications.length > 0){
 			clearNoGeneralNotificationsCard()
 			notifications.forEach(notification => {
 
-				appendBottomGeneralNotification(notification)
 
+				console.log("incoming time stamp", notification['timestamp'])
+				submitGeneralNotificationToCache(notification)
+
+				setGeneralOldestTimestamp(notification['timestamp'])
+				setGeneralNewestTimestamp(notification['timestamp'])
 			})
 			setGeneralPageNumber(new_page_number)
 		}
 	}
+
+
+
+		/*
+		If a newer timestamp comes in 
+		Keep track of the 'general' newest notification in view. 
+		When 'getNewGeneralNotifications' is called, it retrieves all the notifications newer than this date.
+	*/
+	 function setGeneralNewestTimestamp(timestamp){
+		element = document.getElementById("id_general_newest_timestamp")
+		current = element.innerHTML
+		if(Date.parse(timestamp) > Date.parse(current)){
+			element.innerHTML = timestamp
+		}
+		else if(current == ""){
+			element.innerHTML = timestamp
+		}
+	}
+	 
+
+	/*
+	Msg -type 2 data 
+	/*
+			Received a payload from socket containing notifications currently in view.
+			Called every GENERAL_NOTIFICATION_INTERVAL
+		*/
+	function refreshGeneralNotificationsData(notifications) {
+		console.log(notifications)
+		if (notifications.length > 0) {
+			clearNoGeneralNotificationsCard()
+			notifications.forEach(notification => {
+
+				submitGeneralNotificationToCache(notification)
+
+				setGeneralOldestTimestamp(notification['timestamp'])
+				setGeneralNewestTimestamp(notification['timestamp'])
+			})
+		}
+	}
+
+	/*
+		Refresh the notifications that are currently visible
+		called by refreshGeneralnotificationsData
+	*/
+	function refreshGeneralNotifications() {
+		oldestTimestamp = document.getElementById("id_general_oldest_timestamp").innerHTML
+		newestTimestamp = document.getElementById("id_general_newest_timestamp").innerHTML
+
+
+		if(authUser.isAuthenticated){
+		notificationSocket.send(JSON.stringify({
+			"command": "refresh_general_notifications",
+			"oldest_timestamp": oldestTimestamp,
+			"newest_timestamp": newestTimestamp,
+		}));
+
+
+		console.log("command sent", oldestTimestamp, newestTimestamp);
+		}
+	}
+
+
 
 
 
@@ -436,6 +601,35 @@ export const Header = () => {
 
 
 
+/*
+	Append to bottom. 
+	Used for
+		1. Page load
+		2. pagination
+		3. Refresh
+	Called by 'handleGeneralNotificationsData' &  'refreshGeneralNotificationsData'
+*/
+function submitGeneralNotificationToCache(notification){
+
+	console.log("the window " , this);
+	// Use this to make sure the notification does not already exist in the list 
+	var result = generalCachedNotifList.filter(function(n){ 
+		return n['notification_id'] === notification['notification_id']
+	})
+	// This notification does not already exist in the list
+	if(result.length == 0){
+		generalCachedNotifList.push(notification)
+
+		// append to bottom of list
+		appendBottomGeneralNotification(notification)
+	}
+	// This notification already exists in the list
+	else{
+		// find the div and update it.
+		refreshGeneralNotificationsList(notification)
+	}
+}
+
 
 	/*
 	Use this function here and notification_socket can be set here
@@ -443,6 +637,7 @@ export const Header = () => {
 	Accept a Friend request
 	*/
 	function sendAcceptFriendRequestToSocket(notification_id) {
+
 		notificationSocket.send(JSON.stringify({
 			"command": "accept_friend_request",
 			"notification_id": notification_id,
@@ -459,18 +654,17 @@ export const Header = () => {
 		}));
 	}
 
-
-	/*
-	This will always fire first. 
-		Retrieve the first page of notifications.
-		Called when page loads.
+	/* // Part of the pagination 
+		Retrieve the next page of notifications
+		Called when the user scrolls to the bottom of the popup menu.
 	*/
-	function getFirstGeneralNotificationsPage() {
-		// console.log("the notification sent");
-		if ("{{request.user.is_authenticated}}") {
+	function getNextGeneralNotificationsPage(){
+		var pageNumber = document.getElementById("id_general_page_number").innerHTML
+		// -1 means exhausted or a query is currently in progress
+		if("{{request.user.is_authenticated}}" && pageNumber != "-1"){
 			notificationSocket.send(JSON.stringify({
 				"command": "get_general_notifications",
-				"page_number": "1",
+				"page_number": pageNumber,
 			}));
 		}
 	}
@@ -619,15 +813,47 @@ Params:
 
 
 
+
+
+
+	function preloadCallback(src, elementId) {
+		var img = document.getElementById(elementId)
+
+		var replaced_url = src.replace("3000", "8000")
+		// console.log(replaced_url);
+		img.src = replaced_url
+
+
+	}
+
+	/*
+		Start the functions that will be executed constantly
+		should only start if there is notifications
+	*/
+	function startGeneralNotificationService() {
+		if (authUser.isAuthenticated === true) {
+			setInterval(refreshGeneralNotifications, GENERAL_NOTIFICATION_INTERVAL)
+		}
+	}
+
+	/*
+	This will always fire first. 
+		Retrieve the first page of notifications.
+		Called when page loads.
+	*/
+	function getFirstGeneralNotificationsPage() {
+		// console.log("the notification sent");
+		if ("{{request.user.is_authenticated}}") {
+			notificationSocket.send(JSON.stringify({
+				"command": "get_general_notifications",
+				"page_number": "1",
+			}));
+		}
+
+
+	}
+
+
 };
-function preloadCallback(src, elementId) {
-	var img = document.getElementById(elementId)
-
-	var replaced_url = src.replace("3000", "8000")
-	// console.log(replaced_url);
-	img.src = replaced_url
-
-
-}
 export var notificationSocket
 export default Header;

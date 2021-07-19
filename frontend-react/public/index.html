@@ -47,11 +47,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/11.0.1/markdown-it.min.js"></script>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css">
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
-
+	<script src="collections/collections.min.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
 	<script src="../copperjs/dist/cropper.js"></script>
 
-	<script src="collections-master/collections.min.js"></script>
+
+	 <!-- A special environment variable in react -->
+	 <script src="collections-master/collections.min.js"></script>
 
 	<link rel="stylesheet" href="./src/assets/style.css" />
 	<script src="./src/index.js" type="text/babel"></script>
@@ -81,9 +83,92 @@
 <body>
 
 
+
 	<noscript>You need to enable JavaScript to run this app.</noscript>
 	<div id="root" style="width: 90%;"></div>
 
+	<!-- <link src="%PUBLIC_URL%/collections-master/collections.min.js" /> -->
+	<script type="text/javascript">
+
+// The following would work
+// var generalCachedNotifList = new List([])
+// 	console.log(generalCachedNotifList);
+//     window.generalCachedNotifList= generalCachedNotifList
+
+			function displayLoadingSpinner(isDisplayed) {
+				var spinner = document.getElementById("id_loading_spinner")
+				if (isDisplayed) {
+					spinner.style.display = "block"
+				}
+				else {
+					spinner.style.display = "none"
+				}
+			}
+		
+			//      export function readURL(e) {
+		
+			// var input = e.target
+		
+			// // THis means sth is selected
+			//     if (input.files && input.files[0]) {
+			//         var reader = new FileReader();
+		
+			//         reader.onload = function (e) {
+			//           disableImageOverlay()
+			//           var image = e.target.result
+			//           var imageField = document.getElementById('id_profile_image_display')
+			//             imageField.src = image
+			//     cropper = new Cropper(imageField, {
+			//       aspectRatio: 1/1,
+			//       crop(event) {
+			//         // console.log("CROP START")
+			//         // console.log("x: " + event.detail.x);
+			//         // console.log("y: " + event.detail.y);
+			//         // console.log("width: " + event.detail.width);
+			//         // console.log("height: " + event.detail.height);
+			//         // setImageCropProperties(
+			//         // 	image,
+			//         // 	event.detail.x,
+			//         // 	event.detail.y,
+			//         // 	event.detail.width,
+			//         // 	event.detail.height
+			//         // )
+			//       },
+			//     });
+			//         };
+			//         reader.readAsDataURL(input.files[0]);
+			//     }
+			// };
+		
+		
+			/*
+					Build a <p> for messages using markdown
+					https://github.com/markdown-it/markdown-it
+				*/
+			function validateText(str) {
+				var md = window.markdownit({
+					highlight: function (str, lang) {
+						if (lang && hljs.getLanguage(lang)) {
+							try {
+								return '<pre class="hljs"><code>' +
+									hljs.highlight(lang, str, true).value +
+									'</code></pre>';
+							} catch (__) { }
+						}
+						return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+					},
+		
+					// THis is important 
+					// Allow link to be posted and then add 
+					linkify: true,
+				});
+				var result = md.render(str);
+				return result
+			}
+		
+		
+		</script>
+		
 	<div class="container" id="id_loading_spinner" style="display: none">
 		<div class="d-flex flex-row mx-auto flex-grow-1 justify-content-center">
 			<div class="spinner-border text-primary" role="status">
@@ -120,10 +205,7 @@
 	<!-- Have these run as regular functions  -->
 
 
-
-
-
-
+	
 
 	<!-- <script type="module" src = "/frontend-react/src/Reusable/mark_down.js"></script> -->
 </body>
@@ -131,85 +213,5 @@
 
 // Use it like this
 
-<script type="text/javascript">
-
-
-
-var generalCachedNotifList = new List([])
-
-	
-	function displayLoadingSpinner(isDisplayed) {
-		var spinner = document.getElementById("id_loading_spinner")
-		if (isDisplayed) {
-			spinner.style.display = "block"
-		}
-		else {
-			spinner.style.display = "none"
-		}
-	}
-
-	//      export function readURL(e) {
-
-	// var input = e.target
-
-	// // THis means sth is selected
-	//     if (input.files && input.files[0]) {
-	//         var reader = new FileReader();
-
-	//         reader.onload = function (e) {
-	//           disableImageOverlay()
-	//           var image = e.target.result
-	//           var imageField = document.getElementById('id_profile_image_display')
-	//             imageField.src = image
-	//     cropper = new Cropper(imageField, {
-	//       aspectRatio: 1/1,
-	//       crop(event) {
-	//         // console.log("CROP START")
-	//         // console.log("x: " + event.detail.x);
-	//         // console.log("y: " + event.detail.y);
-	//         // console.log("width: " + event.detail.width);
-	//         // console.log("height: " + event.detail.height);
-	//         // setImageCropProperties(
-	//         // 	image,
-	//         // 	event.detail.x,
-	//         // 	event.detail.y,
-	//         // 	event.detail.width,
-	//         // 	event.detail.height
-	//         // )
-	//       },
-	//     });
-	//         };
-	//         reader.readAsDataURL(input.files[0]);
-	//     }
-	// };
-
-
-	/*
-			Build a <p> for messages using markdown
-			https://github.com/markdown-it/markdown-it
-		*/
-	function validateText(str) {
-		var md = window.markdownit({
-			highlight: function (str, lang) {
-				if (lang && hljs.getLanguage(lang)) {
-					try {
-						return '<pre class="hljs"><code>' +
-							hljs.highlight(lang, str, true).value +
-							'</code></pre>';
-					} catch (__) { }
-				}
-				return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
-			},
-
-			// THis is important 
-			// Allow link to be posted and then add 
-			linkify: true,
-		});
-		var result = md.render(str);
-		return result
-	}
-
-
-</script>
 
 </html>
