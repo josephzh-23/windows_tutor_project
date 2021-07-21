@@ -42,7 +42,6 @@ class UserAccountManager(BaseUserManager):
 # Our static files are in the media folder 
 def get_default_image():
     return "pickachu.png"
-
 def get_profile_image_filepath(self, filename):
 	return 'profile_images/' + str(self.pk) + '/profile_image.png'
     

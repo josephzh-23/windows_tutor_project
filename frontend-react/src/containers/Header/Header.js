@@ -25,7 +25,8 @@ import {
 	setInitialTimestamp,
 	setGeneralOldestTimestamp,
 	submitGeneralNotificationToCache,
-	refreshGeneralNotificationsList
+	refreshGeneralNotificationsList,
+	handleNewGeneralNotificationsData
 } from './general_notification_fxn.js';
 import './Header.css';
 import { build_promise } from './../../Reusable/Async_await/Promise';
@@ -35,7 +36,7 @@ var List = require("collections/list");
 // Id of the notification span: id_general_notifications_container
 // Used to set up the notificatino websocket 
 export const Header = (props) => {
-	const GENERAL_NOTIFICATION_INTERVAL = 10000
+	const GENERAL_NOTIFICATION_INTERVAL = 30000
 	const GENERAL_NOTIFICATION_TIMEOUT = 5000
 
 
@@ -49,6 +50,8 @@ var generalCachedNotifList = new List ([])
 
 	var $ = function( id ) { return document.getElementById( id ); };
 	var oldestTimestamp
+
+	// This alwasy comes from the newest time notification
 	var newestTimestamp
 
 	const { authUser } = useContext(UserContext)
@@ -171,7 +174,7 @@ var generalCachedNotifList = new List ([])
 
 									<div className="btn-group dropleft">
 										<div className="d-flex notifications-icon-container rounded-circle align-items-center mr-3" id="id_notification_dropdown_toggle" data-toggle="dropdown"
-										//  onClick={setGeneralNotificationsAsRead}
+										 onClick={setGeneralNotificationsAsRead}
 										>
 											<span id="id_general_notifications_count" className="notify-badge"></span>
 											<span className="d-flex material-icons notifications-material-icon m-auto align-items-center">notifications</span>
@@ -245,6 +248,23 @@ var generalCachedNotifList = new List ([])
 		setGeneralPageNumber("-1")
 	}
 
+
+	/*
+		Received a payload from socket containing NEW notifications
+		Called every GENERAL_NOTIFICATION_INTERVAL
+	*/
+	 function handleNewGeneralNotificationsData(notifications){
+    	if(notifications.length > 0){
+    		clearNoGeneralNotificationsCard()
+    		notifications.forEach(notification => {
+
+    			submitNewGeneralNotificationToCache(notification)
+
+				setGeneralOldestTimestamp(notification['timestamp'])
+				setGeneralNewestTimestamp(notification['timestamp'])
+			})
+	    }
+	}
 	/*
 		Sets the pagination page number.
 	*/
@@ -315,7 +335,31 @@ var generalCachedNotifList = new List ([])
 		window.location.href = url
 	}
 
+	/*
+		Sets all the notifications currently visible as "read"
+	*/
+	function setGeneralNotificationsAsRead(){
+		if(authUser.isAuthenticated){
+			oldestTimestamp = document.getElementById("id_general_oldest_timestamp").innerHTML
+			notificationSocket.send(JSON.stringify({
+				"command": "mark_notifications_read",
+			}));
+			console.log("Marking notif as read");
+			getUnreadGeneralNotificationsCount()
+		}
+	}
 
+/*
+		Retrieve the number of unread notifications. (This is the red dot in the notifications icon)
+		Called every GENERAL_NOTIFICATION_INTERVAL
+	*/
+	function getUnreadGeneralNotificationsCount(){
+		if("{{request.user.is_authenticated}}"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_unread_general_notifications_count",
+			}));
+		}
+	}
 
 
 
@@ -382,6 +426,15 @@ var generalCachedNotifList = new List ([])
 				refreshGeneralNotificationsData(data['notifications'])
 				// }
 			}
+
+
+			if(data.general_msg_type == 3){
+				handleNewGeneralNotificationsData(data['notifications'])
+			}
+
+			if(data.general_msg_type == 4){
+				setUnreadGeneralNotificationsCount(data['count'])
+			}
 			// THis allows you to update the notification based on what's coming in 
 
 			if (data.general_msg_type == 5) {
@@ -398,6 +451,8 @@ var generalCachedNotifList = new List ([])
 
 			setupGeneralNotificationsMenu()
 			getFirstGeneralNotificationsPage()
+
+			getUnreadGeneralNotificationsCount()
 		}
 
 		notificationSocket.onerror = function (e) {
@@ -569,6 +624,33 @@ var generalCachedNotifList = new List ([])
 		}
 	}
 
+
+	/*
+		Append a general notification to the TOP of the list.
+	*/
+	function appendTopGeneralNotification(notification){
+
+		switch(notification['notification_type']) {
+
+			case "FriendRequest":
+				notificationContainer = document.getElementById("id_general_notifications_container")
+				card = createFriendRequestElement(notification)
+				notificationContainer.insertBefore(card, notificationContainer.childNodes[0]);
+				break;
+
+			case "FriendList":
+				notificationContainer = document.getElementById("id_general_notifications_container")
+				card = createFriendListElement(notification)
+				notificationContainer.insertBefore(card, notificationContainer.childNodes[0]);
+				break;
+
+			default:
+				// code block
+		}
+
+		preloadImage(notification['from']['image_url'], assignGeneralImgId(notification))
+	}
+
 	/*
 		Build general notification
 	*/
@@ -601,6 +683,33 @@ var generalCachedNotifList = new List ([])
 
 
 
+
+	/*
+		Append to top OR update a div that already exists.
+		Called by 'handleNewGeneralNotificationsData'
+	*/
+	function submitNewGeneralNotificationToCache(notification){
+
+		// Check if this notififcation already exists or not 
+
+		var result = generalCachedNotifList.filter(function(n){ 
+			return n['notification_id'] === notification['notification_id']
+		})
+		// This notification does not already exist in the list
+		// A brand new one
+		if(result.length == 0){
+			generalCachedNotifList.push(notification)
+
+			// append to top of list
+			appendTopGeneralNotification(notification)
+		}
+		// This notification already exists in the list
+		else{
+			// find the div and update it.
+			refreshGeneralNotificationsList(notification)
+		}
+	}
+
 /*
 	Append to bottom. 
 	Used for
@@ -609,6 +718,9 @@ var generalCachedNotifList = new List ([])
 		3. Refresh
 	Called by 'handleGeneralNotificationsData' &  'refreshGeneralNotificationsData'
 */
+
+
+
 function submitGeneralNotificationToCache(notification){
 
 	console.log("the window " , this);
@@ -826,6 +938,20 @@ Params:
 
 	}
 
+
+	/*
+		Retrieve any new notifications
+		Called every GENERAL_NOTIFICATION_INTERVAL seconds
+	*/
+	function getNewGeneralNotifications(){
+		newestTimestamp = document.getElementById("id_general_newest_timestamp").innerHTML
+		if("{{request.user.is_authenticated}}"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_new_general_notifications",
+				"newest_timestamp": newestTimestamp,
+			}));
+		}
+	}
 	/*
 		Start the functions that will be executed constantly
 		should only start if there is notifications
@@ -833,6 +959,27 @@ Params:
 	function startGeneralNotificationService() {
 		if (authUser.isAuthenticated === true) {
 			setInterval(refreshGeneralNotifications, GENERAL_NOTIFICATION_INTERVAL)
+
+			setInterval(getNewGeneralNotifications, GENERAL_NOTIFICATION_INTERVAL)
+			setInterval(getUnreadGeneralNotificationsCount, GENERAL_NOTIFICATION_INTERVAL)
+
+		}
+	}
+
+
+	/*
+		Set the number of unread notifications.
+	*/
+	function setUnreadGeneralNotificationsCount(count){
+		var countElement = document.getElementById("id_general_notifications_count")
+		if(count > 0){
+			countElement.style.background = "red"
+			countElement.style.display = "block"
+			countElement.innerHTML = count
+		}
+		else{
+			countElement.style.background = "transparent"
+			countElement.style.display = "none"
 		}
 	}
 

@@ -190,6 +190,11 @@ def cancel_friend_request(request):
 				# found the request. Now cancel it
 				friend_requests.first().cancel()
 				res = "Friend request canceled."
+
+			### todo: also need to account for the case
+			# when user A already accepts the friend request
+			# User B shouldn't be able to cancel the friend request anymore
+			#UserB should get a refresh
 		else:
 			err = "Unable to cancel that friend request."
 	else:

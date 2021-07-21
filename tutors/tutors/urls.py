@@ -27,6 +27,8 @@ from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
+from upload import views
+
 urlpatterns = [
     #Need slash for sure here
 
@@ -44,6 +46,19 @@ urlpatterns = [
     # path('api/realtors/', include('realtors.urls')),
     path('api/listings/', include('listings.urls')),
     path('api/contacts/', include('contacts.urls')),
+
+
+    # The following for the uploads section
+
+    path('', views.Home.as_view(), name='home'),
+    path('upload/', views.upload, name='upload'),
+    path('books/', views.book_list, name='book_list'),
+    path('books/upload/', views.upload_book, name='upload_book'),
+    path('books/<int:pk>/', views.delete_book, name='delete_book'),
+
+    path('class/books/', views.BookListView.as_view(), name='class_book_list'),
+    path('class/books/upload/', views.UploadBookView.as_view(), name='class_upload_book'),
+
 ] 
 
 # 
@@ -52,6 +67,8 @@ urlpatterns = [
 # urlpatterns += [re_path(r'^.*', TemplateView.as_view(template_name='index.html'))]
 
 
+#This will be where all the uploaded files will be stored
+#Static folder and the media folder
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
