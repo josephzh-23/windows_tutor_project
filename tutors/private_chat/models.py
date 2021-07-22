@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from playhouse.signals import pre_save
 from pyasn1_modules.rfc2315 import ContentType
@@ -52,32 +53,32 @@ class PrivateChatRoom(models.Model):
         return f"PrivateChatRoom-{self.id}"
 
 class RoomChatMessageManager(models.Manager):
-	def by_room(self, room):
-		qs = RoomChatMessage.objects.filter(room=room).order_by("-timestamp")
-		return qs
+    def by_room(self, room):
+        qs = RoomChatMessage.objects.filter(room=room).order_by("-timestamp")
+        return qs
 
 class RoomChatMessage(models.Model):
-	"""
-	Chat message created by a user inside a Room
-	"""
-	user                = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-	room                = models.ForeignKey(PrivateChatRoom, on_delete=models.CASCADE)
-	timestamp           = models.DateTimeField(auto_now_add=True)
-	content             = models.TextField(unique=False, blank=False,)
+    """
+    Chat message created by a user inside a Room
+    """
+    user                = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    room                = models.ForeignKey(PrivateChatRoom, on_delete=models.CASCADE)
+    timestamp           = models.DateTimeField(auto_now_add=True)
+    content             = models.TextField(unique=False, blank=False,)
 
-	objects = RoomChatMessageManager()
+    objects = RoomChatMessageManager()
 
-	def __str__(self):
-		return self.content
+    def __str__(self):
+        return self.content
 
 
 
 
 class UnreadChatRoomMessages(models.Model):
     """
-	Keep track of the number of unread messages by a specific user in a specific private chat.
-	When the user connects the chat room, the messages will be considered "read" and 'count' will be set to 0.
-	"""
+    Keep track of the number of unread messages by a specific user in a specific private chat.
+    When the user connects the chat room, the messages will be considered "read" and 'count' will be set to 0.
+    """
     room = models.ForeignKey(PrivateChatRoom, on_delete=models.CASCADE, related_name="room")
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -109,15 +110,15 @@ class UnreadChatRoomMessages(models.Model):
     @property
     def get_cname(self):
         """
-		For determining what kind of object is associated with a Notification
-		"""
+        For determining what kind of object is associated with a Notification
+        """
         return "UnreadChatRoomMessages"
 
     @property
     def get_other_user(self):
         """
-		Get the other user in the chat room
-		"""
+        Get the other user in the chat room
+        """
         if self.user == self.room.user1:
             return self.room.user2
         else:
@@ -132,9 +133,9 @@ class UnreadChatRoomMessages(models.Model):
 @receiver(pre_save, sender=UnreadChatRoomMessages)
 def increment_unread_msg_count(sender, instance, **kwargs):
     """
-	When the unread message count increases, update the notification.
-	If one does not exist, create one. (This should never happen)
-	"""
+    When the unread message count increases, update the notification.
+    If one does not exist, create one. (This should never happen)
+    """
     if instance.id is None:  # new object will be created
         pass  # create_unread_chatroom_messages_obj will handle this scenario
     else:
@@ -163,13 +164,22 @@ def increment_unread_msg_count(sender, instance, **kwargs):
                     verb=instance.most_recent_message,
                     content_type=content_type,
                 )
+@receiver(post_save, sender=PrivateChatRoom)
+def create_unread_chatroom_messages_obj(sender, instance, created, **kwargs):
+    if created:
+        unread_msgs1 = UnreadChatRoomMessages(room=instance, user=instance.user1)
+        print('unread obj user 1 is', instance.user1)
+        unread_msgs1.save()
 
+        unread_msgs2 = UnreadChatRoomMessages(room=instance, user=instance.user2)
+        print('unread obj user 1 is', instance.user2)
+        unread_msgs2.save()
 
 @receiver(pre_save, sender=UnreadChatRoomMessages)
 def remove_unread_msg_count_notification(sender, instance, **kwargs):
     """
-	If the unread messge count decreases, it means the user joined the chat. So delete the notification.
-	"""
+    If the unread messge count decreases, it means the user joined the chat. So delete the notification.
+    """
     if instance.id is None:  # new object will be created
         pass  # create_unread_chatroom_messages_obj will handle this scenario
     else:

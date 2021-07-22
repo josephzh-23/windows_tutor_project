@@ -21,6 +21,8 @@ def upload(request):
     return render(request, 'upload.html', context)
 
 
+
+#Shows all the books lists
 def book_list(request):
     books = Book.objects.all()
     return render(request, 'book_list.html', {

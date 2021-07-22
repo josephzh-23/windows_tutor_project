@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'friend',
     'public_chat',
     'private_chat',
-    'upload'
+    'upload',
+'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -88,7 +89,7 @@ ROOT_URLCONF = 'tutors.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(SETTINGS_PATH, 'templates')],
+        'DIRS': [os.path.join(SETTINGS_PATH, 'tutors/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

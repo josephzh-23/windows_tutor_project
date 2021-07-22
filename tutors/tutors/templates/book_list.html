@@ -20,6 +20,8 @@
       </tr>
     </thead>
     <tbody>
+
+<!--    Would just iterate over each book and print it out as acoordingly -->
       {% for book in books %}
         <tr>
           <td>
@@ -32,6 +34,8 @@
           <td>{{ book.title }}</td>
           <td>{{ book.author }}</td>
           <td>
+
+<!--            By showing the url you can just open it in the new tab -->
             <a href="{{ book.pdf.url }}" class="btn btn-primary btn-sm" target="_blank">
               Download PDF
             </a>

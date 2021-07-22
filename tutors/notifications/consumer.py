@@ -13,7 +13,7 @@ from friend.models import FriendRequest, BuddyList
 from notifications.constants import GENERAL_MSG_TYPE_NOTIFICATIONS_PAYLOAD, DEFAULT_NOTIFICATION_PAGE_SIZE, \
 	GENERAL_MSG_TYPE_UPDATED_NOTIFICATION, GENERAL_MSG_TYPE_PAGINATION_EXHAUSTED, \
 	GENERAL_MSG_TYPE_NOTIFICATIONS_REFRESH_PAYLOAD, GENERAL_MSG_TYPE_GET_NEW_GENERAL_NOTIFICATIONS, \
-	GENERAL_MSG_TYPE_GET_UNREAD_NOTIFICATIONS_COUNT
+	GENERAL_MSG_TYPE_GET_UNREAD_NOTIFICATIONS_COUNT, CHAT_MSG_TYPE_GET_NEW_NOTIFICATIONS
 from notifications.models import Notification
 from notifications.utils import LazyNotificationEncoder
 from private_chat.exceptions import ClientError
@@ -119,6 +119,21 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
 			elif command == "mark_notifications_read":
 				await mark_notifications_read(self.scope["user"])
+
+			elif command == "get_chat_notifications":
+				payload = await get_chat_notifications(self.scope["user"], content.get("page_number", None))
+				if payload == None:
+					pass
+				else:
+					payload = json.loads(payload)
+					await self.send_chat_notifications_payload(payload['notifications'], payload['new_page_number'])
+
+			elif command == "get_new_chat_notifications":
+				payload = await get_new_chat_notifications(self.scope["user"], content.get("newest_timestamp", None))
+				if payload != None:
+					payload = json.loads(payload)
+					await self.send_new_chat_notifications_payload(payload['notifications'])
+
 		except Exception as e:
 			print("EXCEPTION: receive_json: " + str(e))
 			pass
@@ -201,6 +216,30 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 			{
 				"general_msg_type": GENERAL_MSG_TYPE_GET_UNREAD_NOTIFICATIONS_COUNT,
 				"count": count,
+			},
+		)
+
+	async def send_chat_notifications_payload(self, notifications, new_page_number):
+		"""
+		Called by receive_json when ready to send a json array of the chat notifications
+		"""
+		# print("NotificationConsumer: send_chat_notifications_payload")
+		await self.send_json(
+			{
+				"chat_msg_type": CHAT_MSG_TYPE_NOTIFICATIONS_PAYLOAD,
+				"notifications": notifications,
+				"new_page_number": new_page_number,
+			},
+		)
+
+	async def send_new_chat_notifications_payload(self, notifications):
+		"""
+		Called by receive_json when ready to send a json array of the notifications
+		"""
+		await self.send_json(
+			{
+				"chat_msg_type": CHAT_MSG_TYPE_GET_NEW_NOTIFICATIONS,
+				"notifications": notifications,
 			},
 		)
 
@@ -392,6 +431,35 @@ def mark_notifications_read(user):
 	return
 
 
+@database_sync_to_async
+def get_chat_notifications(user, page_number):
+	"""
+	Get Chat Notifications with Pagination (next page of results).
+	This is for appending to the bottom of the notifications list.
+	Chat Notifications are:
+	1. UnreadChatRoomMessages
+	"""
+	if user.is_authenticated:
+		chatmessage_ct = ContentType.objects.get_for_model(UnreadChatRoomMessages)
+		notifications = Notification.objects.filter(target=user, content_type=chatmessage_ct).order_by('-timestamp')
+		p = Paginator(notifications, DEFAULT_NOTIFICATION_PAGE_SIZE)
+
+		# sleep 1s for testing
+		# sleep(1)
+		payload = {}
+		if len(notifications) > 0:
+			if int(page_number) <= p.num_pages:
+				s = LazyNotificationEncoder()
+				serialized_notifications = s.serialize(p.page(page_number).object_list)
+				payload['notifications'] = serialized_notifications
+				new_page_number = int(page_number) + 1
+				payload['new_page_number'] = new_page_number
+				return json.dumps(payload)
+		else:
+			return None
+	else:
+		raise ClientError("AUTH_ERROR", "User must be authenticated to get notifications.")
+	return None
 
 
 
@@ -402,5 +470,22 @@ def mark_notifications_read(user):
 
 
 
+@database_sync_to_async
+def get_new_chat_notifications(user, newest_timestatmp):
+	"""
+	Retrieve any notifications newer than the newest_timestatmp on the screen.
+	"""
+	payload = {}
+	if user.is_authenticated:
+		timestamp = newest_timestatmp[0:newest_timestatmp.find("+")] # remove timezone because who cares
+		timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
+		chatmessage_ct = ContentType.objects.get_for_model(UnreadChatRoomMessages)
+		notifications = Notification.objects.filter(target=user, content_type__in=[chatmessage_ct], timestamp__gt=timestamp).order_by('-timestamp')
+		s = LazyNotificationEncoder()
+		payload['notifications'] = s.serialize(notifications)
+		return json.dumps(payload)
+	else:
+		raise ClientError("AUTH_ERROR", "User must be authenticated to get notifications.")
 
+	return None
 

@@ -46,7 +46,7 @@ urlpatterns = [
     # path('api/realtors/', include('realtors.urls')),
     path('api/listings/', include('listings.urls')),
     path('api/contacts/', include('contacts.urls')),
-
+    path('api/contacts/', include('contacts.urls')),
 
     # The following for the uploads section
 
