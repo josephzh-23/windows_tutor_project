@@ -1,25 +1,46 @@
-var card, span, notificationContainer
-var span1, span2
+//import default 
 
-var element
-var current
-var updatedDiv
-var card
-var span
-var img
-var div2
-var pos_action
-var neg_action
-var divs
+import { createConnectedDisconnectedElement } from './../Private_chat/Private_Chat_fxn';
+import { notificationSocket } from './../Header/Header';
+// var List = require("collections/list");
 
+console.log("Chat notifications");
+
+
+
+
+var notificationContainer 
 
 var chatNotificationContainer
+var card
+
 var newestTimestamp
+var element
+var current 
 
-var notificationSocket
+var divs 
+var span1 
+var span2
 
-var List = require("collections/list");
-console.log("Chat notifications");
+var chatCachedNotifList
+var span 
+var img 
+
+
+
+	/*
+		Retrieve the number of unread chat notifications. (This is the red dot in the notifications icon)
+		Called every CHAT_NOTIFICATION_INTERVAL
+	*/
+	function getUnreadChatNotificationsCount(){
+		if("{{request.user.is_authenticated}}"){
+			// var notificationSocket = notificationSocket
+			notificationSocket.send(JSON.stringify({
+				"command": "get_unread_chat_notifications_count",
+			}));
+		}
+	}
+setOnChatNotificationScrollListener()
 /*
 		Search for the notification in the list using it's id. Then update its properties.
 		I do not update the image_url since that makes the notifications "flicker".
@@ -49,9 +70,12 @@ handleChatNotificationData ( for handling pagination)
 const CHAT_NOTIFICATION_INTERVAL = 4000
 
 // Keep track of what notifications are currently visible to the user.
-var chatCachedNotifList = new List([])
+// var chatCachedNotifList = h.chatCachedNotifList
+
+
 
 /*
+
 		Append a chat notification to the TOP of the list.
 	*/
 	function appendTopChatNotification(notification){
@@ -85,7 +109,7 @@ var chatCachedNotifList = new List([])
 		Append to top OR update a div that already exists.
 		Called by 'handleNewChatNotificationsData'
 	*/
-	function submitNewChatNotificationToCache(notification){
+	export function submitNewChatNotificationToCache(notification){
 		var result = chatCachedNotifList.filter(function(n){ 
 			return n['notification_id'] === notification['notification_id']
 		})
@@ -104,25 +128,7 @@ var chatCachedNotifList = new List([])
 	}
 
 
-    	/*
-		Received a payload from socket containing chat notifications.
-		Called:
-			1. When page loads
-			2. pagination
-	*/
-    export function handleChatNotificationsData(notifications, new_page_number){
-    	if(notifications.length > 0){
-    		clearNoChatNotificationsCard()
-    		
-    		notifications.forEach(notification => {
-
-				submitChatNotificationToCache(notification)
-
-				setChatNewestTimestamp(notification['timestamp'])
-			})
-	    }
-	}
-
+    
 
 	/*
 		Refresh a refreshUnreadChatRoomMessagesCard card with current data
@@ -166,29 +172,40 @@ var chatCachedNotifList = new List([])
 	}
 
 
-/*
-		Append to bottom. 
-		Used for
-			1. Page load
-			2. pagination
-			3. Refresh
-		Called by 'handleChatNotificationsData' &  'refreshChatNotificationsData'
-	*/
-	function submitChatNotificationToCache(notification){
-		var result = chatCachedNotifList.filter(function(n){ 
-			return n['notification_id'] === notification['notification_id']
-		})
-		// This notification does not already exist in the list
-		if(result.length == 0){
-			chatCachedNotifList.push(notification)
 
-			// append to bottom of list
-			appendBottomChatNotification(notification)
+	/*
+		Sets the scroll listener for when user scrolls to bottom of notification menu.
+		It will retrieve the next page of results.
+	*/
+	function setOnChatNotificationScrollListener(){
+		var menu = document.getElementById("id_chat_notifications_container")
+		if(menu != null ){
+			menu.addEventListener("scroll", function(e){
+
+				// When scrolled to the bottom 
+				if ((menu.scrollTop) >= (menu.scrollHeight - menu.offsetHeight)) {
+					getNextChatNotificationsPage()
+				}
+			});
 		}
-		// This notification already exists in the list
-		else{
-			// find the div and update it.
-			refreshChatNotificationsList(notification)
+		
+	}
+
+	/*
+		Retrieve the next page of chat notifications
+		Called when the user scrolls to the bottom of the popup menu.
+	*/
+	function getNextChatNotificationsPage(){
+		var pageNumber = document.getElementById("id_chat_page_number").innerHTML
+		// -1 means exhausted or a query is currently in progress
+
+		if("{{request.user.is_authenticated}}" && pageNumber != "-1"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_chat_notifications",
+				"page_number": pageNumber,
+			}));
+
+			getUnreadChatNotificationsCount()
 		}
 	}
 
@@ -199,6 +216,8 @@ var chatCachedNotifList = new List([])
 	*/
 	function getNewChatNotifications(){
 		newestTimestamp = document.getElementById("id_chat_newest_timestamp").innerHTML
+		
+		
 		if("{{request.user.is_authenticated}}"){
 			notificationSocket.send(JSON.stringify({
 				"command": "get_new_chat_notifications",
@@ -208,29 +227,8 @@ var chatCachedNotifList = new List([])
 	}
 
 
-	export function setChatInitialTimestamp(){
-		// ('%Y-%m-%d %H:%M:%S.%f')
-		var today = new Date();
-		var date = today.getFullYear() + "-01-01 01:00:00.000000"
-		document.getElementById("id_chat_newest_timestamp").innerHTML = date
-	}
 
 
-
-/*
-		Keep track of the 'chat' newest notification in view. 
-		When 'getNewChatNotifications' is called, it retrieves all the notifications newer than this date.
-	*/
-	function setChatNewestTimestamp(timestamp){
-		element = document.getElementById("id_chat_newest_timestamp")
-		current = element.innerHTML
-		if(Date.parse(timestamp) > Date.parse(current)){
-			element.innerHTML = timestamp
-		}
-		else if(current == "" || current == null || current == "undefined"){
-			element.innerHTML = timestamp
-		}
-	}
 	/*
 		Add a header to the dropdown so users can visit /chat/
 	*/
@@ -263,39 +261,23 @@ var chatCachedNotifList = new List([])
 		window.location.href = url
 	}
 
+
+
+
 	/*
-		Display a card that says "You have no notifications"
+		Start the functions that will be executed constantly
 	*/
-	export function setupChatNotificationsMenu(){
-		var notificationContainer = document.getElementById("id_chat_notifications_container")
-
-		if(notificationContainer != null){
-			setupChatDropdownHeader()
-
-			card = createChatNotificationCard("id_no_chat_notifications")
-
-			var div = document.createElement("div")
-			div.classList.add("d-flex", "flex-row", "align-items-start")
-
-			span = document.createElement("span")
-			span.classList.add("align-items-start", "pt-1", "m-auto")
-			span.innerHTML = "You have no notifications."
-			div.appendChild(span)
-			card.appendChild(div)
-			notificationContainer.appendChild(card)
+	function startChatNotificationService(){
+		if("{{request.user.is_authenticated}}" == "True"){
+			setInterval(getNewChatNotifications, CHAT_NOTIFICATION_INTERVAL)
+			setInterval(getUnreadChatNotificationsCount, CHAT_NOTIFICATION_INTERVAL)
 		}
 	}
 
-	/*
-		Remove the element that says "There are no notifications".
-	*/
-	function clearNoChatNotificationsCard(){
-		var element = document.getElementById("id_no_chat_notifications")
-		if(element != null && element != "undefined"){
-			document.getElementById("id_chat_notifications_container").removeChild(element)
-		}
-	}
+	startChatNotificationService()
 
+	
+	
 	/*
 		The card that each notification sits in
 	*/
@@ -397,39 +379,9 @@ var chatCachedNotifList = new List([])
 		}
 	}
 
-
-
-
-    /*
-		Received a payload from socket containing NEW chat notifications
-		Called every CHAT_NOTIFICATION_INTERVAL
-	*/
-	export function handleNewChatNotificationsData(notifications){
-		if(notifications.length > 0){
-			clearNoChatNotificationsCard()
-			notifications.forEach(notification => {
-
-				submitNewChatNotificationToCache(notification)
-
-				setChatNewestTimestamp(notification['timestamp'])
-			})
-		}
-	}
     
 
-    /*
-    Called when the page first loads 
-		Retrieve the number of unread chat notifications. (This is the red dot in the notifications icon)
-		Called every CHAT_NOTIFICATION_INTERVAL
-	*/
-	function getFirstChatNotificationsPage(){
-		if("{{request.user.is_authenticated}}"){
-			notificationSocket.send(JSON.stringify({
-				"command": "get_chat_notifications",
-				"page_number": "1",
-			}));
-		}
-	}
+   
 
 {/* </script> */}
 
@@ -463,4 +415,152 @@ var chatCachedNotifList = new List([])
 
 	function assignChatCardId(notification){
 		return "id_notification_" + notification['notification_id']
+	}
+
+
+	
+
+
+/*
+		Remove the element that says "There are no notifications".
+	*/
+	function clearNoChatNotificationsCard(){
+		var element = document.getElementById("id_no_chat_notifications")
+		if(element != null && element != "undefined"){
+			document.getElementById("id_chat_notifications_container").removeChild(element)
+		}
+	}
+
+
+
+	/*
+		Received a payload from socket containing chat notifications.
+		Called:
+			1. When page loads
+			2. pagination
+	*/
+    export function handleChatNotificationsData(notifications, new_page_number){
+    	if(notifications.length > 0){
+    		clearNoChatNotificationsCard()
+    		
+    		notifications.forEach(notification => {
+
+				submitChatNotificationToCache(notification)
+
+				setChatNewestTimestamp(notification['timestamp'])
+			})
+
+			setChatPageNumber(new_page_number)
+	    }
+	}
+
+/*
+		Retrieve the number of unread chat notifications. (This is the red dot in the notifications icon)
+		Called every CHAT_NOTIFICATION_INTERVAL
+	*/
+	export function getFirstChatNotificationsPage(){
+		if("{{request.user.is_authenticated}}"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_chat_notifications",
+				"page_number": "1",
+			}));
+		}
+	}
+	/*
+		Display a card that says "You have no notifications"
+	*/
+	export function setupChatNotificationsMenu(){
+		var notificationContainer = document.getElementById("id_chat_notifications_container")
+
+		if(notificationContainer != null){
+			setupChatDropdownHeader()
+
+			card = createChatNotificationCard("id_no_chat_notifications")
+
+			var div = document.createElement("div")
+			div.classList.add("d-flex", "flex-row", "align-items-start")
+
+			span = document.createElement("span")
+			span.classList.add("align-items-start", "pt-1", "m-auto")
+			span.innerHTML = "You have no notifications."
+			div.appendChild(span)
+			card.appendChild(div)
+			notificationContainer.appendChild(card)
+		}
+	}
+
+/*
+		Called when pagination is exhausted and there is no more notifications.
+	*/
+	export function setChatPaginationExhausted(){
+		setChatPageNumber("-1")
+	}
+
+	export function setChatNotificationsCount(count){
+		var countElement = document.getElementById("id_chat_notifications_count")
+		if(count > 0){
+			countElement.style.background = "red"
+			countElement.style.display = "block"
+			countElement.innerHTML = count
+		}
+		else{
+			countElement.style.background = "transparent"
+			countElement.style.display = "none"
+		}
+	}
+	
+	/*
+		Keep track of the 'chat' newest notification in view. 
+		When 'getNewChatNotifications' is called, it retrieves all the notifications newer than this date.
+	*/
+	export function setChatNewestTimestamp(timestamp){
+		element = document.getElementById("id_chat_newest_timestamp")
+		current = element.innerHTML
+		if(Date.parse(timestamp) > Date.parse(current)){
+			element.innerHTML = timestamp
+		}
+		else if(current == "" || current == null || current == "undefined"){
+			element.innerHTML = timestamp
+		}
+	}
+	export function setChatInitialTimestamp(){
+		// ('%Y-%m-%d %H:%M:%S.%f')
+		var today = new Date();
+		var date = today.getFullYear() + "-01-01 01:00:00.000000"
+		document.getElementById("id_chat_newest_timestamp").innerHTML = date
+	}
+
+	// setChatInitialTimestamp()
+
+/*
+		Sets the pagination page number.
+	*/
+	function setChatPageNumber(pageNumber){
+		document.getElementById("id_chat_page_number").innerHTML = pageNumber
+	}
+/*
+	/*
+		Append to bottom. 
+		Used for
+			1. Page load
+			2. pagination
+			3. Refresh
+		Called by 'handleChatNotificationsData' &  'refreshChatNotificationsData'
+	*/
+	export function submitChatNotificationToCache(notification){
+		var result = chatCachedNotifList.filter(function(n){ 
+			return n['notification_id'] === notification['notification_id']
+		})
+		// This notification does not already exist in the list
+		if(result.length == 0){
+			chatCachedNotifList.push(notification)
+
+			// append to bottom of list
+			appendBottomChatNotification(notification)
+		}
+		// This notification already exists in the list
+		else{
+			// find the div and update it.
+			refreshChatNotificationsList(notification)
+		}
 	}

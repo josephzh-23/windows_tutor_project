@@ -1,8 +1,7 @@
 
 // If no notification, need to call clearNoGeneralNotificationCard()
 
-import { notificationSocket } from "./Header"
-
+import { notificationSocket } from "./Header.js"
 
 var oldestTimestamp
 var newestTimestamp
@@ -149,9 +148,32 @@ function appendBottomGeneralNotification(notification) {
 		}
 	}
 
+	/*
+			Retrieve the number of unread notifications. (This is the red dot in the notifications icon)
+			Called every GENERAL_NOTIFICATION_INTERVAL
+		*/
+		function getUnreadGeneralNotificationsCount() {
+			if ("{{request.user.is_authenticated}}") {
+				notificationSocket.send(JSON.stringify({
+					"command": "get_unread_general_notifications_count",
+				}));
+			}
+		}
+	/*
+		Sets all the notifications currently visible as "read"
+	*/
+	export function setGeneralNotificationsAsRead(){
+		if("{{request.user.is_authenticated}}"){
+			oldestTimestamp = document.getElementById("id_general_oldest_timestamp").innerHTML
+			notificationSocket.send(JSON.stringify({
+				"command": "mark_notifications_read",
+			}));
+			getUnreadGeneralNotificationsCount()
+		}
+	}
+
+
 	
-
-
 
 /*
 If an older time stamp comes in 
@@ -457,6 +479,7 @@ If an older time stamp comes in
 		Decline a friend request
 	*/
 	function sendDeclineFriendRequestToSocket(notification_id) {
+
 		notificationSocket.send(JSON.stringify({
 			"command": "decline_friend_request",
 			"notification_id": notification_id,

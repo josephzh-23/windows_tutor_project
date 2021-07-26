@@ -164,6 +164,7 @@ def increment_unread_msg_count(sender, instance, **kwargs):
                     verb=instance.most_recent_message,
                     content_type=content_type,
                 )
+
 @receiver(post_save, sender=PrivateChatRoom)
 def create_unread_chatroom_messages_obj(sender, instance, created, **kwargs):
     if created:

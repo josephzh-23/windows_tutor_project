@@ -23,18 +23,22 @@ import {
 	setInitialTimestamp,
 	setGeneralOldestTimestamp,
 	submitGeneralNotificationToCache,
-	refreshGeneralNotificationsList
+	refreshGeneralNotificationsList,
+	setGeneralNotificationsAsRead
 } from './general_notification_fxn.js';
 import './Header.css';
 import { build_promise } from './../../Reusable/Async_await/Promise';
 import { preloadImage } from '../../Reusable/Async_image_loader.js';
 import ImportScript from '../../Reusable/ImportScript.js';
-import { Chat_Notifications, handleChatNotificationsData,  handleNewChatNotificationsData,  setChatInitialTimestamp,  setupChatNotificationsMenu } from '../Chat_Notifications/Chat_Notifications.js';
+import {  handleChatNotificationsData,  handleNewChatNotificationsData,  setChatInitialTimestamp,  setChatNotificationsCount,  setChatPaginationExhausted,  setupChatNotificationsMenu } from '../Chat_Notifications/Chat_Notifications.js';
+import { submitNewChatNotificationToCache, setChatNewestTimestamp} from './../Chat_Notifications/Chat_Notifications';
 
 var List = require("collections/list");
+
+
 // Id of the notification span: id_general_notifications_container
 // Used to set up the notificatino websocket 
-export const Header = (props) => {
+const Header =() => {
 	const GENERAL_NOTIFICATION_INTERVAL = 10000
 	const GENERAL_NOTIFICATION_TIMEOUT = 5000
 
@@ -58,11 +62,16 @@ export const Header = (props) => {
 	var notificationSocket
 
 
+
+	var props = {
+		"chatCachedNotifList": chatCachedNotifList,
+		"card": card
+	}
 	// Will govern what we have as well 
 	// Here we will use the list from the collections library 
 	var generalCachedNotifList = new List([])
 
-
+	var chatCachedNotifList = new List([])
 
 
 
@@ -104,18 +113,18 @@ export const Header = (props) => {
 		var date = today.getFullYear() + '-' + month + '-' + day + " " + hours + ":" + minutes + ":" + seconds + "." + ms
 		document.getElementById("id_general_oldest_timestamp").innerHTML = date
 
-		// This is important 
-		document.getElementById("id_general_newest_timestamp").innerHTML = date
+	
+	document.getElementById("id_general_newest_timestamp").innerHTML = date
 		console.log(document.getElementById("id_general_oldest_timestamp").innerHTML)
 	}
 
 	useEffect(() => {
 
-		const script = document.createElement('script');
+		// const script = document.createElement('script');
 	
-		script.src = '../Chat_Notifications/Chat_Notifications.js';
-		script.async = true;
-		document.body.appendChild(script);
+		// script.src = '../Chat_Notifications/Chat_Notifications.js';
+		// script.async = true;
+		// document.body.appendChild(script);	
 		setOnGeneralNotificationScrollListener()
 		// startGeneralNotificationService()
 	
@@ -134,9 +143,9 @@ export const Header = (props) => {
 
 
 		console.log("user is logged?", authUser.isAuthenticated);
-		return () => {
-			document.body.removeChild(script);
-		  }
+		// return () => {
+		// 	document.body.removeChild(script);
+		//   }
 
 	}, [authUser])
 
@@ -150,9 +159,9 @@ export const Header = (props) => {
 		// Conditinoal rendering here 
 		// <!-- Header -->
 		<div className="d-flex flex-column flex-lg-row p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-	<p className="d-none" id="id_chat_newest_timestamp"></p>
-			{/* <Chat_Notifications/> */}
-
+			<p className="d-none" id="id_chat_newest_timestamp"></p>
+	
+<p className="d-none" id="id_chat_page_number">1</p>
 			{/* Used for settting the page number  */}
 			<p className="d-none" id="id_general_page_number">1</p>
 			<p className="d-none" id="id_general_oldest_timestamp"></p>
@@ -186,7 +195,7 @@ export const Header = (props) => {
 
 								<div className="btn-group dropleft">
 									<div className="d-flex notifications-icon-container rounded-circle align-items-center mr-3" id="id_notification_dropdown_toggle" data-toggle="dropdown"
-									//  onClick={setGeneralNotificationsAsRead}
+									 onClick={setGeneralNotificationsAsRead}
 									>
 										<span id="id_general_notifications_count" className="notify-badge"></span>
 										<span className="d-flex material-icons notifications-material-icon m-auto align-items-center">notifications</span>
@@ -374,8 +383,10 @@ export const Header = (props) => {
 			// to be passed around
 
 			console.log("this is ", window);
-			console.log("Got notification websocket message.");
+	
 			var data = JSON.parse(message.data);
+			console.log("Got notification websocket message."+ data.general_msg_type);
+			console.log("Got notification websocket message."+ data.chat_msg_type);
 
 			console.log("received socket message is", data);
 			/*
@@ -430,9 +441,17 @@ export const Header = (props) => {
 				handleChatNotificationsData(data['notifications'], data['new_page_number'])
 			}
 
+			// "Chat" Pagination exhausted. No more results.
+		if(data.chat_msg_type == 11){
+			setChatPaginationExhausted()
+		}
 			// refreshed chat notifications
 			if (data.chat_msg_type == 13) {
 				handleNewChatNotificationsData(data['notifications'])
+			}
+
+			if(data.chat_msg_type == 14){
+				setChatNotificationsCount(data.count)
 			}
 		}
 
@@ -449,8 +468,9 @@ export const Header = (props) => {
 			getUnreadGeneralNotificationsCount()
 
 			setupChatNotificationsMenu()
-			getFirstGeneralNotificationsPage()
+			getFirstChatNotificationsPage()
 		}
+
 
 		notificationSocket.onerror = function (e) {
 			console.log('Notification Socket error', e)
@@ -939,7 +959,18 @@ Params:
 
 
 
-
+/*
+		Retrieve the number of unread chat notifications. (This is the red dot in the notifications icon)
+		Called every CHAT_NOTIFICATION_INTERVAL
+	*/
+	function getFirstChatNotificationsPage(){
+		if("{{request.user.is_authenticated}}"){
+			notificationSocket.send(JSON.stringify({
+				"command": "get_chat_notifications",
+				"page_number": "1",
+			}));
+		}
+	}
 	function preloadCallback(src, elementId) {
 		var img = document.getElementById(elementId)
 
@@ -948,6 +979,34 @@ Params:
 		img.src = replaced_url
 
 
+	}
+
+	/*
+		Received a payload from socket containing NEW chat notifications
+		Called every CHAT_NOTIFICATION_INTERVAL
+	*/
+	function handleNewChatNotificationsData(notifications){
+		if(notifications.length > 0){
+			clearNoChatNotificationsCard()
+			notifications.forEach(notification => {
+
+				submitNewChatNotificationToCache(notification)
+
+				setChatNewestTimestamp(notification['timestamp'])
+			})
+		}
+	}
+
+
+	
+/*
+		Remove the element that says "There are no notifications".
+	*/
+	function clearNoChatNotificationsCard(){
+		var element = document.getElementById("id_no_chat_notifications")
+		if(element != null && element != "undefined"){
+			document.getElementById("id_chat_notifications_container").removeChild(element)
+		}
 	}
 
 	/*
@@ -995,6 +1054,21 @@ Params:
 		}
 	}
 
+
+	/*
+		Sets all the notifications currently visible as "read"
+	*/
+	function setGeneralNotificationsAsRead(){
+		if("{{request.user.is_authenticated}}"){
+			oldestTimestamp = document.getElementById("id_general_oldest_timestamp").innerHTML
+			notificationSocket.send(JSON.stringify({
+				"command": "mark_notifications_read",
+			}));
+			getUnreadGeneralNotificationsCount()
+		}
+	}
+
+
 	/*
 	This will always fire first. 
 		Retrieve the first page of notifications.
@@ -1002,7 +1076,7 @@ Params:
 	*/
 	function getFirstGeneralNotificationsPage() {
 		// console.log("the notification sent");
-		if ("{{request.user.is_authenticated}}") {
+		if (authUser.isAuthenticated) {
 			notificationSocket.send(JSON.stringify({
 				"command": "get_general_notifications",
 				"page_number": "1",
@@ -1015,4 +1089,5 @@ Params:
 
 };
 export var notificationSocket
-export default Header;
+
+export default Header

@@ -98,7 +98,29 @@ class Account(AbstractBaseUser, PermissionsMixin):
 class UserEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
-        
+
+
+#Model #2
+class Subject(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+
+# We should be able to search based on the category
+class Posting(models.Model):
+    title = models.CharField(max_length=120)
+    author = models.ForeignKey(Account, on_delete=models.CASCADE)
+    subject = models.ManyToManyField(Subject)
+    publish_date = models.DateTimeField()
+    price_per_hour = models.IntegerField(default=0)
+    reviewed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+
+
 @receiver(post_save, sender = settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance = None, created = False, **kwargs):
     if created:

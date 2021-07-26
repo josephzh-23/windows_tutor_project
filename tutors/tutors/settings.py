@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-cy-$z3w!!$qwtng)(%v%u#bu6b^t#_3m7zu*(6qv&t!ckwie(z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ["open-chat.xyz"]
+ALLOWED_HOSTS = ["10.0.2.2", "localhost", '127.0.0.1']
 
 
 # Application definition
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'public_chat',
     'private_chat',
     'upload',
+
 'crispy_forms'
 ]
 

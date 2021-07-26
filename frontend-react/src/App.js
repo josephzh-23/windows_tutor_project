@@ -28,6 +28,7 @@ import Public_Chat from './containers/Public_chat/Public_Chat.js';
 import Private_Chat from './containers/Private_chat/Private_chat';
 import Header from './containers/Header/Header';
 import ClientErrorModal from './containers/Public_chat/clientErrorModal';
+import SearchFilter from './containers/SearchFilter/SearchFilter.js';
 
 
 
@@ -77,6 +78,9 @@ function App() {
     user id 1)</NavLink></li>
 
     <li><NavLink to="/private_chat/">Private Chat</NavLink></li>
+
+    <li><NavLink to="/searchFilter/">Search Filtering</NavLink></li>
+
     <br/>
     <br/>
     <li><NavLink to="/login">Logging In</NavLink></li>
@@ -138,6 +142,8 @@ function App() {
       </div>
     <BrowserRouter>
     <div>
+
+      
       <ClientErrorModal/>
       <Top_section/>
       </div>
@@ -148,6 +154,10 @@ function App() {
                     <Route path ="/search/" >
                       <SearchFriends/>
                     </Route>
+                    <Route path ="/searchFilter/" >
+                      <SearchFilter/>
+                    </Route>
+
                     <Route path ="/private_chat/" >
                       <Private_Chat/>
                     </Route>

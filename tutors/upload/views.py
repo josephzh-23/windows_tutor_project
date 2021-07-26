@@ -1,4 +1,7 @@
+from tempfile import NamedTemporaryFile
+
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, CreateView
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse_lazy
@@ -11,6 +14,47 @@ class Home(TemplateView):
     template_name = 'home.html'
 
 
+@csrf_exempt
+def android_image_upload(request):
+    context = {}
+
+    print("message came throught here")
+    if request.method == 'POST':
+
+        # Try to save the img coming in from android
+        print(request.body)
+
+        # Using just simply a response
+        uploaded_file = request.body
+        # How you normally get the file out of the body
+        # For a multi part request
+
+
+        #Write jpg file to the temp file
+
+        print(request.FILES)
+        img_temp = NamedTemporaryFile(delete=True)
+        img_temp.write(request.body)
+        fs = FileSystemStorage()
+
+
+        print("file type is", type(uploaded_file))
+        # First get type of the file passed in here
+        name = fs.save("joseph", img_temp)
+
+
+        #The original part
+        # uploaded_file = request.FILES['body']
+        # fs = FileSystemStorage()
+        #
+        # name = fs.save("joseph", uploaded_file)
+
+        # name = fs.save(uploaded_file.name, uploaded_file)
+        # context['url'] = fs.url(name)
+    return render(request, 'upload.html', context)
+
+
+#Regular upload
 def upload(request):
     context = {}
     if request.method == 'POST':
