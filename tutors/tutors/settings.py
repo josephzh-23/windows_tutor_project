@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'private_chat',
     'upload',
 
+    'tutors',
 'crispy_forms'
 ]
 

@@ -9,8 +9,8 @@ from django.contrib import admin
 
 from django.contrib import admin
 
-from .models import Account, Subject, Posting
+from .models import Account, Subject, Tutor_Posting
 
 admin.site.register(Account)
 admin.site.register(Subject)
-admin.site.register(Posting)
+admin.site.register(Tutor_Posting)
