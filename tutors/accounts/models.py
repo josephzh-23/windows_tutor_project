@@ -107,12 +107,11 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
-# We should be able to search based on the category
-class Tutor_Posting(models.Model):
+# We should be able to search based on the subject
+#the tilt
+class Posting(models.Model):
     title = models.CharField(max_length=120)
     author = models.ForeignKey(Account, on_delete=models.CASCADE)
-
-    # Many to many relation here
     subject = models.ManyToManyField(Subject)
     publish_date = models.DateTimeField()
     price_per_hour = models.IntegerField(default=0)

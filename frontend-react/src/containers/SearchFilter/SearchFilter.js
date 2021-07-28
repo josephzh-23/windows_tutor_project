@@ -1,7 +1,75 @@
 
+import { useState } from 'react';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { getCookie } from './../../getCookie';
+import { errorToast, makeToast } from '../../Toaster.js';
+import { backend_url } from './../../Contants';
 
 const SearchFilter = () => {
     
+
+  var csrfToken = getCookie('csrftoken')
+  console.log(csrfToken);
+
+    //Here formData is initalized as en empty objct
+     // Each input will have a value with a key and value 
+     const [values, setValues]  = useState({
+
+      username: '',
+      email:'',
+      password:'',
+      password2:''
+  })
+
+
+  const handleSubmit = (e)=>{
+
+    e.preventDefault()
+    
+    axios(
+      {
+       method: 'POST',
+     url: "http://127.0.0.1:8000/accounts/1/accountUpdate/",
+     data:value,
+       headers: {
+          Authorization: "Token " + sessionStorage.getItem("token"),
+         'Content-type':'application/json',
+         'X-CSRFToken': csrfToken
+       }
+      })
+      .then(res => {
+
+         
+          console.log(res.data);
+          makeToast("error", res.data)
+          // console.log("the resut ",extra.isFriend , extra.isSelf);
+      }).catch(err => {
+          console.log(err)
+      })
+
+
+  }
+  const handleChange =e=>{
+
+      setValues({
+        ...values,
+        [e.target.name]: e.target.value
+      })
+
+      // Can also do 
+      // const {name, value} = e.target
+      // setValues({
+      //   ...values,
+      //   [name]:value
+      // })
+  }
+
+
+  useEffect(()=>{
+
+    console.log("search filter page");
+  })
     return(
 
 
@@ -22,7 +90,7 @@ const SearchFilter = () => {
         <main role="main" className="container">
     
           <h3>Filter Tutors</h3>
-          <form method="GET" action=".">
+          <form onSubmit={handleSubmit} method="post" >
             <div className="form-row">
                 <div className="form-group col-12">
                     <div className="input-group">
@@ -61,25 +129,26 @@ const SearchFilter = () => {
             </div>
             <div className="form-row">
               <div className="form-group col-md-2 col-lg-2">
-                <label for="viewCountMin">Minimum View Count</label>
+                <label htmlFor="viewCountMin">Minimum View Count</label>
                 <input type="number"  className="form-control" id="viewCountMin" placeholder="0" name="view_count_min"/>
               </div>
               <div className="form-group col-md-2 col-lg-2">
-                <label for="viewCountMax">Maximum View Count</label>
+                <label htmlFor="viewCountMax">Maximum View Count</label>
                 <input type="number" className="form-control" id="viewCountMax" placeholder="10000?" name="view_count_max"/>
               </div>
               <div className="form-group col-md-2 col-lg-2">
-                <label for="publishDateMin">Publish date minimum</label>
+                <label htmlFor="publishDateMin">Publish date minimum</label>
                 <input type="date" className="form-control" id="publishDateMin" name="date_min"/>
               </div>
               <div className="form-group col-md-2 col-lg-2">
-                <label for="publishDateMax">Publish date maximum</label>
+                <label htmlFor="publishDateMax">Publish date maximum</label>
                 <input type="date" className="form-control" id="publishDateMax" name="date_max"/>
               </div>
               <div className="form-group col-md-4">
-                <label for="category">Category</label>
+                <label htmlFor="category">Category</label>
                 <select id="category" className="form-control" name="category">
-                  <option selected>Choose...</option>
+                  <option value="selected">Choose...</option>
+
                   {/* {% for cat in categories %} */}
                   {/* <option value="{{ cat }}">{{ cat }}</option> */}
                   {/* {% endfor %} */}
@@ -92,7 +161,7 @@ const SearchFilter = () => {
             <div className="form-group">
               <div className="form-check">
                 <input className="form-check-input" type="checkbox" id="reviewed" name="reviewed"/>
-                <label className="form-check-label" for="reviewed">
+                <label className="form-check-label" htmlFor="reviewed">
                   Reviewed
                 </label>
               </div>
@@ -100,13 +169,13 @@ const SearchFilter = () => {
             <div className="form-group">
               <div className="form-check">
                 <input className="form-check-input" type="checkbox" id="notReviewed" name="notReviewed"/>
-                <label className="form-check-label" for="notReviewed">
+                <label className="form-check-label" htmlFor="notReviewed">
                   Not reviewed
                 </label>
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary">Search</button>
+            <button type="submit"  className="btn btn-primary">Search</button>
                      
 
         </form>

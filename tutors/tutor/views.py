@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
+from accounts.models import Posting, Subject
 from .models import Tutor
 from .serializers import TutorSerializer
 
@@ -53,6 +54,27 @@ def tutorDeleteView(request,pk):
     else:
         data["failed"] = "delete failed"
     return Response(data= data)
+
+
+#Build
+def filterView(request):
+    qs = Posting.objects.all()
+    categories = Subject.objects.all()
+
+    title_contains_query = request.GET.get('title_contains')
+    id_exact_query = request.GET.get('id_exact')
+
+    title_or_author_query = request.GET.get('title_or_author')
+
+    hourly_rate_count_min = request.GET.get('hourly_rate_count_min')
+    hourly_rate_count_max = request.GET.get('hourly_rate_count_max')
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    subject = request.GET.get('subject')
+    reviewed = request.GET.get('reviewed')
+    not_reviewed = request.GET.get('notReviewed')
+
 
 
 

@@ -2,7 +2,7 @@ import datetime
 import random
 from django.core.management.base import BaseCommand
 
-from accounts.models import Account, Tutor_Posting, Subject
+from accounts.models import Account, Subject, Posting
 
 # case 1
 # This file has to be run from under the
@@ -27,11 +27,13 @@ def get_one_random_domain(domains):
     return domains[random.randint(0, len(domains) - 1)]
 
 
+# This would take a bunch of letters and loop and add
+# UP to length 7 as discussed
 def get_one_random_name(letters):
-    email_name = ""
+    name = ""
     for i in range(7):
-        email_name = email_name + letters[random.randint(0, 11)]
-    return email_name
+        name = name + letters[random.randint(0, 11)]
+    return name
 
 
 def generate_random_emails():
@@ -92,7 +94,9 @@ class Command(BaseCommand):
         with open(f'{file_name}.txt') as file:
             for row in file:
                 title = row
-                tutor_name = generate_tutor_name()
+                # tutor_name = generate_tutor_name()
+
+                tutor_name = get_one_random_name(letters)
                 course_name = generate_course_name()
                 posted_data = generate_publish_date()
                 hourly_rate = generate_hourly_rate()
@@ -100,13 +104,23 @@ class Command(BaseCommand):
 
                 rand_email = generate_random_emails()
                 print('email is with username ', rand_email, tutor_name)
-                author = Account.objects.get_or_create(
-                    username=tutor_name,
-                    email=rand_email
-                )
+
+                # Make sure if author is not found here
+                # Then create an user with a password, email and username
+
+                try:
+                    author = Account.objects.get(
+                        username=tutor_name
+                    )
+                    return author
+                except Account.DoesNotExist:
+                    Account.objects.create_user(rand_email,
+                                                tutor_name,
+                                                "931108"
+                                                )
 
 
-                posting = Tutor_Posting(
+                posting = Posting(
                     title=title,
                     author=Account.objects.get(username=tutor_name),
                     publish_date=posted_data,
