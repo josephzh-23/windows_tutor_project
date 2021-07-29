@@ -120,6 +120,10 @@ class Posting(models.Model):
     def __str__(self):
         return self.title
 
+    # subclass Post Encoder
+class PostingEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 
 @receiver(post_save, sender = settings.AUTH_USER_MODEL)

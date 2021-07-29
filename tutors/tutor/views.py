@@ -1,3 +1,6 @@
+import json
+
+from django.db.models import Q
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -8,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
-from accounts.models import Posting, Subject
+from accounts.models import Posting, Subject, PostingEncoder
 from .models import Tutor
 from .serializers import TutorSerializer
 
@@ -57,17 +60,23 @@ def tutorDeleteView(request,pk):
 
 
 #Build
-def filterView(request):
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def search_posting(request):
+
+    print(request.body)
+    body = request.body
     qs = Posting.objects.all()
-    categories = Subject.objects.all()
+    subject = Subject.objects.all()
 
     title_contains_query = request.GET.get('title_contains')
     id_exact_query = request.GET.get('id_exact')
 
     title_or_author_query = request.GET.get('title_or_author')
 
-    hourly_rate_count_min = request.GET.get('hourly_rate_count_min')
-    hourly_rate_count_max = request.GET.get('hourly_rate_count_max')
+    min_hourly_rate = request.GET.get('min_hourly_rate')
+    max_hourly_rate = request.GET.get('max_hourly_rate')
 
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
@@ -75,8 +84,47 @@ def filterView(request):
     reviewed = request.GET.get('reviewed')
     not_reviewed = request.GET.get('notReviewed')
 
+    if is_valid_queryparam(title_contains_query):
+        qs = qs.filter(title__icontains=title_contains_query)
+
+    #This checks for both the title or author query here
+    elif is_valid_queryparam(title_or_author_query):
+        qs = qs.filter(Q(title__icontains=title_or_author_query)
+                       | Q(author__name__icontains=title_or_author_query)
+                       ).distinct()
+
+    elif is_valid_queryparam(id_exact_query):
+        qs = qs.filter(id=id_exact_query)
+
+    if is_valid_queryparam(min_hourly_rate):
+        qs = qs.filter(views__gte=min_hourly_rate)
 
 
+    if is_valid_queryparam(max_hourly_rate):
+        qs = qs.filter(views__lt=max_hourly_rate)
+
+    if is_valid_queryparam(date_min):
+        qs = qs.filter(publish_date__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        qs = qs.filter(publish_date__lt=date_max)
+
+    if is_valid_queryparam(subject) and subject != 'Choose...':
+        qs = qs.filter(subject__name=subject)
+
+    if reviewed == 'on':
+        qs = qs.filter(reviewed=True)
+
+    elif not_reviewed == 'on':
+        qs = qs.filter(reviewed=False)
+
+    print(qs)
+
+    posting_json_data = json.dumps(qs, indent=4, cls= PostingEncoder)
+    return Response(qs)
+
+def is_valid_queryparam(param):
+    return param != '' and param is not None
 
 # Retireve 1 single tutor 
 @api_view(['PUT',])

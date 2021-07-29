@@ -5,6 +5,8 @@ const UploadPage  = () => {
 
     //Here formData is initalized as en empty objct
     const [formData, setFormData] = useState({})
+
+    
     const fileSelectedHandler = event=>{
         // tis is the 1st file in a multi-file 
        console.log(event.target.files[0]);

@@ -16,22 +16,42 @@ const SearchFilter = () => {
      // Each input will have a value with a key and value 
      const [values, setValues]  = useState({
 
-      username: '',
-      email:'',
-      password:'',
-      password2:''
+      title_contains: '',
+      id_exact:'', 
+      title_or_author:"", 
+      hourly_rate_count_min:"", 
+      hourly_rate_count_max:''
+      // date_min,
+      // date_max,
+      // subject,
+      // reviewed,
+      // not_reviewed
   })
 
 
+
+  // 
   const handleSubmit = (e)=>{
 
     e.preventDefault()
+    console.log(e.target.elements.length);
+    // Build the form data here
+
+    const form = e.target
+    const formData = new FormData(e.target)
+
+    const data = {};
+    for (let i=0; i < form.elements.length; i++) {
+        const elem = form.elements[i];
+        data[elem.name] = elem.value
+    }
+    console.log('data is ', data);
     
     axios(
       {
        method: 'POST',
-     url: "http://127.0.0.1:8000/accounts/1/accountUpdate/",
-     data:value,
+     url: "http://127.0.0.1:8000/accounts/search_posting/",
+     data:values,
        headers: {
           Authorization: "Token " + sessionStorage.getItem("token"),
          'Content-type':'application/json',
@@ -50,6 +70,8 @@ const SearchFilter = () => {
 
 
   }
+
+  // For this project here, we will skip using handleChange()
   const handleChange =e=>{
 
       setValues({
@@ -94,7 +116,9 @@ const SearchFilter = () => {
             <div className="form-row">
                 <div className="form-group col-12">
                     <div className="input-group">
-                        <input className="form-control py-2 border-right-0 border" type="search" name="title_contains" placeholder="Title contains..." />
+                        <input className="form-control py-2 border-right-0 border" 
+                        type="search" name="title_contains" placeholder="Title contains..."
+                         />
                         <span className="input-group-append">
                             <div className="input-group-text bg-transparent">
                                 <i className="fa fa-search"></i>
@@ -106,7 +130,10 @@ const SearchFilter = () => {
             <div className="form-row">
                 <div className="form-group col-12">
                     <div className="input-group">
-                        <input className="form-control py-2 border-right-0 border" type="search" name="id_exact" placeholder="ID exact..." />
+                        <input className="form-control py-2 border-right-0 border" type="search"
+                         name="id_exact" placeholder="ID exact..." 
+                        //  onChange= {handleChange}
+                        value= {values.id_exact}/>
                         <span className="input-group-append">
                             <div className="input-group-text bg-transparent">
                                 <i className="fa fa-search"></i>
@@ -129,12 +156,14 @@ const SearchFilter = () => {
             </div>
             <div className="form-row">
               <div className="form-group col-md-2 col-lg-2">
-                <label htmlFor="viewCountMin">Minimum View Count</label>
-                <input type="number"  className="form-control" id="viewCountMin" placeholder="0" name="view_count_min"/>
+                <label htmlFor="viewCountMin">Minimum Hourly rate</label>
+                <input type="number"  className="form-control" id="viewCountMin" 
+                placeholder="0" name="min_hourly_rate"
+               />
               </div>
               <div className="form-group col-md-2 col-lg-2">
                 <label htmlFor="viewCountMax">Maximum View Count</label>
-                <input type="number" className="form-control" id="viewCountMax" placeholder="10000?" name="view_count_max"/>
+                <input type="number" className="form-control" id="viewCountMax" placeholder="10000?" name="max_hourly_rate"/>
               </div>
               <div className="form-group col-md-2 col-lg-2">
                 <label htmlFor="publishDateMin">Publish date minimum</label>
@@ -145,8 +174,8 @@ const SearchFilter = () => {
                 <input type="date" className="form-control" id="publishDateMax" name="date_max"/>
               </div>
               <div className="form-group col-md-4">
-                <label htmlFor="category">Category</label>
-                <select id="category" className="form-control" name="category">
+                <label htmlFor="category">Subject</label>
+                <select id="category" className="form-control" name="subject">
                   <option value="selected">Choose...</option>
 
                   {/* {% for cat in categories %} */}
