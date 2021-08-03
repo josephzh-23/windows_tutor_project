@@ -87,9 +87,9 @@ const Create_Posting = () => {
   const add_posting = async (event) => {
     event.preventDefault();
       // Need to first validate the data object
-    // if(!validate_form(formData)){
-    //     errorToast('Please fill out all the fields')
-    // }else{
+    if(!validate_form(formData)){
+        errorToast('Please fill out all the fields')
+    }else{
    
 
     console.log(formData);
