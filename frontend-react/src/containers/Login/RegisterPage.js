@@ -7,7 +7,7 @@ import {useHistory} from 'react-router-dom'
 
 
 import { makeToast } from "../../Toaster";
-import { getCookie } from "../../Reusable/Utilities/Util";
+import { getCookie } from "../../Reusable_Vanilla/Utilities/Util";
 const RegisterPage = (props) => {
   const history = useHistory();
   const nameRef = React.createRef();

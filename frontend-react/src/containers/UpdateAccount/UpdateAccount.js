@@ -4,12 +4,12 @@ import axios from 'axios';
 
 import  "../Profile/Profile.css";
 import { disableImageOverlay, enableImageOverlay ,
-    setImageCropProperties} from "../../Reusable/Utilities/croppingEditor.js"
+    setImageCropProperties} from "../../Reusable_Vanilla/Utilities/croppingEditor.js"
 import './UpdateAccount.css';
 
 import Cropper from 'cropperjs';
 import { makeToast } from "../../Toaster.js";
-import { getCookie } from "../../Reusable/Utilities/Util";
+import { getCookie } from "../../Reusable_Vanilla/Utilities/Util";
 
 
 const UpdateAccount = (params) => {

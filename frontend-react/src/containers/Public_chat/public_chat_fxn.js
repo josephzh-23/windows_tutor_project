@@ -2,9 +2,9 @@
 //Contain all the function for handling user input
 // in public chat page 
 
-import { preloadImage } from "../../Reusable/Async_image_loader.js"
-import auth_user from "../../Reusable/auth_user.js"
-import { delete_public_chat_Cookie, getCookie, set_cookie } from "../../Reusable/Cookie.js";
+import { preloadImage } from "../../Reusable_Vanilla/Async_image_loader.js"
+import auth_user from "../../Reusable_React/auth_user.js"
+import { delete_public_chat_Cookie, getCookie, set_cookie } from "../../Reusable_Vanilla/Cookie.js";
 
 
 	function $(element) {

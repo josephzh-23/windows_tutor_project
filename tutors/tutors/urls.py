@@ -40,7 +40,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
         path('accounts/', include('accounts.urls')),
-        path('api/tutor/', include('tutor.urls')),
+        path('tutor/', include('tutor.urls')),
           path('admin/', admin.site.urls),
           path('friend/', include('friend.urls')),
     # path('api/realtors/', include('realtors.urls')),

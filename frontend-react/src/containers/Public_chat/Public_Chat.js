@@ -1,6 +1,6 @@
   
 import { useContext, useEffect } from "react"
-import { UserContext } from "../../Reusable/UserContext.js"
+import { UserContext } from "../../Reusable_React/UserContext.js"
 
 import { getRoomChatMessages, setupPublicChatWebSocket } from "./public_chat_fxn.js"
 

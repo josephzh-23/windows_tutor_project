@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import Listing
 
+
+# Here this is a many to many relation used to
+#create a listing object
 class ListingSerializer(serializers.ModelSerializer):
 
 # Returning the tutor associated 

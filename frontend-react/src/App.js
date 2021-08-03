@@ -21,14 +21,15 @@ import SearchFriends from "./containers/SearchFriends.js"
 import RegisterPage from './containers/Login/RegisterPage.js';
 import LoginPage from './containers/Login/LoginPage.js';
 import UpdateAccount from './containers/UpdateAccount/UpdateAccount.js'
-import { UserContext, UserContextProvider } from './Reusable/UserContext';
+import { UserContext, UserContextProvider } from './Reusable_React/UserContext';
 import { FriendRequests } from './containers/FriendRequests.js';
-import { getCookie } from './Reusable/Utilities/Util';
+import { getCookie } from './Reusable_Vanilla/Utilities/Util';
 import Public_Chat from './containers/Public_chat/Public_Chat.js';
 import Private_Chat from './containers/Private_chat/Private_chat';
 import Header from './containers/Header/Header';
 import ClientErrorModal from './containers/Public_chat/clientErrorModal';
-import SearchFilter from './containers/SearchFilter/SearchFilter.js';
+import Search_Posting from './containers/Search_Posting/Search_Posting.js';
+import Create_Posting from './containers/CreatePosting/Create_Posting.js';
 
 
 
@@ -78,6 +79,7 @@ function App() {
     user id 1)</NavLink></li>
 
     <li><NavLink to="/private_chat/">Private Chat</NavLink></li>
+    <li><NavLink to="/create_posting/">Create Tutor Posting</NavLink></li>
 
     <li><NavLink to="/searchFilter/">Search Filtering</NavLink></li>
 
@@ -155,7 +157,7 @@ function App() {
                       <SearchFriends/>
                     </Route>
                     <Route path ="/searchFilter/" >
-                      <SearchFilter/>
+                      <Search_Posting/>
                     </Route>
 
                     <Route path ="/private_chat/" >
@@ -171,6 +173,9 @@ function App() {
                 <Route path="/login" component={LoginPage} exact />
                 <Route path="/account/friendRequests" component={FriendRequests} exact />
                 
+
+                <Route path="/create_posting" component={Create_Posting} exact />
+
                 <Route path="/public_chat" component ={Public_Chat} exact/>
                 <Route path="/account/friend_list_view" 
                 render= {()=><FriendList user={authUser} />}exact />

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Tutor
+from .models import Tutor, Subject, Posting
+
+
 # Register your models here.
 
 #Where we add the model
@@ -11,3 +13,6 @@ class TutorAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 admin.site.register(Tutor, TutorAdmin)
+
+admin.site.register(Subject)
+admin.site.register(Posting)

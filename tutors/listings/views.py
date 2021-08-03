@@ -30,8 +30,9 @@ class ListingsAllView(ListAPIView):
 @permission_classes([permissions.AllowAny])
 def ListingView(request,pk):
     permission_classes = (permissions.AllowAny, )
-    tutor = Listing.objects.get(id=pk)
-    serializer = ListingSerializer(tutor, many = False)
+    tutor_listing = Listing.objects.get(id=pk)
+
+    serializer = ListingSerializer(tutor_listing, many = False)
     return Response(serializer.data)
 
 

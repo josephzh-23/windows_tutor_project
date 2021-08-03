@@ -4,9 +4,9 @@ import axios from "axios";
 import { useHistory, withRouter } from "react-router-dom";
 
 
-import { UserContext } from "../../Reusable/UserContext";
+import { UserContext } from "../../Reusable_React/UserContext";
 import { errorToast, makeToast } from "../../Toaster";
-import { getCookie } from "../../Reusable/Utilities/Util";
+import { getCookie } from "../../Reusable_Vanilla/Utilities/Util";
 
 const LoginPage = (props) => {
 

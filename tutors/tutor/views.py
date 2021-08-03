@@ -1,19 +1,22 @@
 import json
+from datetime import timezone, datetime
 
 from django.db.models import Q
-from rest_framework import permissions
+from rest_framework import permissions, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework.views import APIView
 
-from accounts.models import Posting, Subject, PostingEncoder
-from .models import Tutor
-from .serializers import TutorSerializer
+from accounts.models import Account
+from listings.serializer import ListingSerializer
+from .models import Tutor, Subject, Posting
+from .serializers import TutorSerializer, PostingSerializer, SubjectSerializer
 
 # Have a section for the tutors here
 # Create your views here.
@@ -42,6 +45,25 @@ def TutorView(request,pk):
     return Response(serializer.data)
 
 
+# Retireve 1 single tutor
+@api_view(['POST',])
+@permission_classes([permissions.AllowAny])
+def tutorDeleteView(request,pk):
+    try:
+        tutor = Tutor.objects.get(id= pk)
+    except Tutor.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    operation = tutor.delete()
+    data= {}
+    if operation:
+        data["success"] = "delete successful"
+    else:
+        data["failed"] = "delete failed"
+    return Response(data= data)
+
+
+#Build
+
 # Retireve 1 single tutor 
 @api_view(['DELETE',])
 @permission_classes([permissions.AllowAny])
@@ -65,28 +87,28 @@ def tutorDeleteView(request,pk):
 @permission_classes([permissions.AllowAny])
 def search_posting(request):
 
-    print(request.body)
-    body = request.body
+    print(request.data)
+
     qs = Posting.objects.all()
     subject = Subject.objects.all()
 
-    title_contains_query = request.GET.get('title_contains')
-    id_exact_query = request.GET.get('id_exact')
+    title_contains_query = request.data.get('title_contains')
+    id_exact_query = request.data.get('id_exact')
 
-    title_or_author_query = request.GET.get('title_or_author')
+    title_or_author_query = request.data.get('title_or_author')
 
-    min_hourly_rate = request.GET.get('min_hourly_rate')
-    max_hourly_rate = request.GET.get('max_hourly_rate')
+    min_hourly_rate = request.data.get('min_hourly_rate')
+    max_hourly_rate = request.data.get('max_hourly_rate')
 
-    date_min = request.GET.get('date_min')
-    date_max = request.GET.get('date_max')
-    subject = request.GET.get('subject')
-    reviewed = request.GET.get('reviewed')
-    not_reviewed = request.GET.get('notReviewed')
+    date_min = request.data.get('date_min')
+    date_max = request.data.get('date_max')
+    subject = request.data.get('subject')
+    reviewed = request.data.get('reviewed')
+    not_reviewed = request.data.get('notReviewed')
 
     if is_valid_queryparam(title_contains_query):
         qs = qs.filter(title__icontains=title_contains_query)
-
+        print(qs)
     #This checks for both the title or author query here
     elif is_valid_queryparam(title_or_author_query):
         qs = qs.filter(Q(title__icontains=title_or_author_query)
@@ -97,11 +119,12 @@ def search_posting(request):
         qs = qs.filter(id=id_exact_query)
 
     if is_valid_queryparam(min_hourly_rate):
-        qs = qs.filter(views__gte=min_hourly_rate)
+        qs = qs.filter(price_per_hour__gte=min_hourly_rate)
+        print(qs)
 
-
+    print('maximum rate is', max_hourly_rate)
     if is_valid_queryparam(max_hourly_rate):
-        qs = qs.filter(views__lt=max_hourly_rate)
+        qs = qs.filter(price_per_hour__lt=max_hourly_rate)
 
     if is_valid_queryparam(date_min):
         qs = qs.filter(publish_date__gte=date_min)
@@ -109,19 +132,24 @@ def search_posting(request):
     if is_valid_queryparam(date_max):
         qs = qs.filter(publish_date__lt=date_max)
 
+#Should be able to search based on the subject
     if is_valid_queryparam(subject) and subject != 'Choose...':
-        qs = qs.filter(subject__name=subject)
+        qs = qs.filter(subject__name__icontains=subject)
 
-    if reviewed == 'on':
-        qs = qs.filter(reviewed=True)
+    # if reviewed == 'on':
+    #     qs = qs.filter(reviewed=True)
+    #
+    # elif not_reviewed == 'on':
+    #     qs = qs.filter(reviewed=False)
 
-    elif not_reviewed == 'on':
-        qs = qs.filter(reviewed=False)
+    print("query data is ", qs)
+    serializer = PostingSerializer
+    #Serializing many data here
+    s = serializer(qs, many=True)
 
-    print(qs)
-
-    posting_json_data = json.dumps(qs, indent=4, cls= PostingEncoder)
-    return Response(qs)
+    # print(s.data)
+    # posting_json_data = json.dumps(qs, indent=4, cls= PostingEncoder)
+    return Response(s.data)
 
 def is_valid_queryparam(param):
     return param != '' and param is not None
@@ -289,19 +317,111 @@ class TutorSearchView(APIView):
 
         return Response(serializer.data)
 
-@api_view(['post',])
+
+@api_view(['post', ])
 @permission_classes([permissions.AllowAny])
 def createTutorView(request):
-    #  we can also edit permission here 
+    #  we can also edit permission here
 
     print(request.data)
 
-    # need to figure out the path here to where it's saved 
-    #Change the req.data.path
-    serializer = TutorSerializer(data =request.data)
+    # need to figure out the path here to where it's saved
+    # Change the req.data.path
+    serializer = TutorSerializer(data=request.data)
     data = {}
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+# @api_view(['post',])
+# @permission_classes([permissions.AllowAny])
+# def create_tutor_posting(request):
+#     #  we can also edit permission here
+#
+#     print(request.body)
+#     body_unicode = request.body.decode('utf-8')
+#     body = json.loads(body_unicode)
+#
+#     print('body is ', body)
+#     subject_name = body.get('subject')
+#     #Find the author and subject associated based on what's passed
+#
+#     author = request.user
+#     print('subject is', subject_name)
+#
+#     # subject = Subject.objects.get_or_create(subject_name )
+#
+#     data = request.body
+#     print(body)
+#     if body is not None:
+#         # need to figure out the path here to where it's saved
+#         #Change the req.data.path
+#         serializer = PostingSerializer(author= author, subject =subject_name, data= data)
+#         try:
+#             if serializer.is_valid():
+#
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             print(serializer)
+#             print(serializer.errors)
+#         except Exception as e:
+#             print(e)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#Handles both post and get requests
+class Postings_Viewset(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = PostingSerializer
+
+    def get_queryset(self):
+        postings = Posting.objects.all()
+        return postings
+
+#For handling the post request
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        #Data here is actually
+        print(request.data)
+        print(data['name'])
+        #Get the author as well
+
+        # ORM : a way of writing sql query in python
+        author = Account.objects.get(username =data["name"])
+        for key in request.data:
+            print(key)
+
+        new_posting = Posting.objects.create(
+            title=data["title"],
+            body=data['body'],
+            publish_date=data["publish_date"],
+            author= author)
+        try:
+            new_posting.save()
+            print(new_posting)
+        except Exception as e:
+            print(e)
+            return Response({"error": "Sorry can't create a posting right now"})
+            #Adding >1 subjects here to the posting
+        for subject in data["subject"]:
+            print('subject is ', subject)
+            subject_added = Subject.objects.get_or_create(name=subject)
+            print(subject_added)
+            new_posting.subject.add(Subject.objects.get(name__iexact= subject))
+
+        serializer = PostingSerializer(new_posting)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+#Also want to show all the subjects
+class Subjects_Viewset(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = SubjectSerializer
+
+    def get_queryset(self):
+        module = Subject.objects.all()
+        return module

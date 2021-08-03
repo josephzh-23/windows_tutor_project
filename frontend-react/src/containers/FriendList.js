@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useContext, useEffect, useState } from "react"
-import { UserContext } from "../Reusable/UserContext.js"
-import { getQueryStrings } from "../Reusable/Utilities/getQueryStrings.js"
+import { UserContext } from "../Reusable_React/UserContext.js"
+import { getQueryStrings } from "../Reusable_Vanilla/Utilities/getQueryStrings.js"
 
 
 /*

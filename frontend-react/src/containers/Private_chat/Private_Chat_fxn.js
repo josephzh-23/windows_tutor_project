@@ -4,10 +4,10 @@
 
 	import axios from "axios"
 import { backend_url } from "../../Contants.js"
-import { preloadImage } from "../../Reusable/Async_image_loader.js"
-	import auth_user from "../../Reusable/auth_user.js"
-import { delete_private_chat_Cookie, getCookie, set_cookie } from "../../Reusable/Cookie.js"
-import { displayChatroomLoadingSpinner } from "../../Reusable/display_chatroom_loading_spinner.js"
+import { preloadImage } from "../../Reusable_Vanilla/Async_image_loader.js"
+	import auth_user from "../../Reusable_React/auth_user.js"
+import { delete_private_chat_Cookie, getCookie, set_cookie } from "../../Reusable_Vanilla/Cookie.js"
+import { displayChatroomLoadingSpinner } from "../../Reusable_Vanilla/display_chatroom_loading_spinner.js"
 import { errorToast, successToast } from "../../Toaster.js"
 
 

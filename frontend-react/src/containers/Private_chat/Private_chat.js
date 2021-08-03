@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { backend_url } from "../../Contants.js";
-import { preloadImage } from "../../Reusable/Async_image_loader.js";
-import { displayChatroomLoadingSpinner } from "../../Reusable/display_chatroom_loading_spinner.js";
-import { UserContext } from "../../Reusable/UserContext.js";
+import { preloadImage } from "../../Reusable_Vanilla/Async_image_loader.js";
+import { displayChatroomLoadingSpinner } from "../../Reusable_Vanilla/display_chatroom_loading_spinner.js";
+import { UserContext } from "../../Reusable_React/UserContext.js";
 
 import { appendChatMessage, closeWebSocket, enableChatLogScrollListener, getUserInfo, handleMessagesPayload, retrieve_user_info_payload, setupWebSocket } from "./Private_Chat_fxn.js"
 
 import { errorToast, successToast } from "../../Toaster.js";
-import { deleteCookie, delete_private_chat_Cookie, getCookie, set_cookie, set_cookie_private_chat } from "../../Reusable/Cookie.js";
+import { deleteCookie, delete_private_chat_Cookie, getCookie, set_cookie, set_cookie_private_chat } from "../../Reusable_Vanilla/Cookie.js";
 import { getRoomChatMessages } from "../Public_chat/public_chat_fxn.js";
 const Private_Chat = (params) => {
 	var $ = function( id ) { return document.getElementById( id ); };

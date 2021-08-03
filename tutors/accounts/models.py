@@ -1,19 +1,18 @@
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.core.files.storage import FileSystemStorage
-from django.conf import settings
-from rest_framework.authtoken.models import Token
-from django.conf import settings
-from json import JSONEncoder
 import datetime
-# Token created here too 
-
-
 import json
+
+from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
 from friend.models import BuddyList
+
+
+# Token created here too
 
 class UserAccountManager(BaseUserManager):
     def create_user(self, email, username, password=None):
@@ -93,37 +92,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
         else:    
             return json.dumps(self, default=lambda o: o.__dict__)
 	# Check if user has permission to view this class 
-
-#The default method the same as the JSONEncoder.encode(object)
-class UserEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
-
-
-#Model #2
-class Subject(models.Model):
-    name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.name
-
-# We should be able to search based on the subject
-#the tilt
-class Posting(models.Model):
-    title = models.CharField(max_length=120)
-    author = models.ForeignKey(Account, on_delete=models.CASCADE)
-    subject = models.ManyToManyField(Subject)
-    publish_date = models.DateTimeField()
-    price_per_hour = models.IntegerField(default=0)
-    reviewed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.title
-
-    # subclass Post Encoder
-class PostingEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
 
 
 @receiver(post_save, sender = settings.AUTH_USER_MODEL)

@@ -1,10 +1,10 @@
 import 'bootstrap/dist/js/bootstrap.bundle';
 import React, { useContext, useEffect } from 'react';
-import { set_cookie } from '../../Reusable/Cookie.js';
-import { UserContext } from '../../Reusable/UserContext.js';
+import { set_cookie } from '../../Reusable_Vanilla/Cookie.js';
+import { UserContext } from '../../Reusable_React/UserContext.js';
 import Form from '../Form.js';
 
-import $ from '../../Reusable/Utilities/Util.js'
+import $ from '../../Reusable_Vanilla/Utilities/Util.js'
 import {
 	updateGeneralNotificationDiv,
 	assignGeneralCardId,
@@ -27,9 +27,9 @@ import {
 	setGeneralNotificationsAsRead
 } from './general_notification_fxn.js';
 import './Header.css';
-import { build_promise } from './../../Reusable/Async_await/Promise';
-import { preloadImage } from '../../Reusable/Async_image_loader.js';
-import ImportScript from '../../Reusable/ImportScript.js';
+
+import { preloadImage } from '../../Reusable_Vanilla/Async_image_loader.js';
+import ImportScript from '../../Reusable_React/ImportScript.js';
 import {  handleChatNotificationsData,  handleNewChatNotificationsData,  setChatInitialTimestamp,  setChatNotificationsCount,  setChatPaginationExhausted,  setupChatNotificationsMenu } from '../Chat_Notifications/Chat_Notifications.js';
 import { submitNewChatNotificationToCache, setChatNewestTimestamp} from './../Chat_Notifications/Chat_Notifications';
 

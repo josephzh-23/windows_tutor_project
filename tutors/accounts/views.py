@@ -122,20 +122,24 @@ def login_view(request, *args, **kwargs):
             password = request.data.get('password')
             user = authenticate(email=email, password=password)
 
+            data ={}
             if user:
                 login(request, user)
                 token = Token.objects.get(user=user).key
                 print(email)
                 username = Account.objects.get(email = email).username
                 userId = user.id
+
+
                 # if destionation:
                 # 	return redirect(destination)
+                data['token'] = token
+                print("joseph")
+                # return Response(data)
+
                 return Response({'token': token, 'userId': userId,
                                  'username': username})
-                # In case there is a destination
-                # if destination:
-                # 	return redirect(destination)
-                # return redirect("home")
+
 
     else:
         form = AccountAuthenticationForm()

@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 // Will work on this page for now 
 import axios from 'axios';
 import "./Profile.css"
-import { getQueryStrings } from '../../Reusable/Utilities/getQueryStrings.js';
+import { getQueryStrings } from '../../Reusable_Vanilla/Utilities/getQueryStrings.js';
 
 import { makeToast } from "../../Toaster"
 // import { makeToast } from "../../Toaster"
 import {getCookie} from "../../getCookie"
 
 import { backend_url_friend,frontend_url_account } from '../../Contants.js';
-import { UserContext } from '../../Reusable/UserContext.js';
+import { UserContext } from '../../Reusable_React/UserContext.js';
 import { errorToast, successToast } from '../../Toaster.js';
 // import { readURL } from '../../scripts/croppingEditor.js';
 

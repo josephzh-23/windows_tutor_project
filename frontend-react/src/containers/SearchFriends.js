@@ -3,7 +3,7 @@ import React from "react";
 import axios from "axios";
 import 'whatwg-fetch'
 import '../assets/common.css'
-import { UserContext } from "../Reusable/UserContext";
+import { UserContext } from "../Reusable_React/UserContext";
 // Right now focused on buidling the user search page 
 
 const SearchFriends= (props) => {

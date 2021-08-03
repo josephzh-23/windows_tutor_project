@@ -4,8 +4,7 @@ from rest_framework.fields import SerializerMethodField
 from .models import Account
 
 
-
-# # Here we are overwriting the save () 
+# # Here we are overwriting the save ()
 class AccountSerializer(serializers.ModelSerializer):
 
 
@@ -38,6 +37,8 @@ class AccountSerializer(serializers.ModelSerializer):
 				return expanded_fields + self.Meta.extra_fields
 			else:
 				return expanded_fields
+
+
 
 # # class RegistrationSerializer(serializers.ModelSerializer):
 
