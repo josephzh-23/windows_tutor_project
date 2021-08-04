@@ -49,7 +49,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    
+
+
+    # A new field for whether user a
     hide_email= models.BooleanField(default=True)
     is_superuser = models.BooleanField(default = False)
     
