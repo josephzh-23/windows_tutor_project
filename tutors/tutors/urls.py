@@ -43,6 +43,8 @@ urlpatterns = [
         path('tutor/', include('tutor.urls')),
           path('admin/', admin.site.urls),
           path('friend/', include('friend.urls')),
+    path('schedule/', include('Schedules.urls')),
+
     # path('api/realtors/', include('realtors.urls')),
     path('api/listings/', include('listings.urls')),
     path('api/contacts/', include('contacts.urls')),
@@ -58,6 +60,7 @@ urlpatterns = [
 
     path('class/books/', views.BookListView.as_view(), name='class_book_list'),
     path('class/books/upload/', views.UploadBookView.as_view(), name='class_upload_book'),
+
 
 ] 
 

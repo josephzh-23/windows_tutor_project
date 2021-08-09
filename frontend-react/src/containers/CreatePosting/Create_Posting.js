@@ -14,6 +14,7 @@ import listPlugin from '@fullcalendar/list';
 
 import interactionPlugin from '@fullcalendar/interaction';
 import { INITIAL_EVENTS, createEventId } from '../../event-util.js';
+import { getCookie } from '../../Reusable_Vanilla/Utilities/Util';
 
 // import Calendar from 'tui-calendar'; /* ES6 */
 // import "tui-calendar/dist/tui-calendar.css";
@@ -24,9 +25,86 @@ import { INITIAL_EVENTS, createEventId } from '../../event-util.js';
 
 //Code for using the calendar library here
 const Create_Posting = () => {
-
+  var csrfToken = getCookie('csrftoken')
 
   useEffect(() => {
+
+
+    // document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('calendar');
+    
+      var calendar = new Calendar(calendarEl, {
+        plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin ],
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        initialDate: '2018-01-12',
+        navLinks: true, // can click day/week names to navigate views
+        editable: true,
+        dayMaxEvents: true, // allow "more" link when too many events
+        events: [
+          {
+            title: 'All Day Event',
+            start: '2018-01-01',
+          },
+          {
+            title: 'Long Event',
+            start: '2018-01-07',
+            end: '2018-01-10'
+          },
+          {
+            groupId: 999,
+            title: 'Repeating Event',
+            start: '2018-01-09T16:00:00'
+          },
+          {
+            groupId: 999,
+            title: 'Repeating Event',
+            start: '2018-01-16T16:00:00'
+          },
+          {
+            title: 'Conference',
+            start: '2018-01-11',
+            end: '2018-01-13'
+          },
+          {
+            title: 'Meeting',
+            start: '2018-01-12T10:30:00',
+            end: '2018-01-12T12:30:00'
+          },
+          {
+            title: 'Lunch',
+            start: '2018-01-12T12:00:00'
+          },
+          {
+            title: 'Meeting',
+            start: '2018-01-12T14:30:00'
+          },
+          {
+            title: 'Happy Hour',
+            start: '2018-01-12T17:30:00'
+          },
+          {
+            title: 'Dinner',
+            start: '2018-01-12T20:00:00'
+          },
+          {
+            title: 'Birthday Party',
+            start: '2018-01-13T07:00:00'
+          },
+          {
+            title: 'Click for Google',
+            url: 'http://google.com/',
+            start: '2018-01-28'
+          }
+        ]
+      });
+    
+      calendar.render();
+    // });
+    getSchedules()
     // var calendar = new Calendar('#calendar', {
     //   defaultView: 'day',
     //   taskView: true,
@@ -37,78 +115,8 @@ const Create_Posting = () => {
     //   }
     // });
     // console.log('user name is ', authUser.username)
-    var calendarEl = document.getElementById('calendar');
+  
 
-    var calendar = new Calendar(calendarEl, {
-      plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-      },
-      initialDate: '2018-01-12',
-      navLinks: true, // can click day/week names to navigate views
-      editable: true,
-      dayMaxEvents: true, // allow "more" link when too many events
-      events: [
-        {
-          title: 'All Day Event',
-          start: '2018-01-01',
-        },
-        {
-          title: 'Long Event',
-          start: '2018-01-07',
-          end: '2018-01-10'
-        },
-        {
-          groupId: 999,
-          title: 'Repeating Event',
-          start: '2018-01-09T16:00:00'
-        },
-        {
-          groupId: 999,
-          title: 'Repeating Event',
-          start: '2018-01-16T16:00:00'
-        },
-        {
-          title: 'Conference',
-          start: '2018-01-11',
-          end: '2018-01-13'
-        },
-        {
-          title: 'Meeting',
-          start: '2018-01-12T10:30:00',
-          end: '2018-01-12T12:30:00'
-        },
-        {
-          title: 'Lunch',
-          start: '2018-01-12T12:00:00'
-        },
-        {
-          title: 'Meeting',
-          start: '2018-01-12T14:30:00'
-        },
-        {
-          title: 'Happy Hour',
-          start: '2018-01-12T17:30:00'
-        },
-        {
-          title: 'Dinner',
-          start: '2018-01-12T20:00:00'
-        },
-        {
-          title: 'Birthday Party',
-          start: '2018-01-13T07:00:00'
-        },
-        {
-          title: 'Click for Google',
-          url: 'http://google.com/',
-          start: '2018-01-28'
-        }
-      ]
-    });
-
-    calendar.render();
   })
   const { authUser } = useContext(UserContext)
   const deleteReminder = async (id) => {
@@ -176,22 +184,27 @@ const Create_Posting = () => {
 
   const noReminder = !postings || (postings && postings.length === 0);
 
-  // const getReminders = async () => {
-  //   const response = await axios.get("tutor/create_posting/").catch((err) => {
-  //     console.log("Error:", err);
-  //   });
-  //   if (response && response.data) {
-  //     set_postings(response.data);
-  //   }
-  // };
+  const getSchedules = async () => {
+    const res = await axios.get("schedule/getschedule/",{
+      headers: {Authorization: `Token ${sessionStorage.getItem('token')}`
+    }, 'X-CSRFToken': csrfToken}).catch((err) => {
+      console.log("Error:", err);
+    });
+    if (res && res.data) {
+
+      // load_user_schedule(res)
+      console.log(res);
+
+    }
+  };
 
   // Fired when you hit "add" button 
   const add_posting = async (event) => {
     event.preventDefault();
     // Need to first validate the data object
-    if (!validate_form(formData)) {
-      errorToast('Please fill out all the fields')
-    } else {
+    // if (!validate_form(formData)) {
+    //   errorToast('Please fill out all the fields')
+    // } else {
 
 
       console.log(formData);
@@ -216,7 +229,7 @@ const Create_Posting = () => {
         }
       console.log('the returned data is ', res);
       // setFormData({});
-    }
+    // }
   };
 
   var handleWeekendsToggle = () => {
@@ -225,21 +238,91 @@ const Create_Posting = () => {
     })
   }
 
+  // var load_user_schedule = (days)=>{
+  //   let calendarApi = selectInfo.view.calendar
+  //   calendarApi.unselect() // clear date selection
+
+  //   // // Add the events to the calendar here 
+  //   days.forEach(day=>{
+
+  //     day.forEach(task=>{
+  //     calendarApi.addEvent({
+  //       id: eventId,
+  //       title:title,
+  //       start: task.start_time,
+  //       end: task.task_time,
+  //       allDay: selectInfo.allDay
+  //     })
+  //     })
+  //   })
+
+  // }
   var handleDateSelect = (selectInfo) => {
+
+    console.log(selectInfo);
     let title = prompt('Please enter a new title for your event')
     let calendarApi = selectInfo.view.calendar
 
     calendarApi.unselect() // clear date selection
 
+    var eventId = createEventId()
+
+
     if (title) {
       calendarApi.addEvent({
-        id: createEventId(),
-        title,
+        id: eventId,
+        title: title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
       })
+
+
+      // Also need to send data to backend 
+      send_event_data(eventId, title, selectInfo)
     }
+  }
+
+  var send_event_data = async(eventId,title, selectInfo)=>{
+
+    
+    // Parse the week day data here 
+    var which_day = selectInfo.start.toString().substring(0,3)
+  
+
+     var strippedStart = stripDate(selectInfo.startStr)
+
+     var strippedEnd = stripDate(selectInfo.endStr)
+    var evtInfo = {
+        'id': eventId, 
+        'title': title,
+        // 'start': selectInfo.start,
+        'start': strippedStart,
+        // 'end': selectInfo.end,
+        'end': strippedEnd,
+
+        'day': which_day
+    }
+    console.log(evtInfo);
+
+    const res = await axios.post("schedule/create/", evtInfo,
+    {
+      headers: {Authorization: `Token ${sessionStorage.getItem('token')}`
+    }, 'X-CSRFToken': csrfToken}).catch((err) => {
+      console.log("Error: ", err);
+    });
+
+    // If a response comes back
+    if (res)
+      //  await getReminders();
+
+      if (res.status == 200) {
+        successToast("Your event has been created successfully")
+      }
+      else {
+        errorToast("Something went wrong, sorry post can't be created")
+      }
+    console.log('the returned data is ', res);
   }
 
  var handleEventClick = (clickInfo) => {
@@ -253,6 +336,29 @@ const Create_Posting = () => {
       currentEvents: events
     })
   }
+
+
+  // A typical time: "2021-08-10T06:30:00-07:00"
+  // what's wanted: "06:30:00"
+  var stripDate=(time)=>{
+
+    //Locate the 'T' letter to separate time 
+    var start_idx = time.indexOf('T') +1
+
+    // Get the 3rd '-' position
+    var end_idx = getPos(time, '-', 3)
+    console.log('the end index ', end_idx);
+    
+    var stripped_time = time.substring(start_idx, end_idx)
+    return stripped_time
+  }
+
+  /*
+    i: is the occurence (3rd occurence)
+  */
+  function getPos(str, subStr, i) {
+    return str.split(subStr, i).join(subStr).length;
+}
 
   const renderSidebar=()=> {
     return (
@@ -276,10 +382,10 @@ const Create_Posting = () => {
           </label>
         </div>
         <div className='demo-app-sidebar-section'>
-          <h2>All Events ({state.currentEvents.length})</h2>
+          {/* <h2>All Events ({state.currentEvents.length})</h2>
           <ul>
             {state.currentEvents.map(renderSidebarEvent)}
-          </ul>
+          </ul> */}
         </div>
       </div>
     )
@@ -295,6 +401,7 @@ const Create_Posting = () => {
         {renderSidebar()}
         <div className='demo-app-main'>
           <FullCalendar
+          dayHeaderFormat = {{ weekday: 'short' }}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
               left: 'prev,next today',
@@ -312,14 +419,15 @@ const Create_Posting = () => {
             eventContent={renderEventContent} // custom render function
             eventClick={handleEventClick}
             eventsSet={handleEvents} // called after events are initialized/added/changed/removed
-          /* you can update a remote database when these fire:
-          eventAdd={function(){}}
-          eventChange={function(){}}
-          eventRemove={function(){}}
-          */
+            /* you can update a remote database when these fire:
+            eventAdd={function(){}}
+            eventChange={function(){}}
+            eventRemove={function(){}}
+            */
           />
         </div>
-      </div>
+     
+     </div>
 
 
 

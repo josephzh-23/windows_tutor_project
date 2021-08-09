@@ -51,7 +51,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
 
-    # A new field for whether user a
+    # A new field for whether user is a tutor or a student
+    role = models.CharField(max_length= 30, blank = True)
     hide_email= models.BooleanField(default=True)
     is_superuser = models.BooleanField(default = False)
     
@@ -78,6 +79,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     #select substring between 2 indexes 
     def get_profile_image_filename(self):
 	    return str(self.profile_image)[str(self.profile_image).index('profile_images/' + str(self.pk) + "/"):]
+
     def __str__(self):
         return self.email
     # Check if the admin has all the permissions 

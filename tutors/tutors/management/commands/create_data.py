@@ -2,7 +2,7 @@ import datetime
 import random
 from django.core.management.base import BaseCommand
 
-from accounts.models import Account, Subject, Posting
+
 
 # case 1
 # This file has to be run from under the
@@ -10,6 +10,9 @@ from accounts.models import Account, Subject, Posting
 
 # 2. Need to include the 'tutors' in installed_app
 # This file is used to craete some dummy data and insert into the database
+from accounts.models import Account
+from tutor.models import Posting, Subject
+
 courses = [
     'Math101',
     'Math105',

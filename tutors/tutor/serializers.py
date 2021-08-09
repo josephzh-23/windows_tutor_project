@@ -42,6 +42,8 @@ class StringSerializer(serializers.StringRelatedField):
         return value
 
 class PostingSerializer(serializers.ModelSerializer):
+
+    # these 2 should match the names of the 2 serializers
     author = StringSerializer(many=False)
     subject = StringSerializer(many=True)
 
