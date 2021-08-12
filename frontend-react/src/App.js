@@ -1,6 +1,6 @@
 
 import logo from './logo.svg';
-import './App.css';
+// import './App.css';
 
 // export default App;
 import React, { useContext, useState } from "react";
@@ -30,6 +30,7 @@ import Header from './containers/Header/Header';
 import ClientErrorModal from './containers/Public_chat/clientErrorModal';
 import Search_Posting from './containers/Search_Posting/Search_Posting.js';
 import Create_Posting from './containers/CreatePosting/Create_Posting.js';
+import Create_Schedule from './containers/CreateSchedule/Create_Schedule';
 
 
 
@@ -80,6 +81,7 @@ function App() {
 
     <li><NavLink to="/private_chat/">Private Chat</NavLink></li>
     <li><NavLink to="/create_posting/">Create Tutor Posting</NavLink></li>
+    <li><NavLink to="/create_schedule/">Create Tutor Schedule</NavLink></li>
 
     <li><NavLink to="/searchFilter/">Search Filtering</NavLink></li>
 
@@ -175,6 +177,7 @@ function App() {
                 
 
                 <Route path="/create_posting" component={Create_Posting} exact />
+                <Route path="/create_schedule" component={Create_Schedule} exact />
 
                 <Route path="/public_chat" component ={Public_Chat} exact/>
                 <Route path="/account/friend_list_view" 

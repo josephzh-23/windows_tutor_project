@@ -17,6 +17,8 @@
     "collections": "^5.1.12",
     "cropper": "^4.1.0",
     "cropperjs": "^1.5.11",
+    "jquery": "^3.6.0",
+    "jquery-schedule": "^2.2.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.0",
     "react-cookies": "^0.1.1",

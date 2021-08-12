@@ -1,18 +1,13 @@
 
 import { useState, useContext } from 'react';
-import FullCalendar, { formatDate } from '@fullcalendar/react'
 import { axios } from './../../Reusable_React/react-axios-master/src/axios';
 import "./Create_Posting.css"
 import { UserContext } from './../../Reusable_React/UserContext';
 import { useEffect } from 'react';
 import { errorToast, successToast } from '../../Toaster.js';
 import { validate_form } from '../../Reusable_Vanilla/validate_form.js';
-import { Calendar } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
 
-import interactionPlugin from '@fullcalendar/interaction';
+
 import { INITIAL_EVENTS, createEventId } from '../../event-util.js';
 import { getCookie } from '../../Reusable_Vanilla/Utilities/Util';
 
@@ -33,76 +28,7 @@ const Create_Posting = () => {
     // document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
     
-      var calendar = new Calendar(calendarEl, {
-        plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin ],
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-        },
-        initialDate: '2018-01-12',
-        navLinks: true, // can click day/week names to navigate views
-        editable: true,
-        dayMaxEvents: true, // allow "more" link when too many events
-        events: [
-          {
-            title: 'All Day Event',
-            start: '2018-01-01',
-          },
-          {
-            title: 'Long Event',
-            start: '2018-01-07',
-            end: '2018-01-10'
-          },
-          {
-            groupId: 999,
-            title: 'Repeating Event',
-            start: '2018-01-09T16:00:00'
-          },
-          {
-            groupId: 999,
-            title: 'Repeating Event',
-            start: '2018-01-16T16:00:00'
-          },
-          {
-            title: 'Conference',
-            start: '2018-01-11',
-            end: '2018-01-13'
-          },
-          {
-            title: 'Meeting',
-            start: '2018-01-12T10:30:00',
-            end: '2018-01-12T12:30:00'
-          },
-          {
-            title: 'Lunch',
-            start: '2018-01-12T12:00:00'
-          },
-          {
-            title: 'Meeting',
-            start: '2018-01-12T14:30:00'
-          },
-          {
-            title: 'Happy Hour',
-            start: '2018-01-12T17:30:00'
-          },
-          {
-            title: 'Dinner',
-            start: '2018-01-12T20:00:00'
-          },
-          {
-            title: 'Birthday Party',
-            start: '2018-01-13T07:00:00'
-          },
-          {
-            title: 'Click for Google',
-            url: 'http://google.com/',
-            start: '2018-01-28'
-          }
-        ]
-      });
-    
-      calendar.render();
+
     // });
     getSchedules()
     // var calendar = new Calendar('#calendar', {
@@ -232,11 +158,11 @@ const Create_Posting = () => {
     // }
   };
 
-  var handleWeekendsToggle = () => {
-    setState({
-      weekendsVisible: !state.weekendsVisible
-    })
-  }
+  // var handleWeekendsToggle = () => {
+  //   setState({
+  //     weekendsVisible: !state.weekendsVisible
+  //   })
+  // }
 
   // var load_user_schedule = (days)=>{
   //   let calendarApi = selectInfo.view.calendar
@@ -257,31 +183,31 @@ const Create_Posting = () => {
   //   })
 
   // }
-  var handleDateSelect = (selectInfo) => {
+  // var handleDateSelect = (selectInfo) => {
 
-    console.log(selectInfo);
-    let title = prompt('Please enter a new title for your event')
-    let calendarApi = selectInfo.view.calendar
+  //   console.log(selectInfo);
+  //   let title = prompt('Please enter a new title for your event')
+  //   let calendarApi = selectInfo.view.calendar
 
-    calendarApi.unselect() // clear date selection
+  //   calendarApi.unselect() // clear date selection
 
-    var eventId = createEventId()
-
-
-    if (title) {
-      calendarApi.addEvent({
-        id: eventId,
-        title: title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay
-      })
+  //   var eventId = createEventId()
 
 
-      // Also need to send data to backend 
-      send_event_data(eventId, title, selectInfo)
-    }
-  }
+  //   if (title) {
+  //     calendarApi.addEvent({
+  //       id: eventId,
+  //       title: title,
+  //       start: selectInfo.startStr,
+  //       end: selectInfo.endStr,
+  //       allDay: selectInfo.allDay
+  //     })
+
+
+  //     // Also need to send data to backend 
+  //     send_event_data(eventId, title, selectInfo)
+  //   }
+  // }
 
   var send_event_data = async(eventId,title, selectInfo)=>{
 
@@ -360,77 +286,13 @@ const Create_Posting = () => {
     return str.split(subStr, i).join(subStr).length;
 }
 
-  const renderSidebar=()=> {
-    return (
-      <div className='demo-app-sidebar'>
-        <div className='demo-app-sidebar-section'>
-          <h2>Instructions</h2>
-          <ul>
-            <li>Select dates and you will be prompted to create a new event</li>
-            <li>Drag, drop, and resize events</li>
-            <li>Click an event to delete it</li>
-          </ul>
-        </div>
-        <div className='demo-app-sidebar-section'>
-          <label>
-            <input
-              type='checkbox'
-              checked={state.weekendsVisible}
-              onChange={handleWeekendsToggle}
-            ></input>
-            toggle weekends
-          </label>
-        </div>
-        <div className='demo-app-sidebar-section'>
-          {/* <h2>All Events ({state.currentEvents.length})</h2>
-          <ul>
-            {state.currentEvents.map(renderSidebarEvent)}
-          </ul> */}
-        </div>
-      </div>
-    )
-  }
-
   return (
 
 
-    <div className="App">
-
-      {/* //Section for the calendar     */}
-      <div className='demo-app'>
-        {renderSidebar()}
-        <div className='demo-app-main'>
-          <FullCalendar
-          dayHeaderFormat = {{ weekday: 'short' }}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            }}
-            initialView='dayGridMonth'
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={state.weekendsVisible}
-            initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-            select={handleDateSelect}
-            eventContent={renderEventContent} // custom render function
-            eventClick={handleEventClick}
-            eventsSet={handleEvents} // called after events are initialized/added/changed/removed
-            /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
-          />
-        </div>
-     
-     </div>
+    
 
 
-
+<div>
       <h3>Create Posting</h3>
       {!noReminder &&
         postings.map((reminder, idx) => (
@@ -510,13 +372,6 @@ function renderEventContent(eventInfo) {
   )
 }
 
-function renderSidebarEvent(event) {
-  return (
-    <li key={event.id}>
-      <b>{formatDate(event.start, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
-      <i>{event.title}</i>
-    </li>
-  )
-}
+
 
 export default Create_Posting

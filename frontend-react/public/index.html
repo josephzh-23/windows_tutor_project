@@ -11,8 +11,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Document</title>
-	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link href="https://cdn.rawgit.com/fengyuanchen/cropper/v2.0.1/dist/cropper.min.css" rel="stylesheet">
 	<script src="https://cdn.rawgit.com/fengyuanchen/cropper/v2.0.1/dist/cropper.min.js"></script>
@@ -30,9 +33,9 @@
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
 		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+	<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
 		integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-		crossorigin="anonymous"></script>
+		crossorigin="anonymous"></script> -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
 		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 		crossorigin="anonymous"></script>
@@ -41,8 +44,7 @@
 		crossorigin="anonymous"></script>
 	<!-- THe mark down section here  -->
 
-
-
+	
 	<!-- Markdown-it -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/11.0.1/markdown-it.min.js"></script>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css">
@@ -71,7 +73,6 @@
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
-
       Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
@@ -87,6 +88,7 @@
 	<noscript>You need to enable JavaScript to run this app.</noscript>
 	<div id="root" style="width: 90%;"></div>
 
+	<div class="joseph" id="schedule"></div>
 	<!-- <link src="%PUBLIC_URL%/collections-master/collections.min.js" /> -->
 	<script type="text/javascript">
 
@@ -178,7 +180,44 @@
 	</div>
 
 	<!-- Body -->
+	<div id = "schedule"></div>
 
+    <script>
+        // Base
+        $('#schedule').jqs();
+        
+        // Full options
+        $('#schedule').jqs({
+          mode: 'edit',
+          hour: 24,
+          days: 7,
+          periodDuration: 30,
+          data: [],
+          periodOptions: true,
+          periodColors: [],
+          periodTitle: '',
+          periodBackgroundColor: 'rgba(82, 155, 255, 0.5)',
+          periodBorderColor: '#2a3cff',
+          periodTextColor: '#000',
+          periodRemoveButton: 'Remove',
+          periodDuplicateButton: 'Duplicate',
+          periodTitlePlaceholder: 'Title',
+          daysList: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday'
+          ],
+          onInit: function () {},
+          onAddPeriod: function () {},
+          onRemovePeriod: function () {},
+          onDuplicatePeriod: function () {},
+          onClickPeriod: function () {}
+        });
+            </script>
 	<style type="text/css">
 		.main {
 			min-height: 100vh;
@@ -188,14 +227,10 @@
 	<!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
-
       You can add webfonts, meta tags, or analytics to this file.
       The build step will place the bundled scripts into the <body> tag.
-
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
-
-
     -->
 
 
@@ -206,42 +241,7 @@
 
 
 	
-
 	<!-- <script type="module" src = "/frontend-react/src/Reusable/mark_down.js"></script> -->
-	<script type="text/javascript"
-	src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-	</script></div>
-	<div class="jquery-script-clear"></div>
-	</div>
-	</div>
-			<div class="container" style="margin: 150px auto; width: 50%; height: 100%; display: flex; flex-direction: row; justify-content: center;">
-			<h1>jQuery Weekly Scheduler Demo</h1>
-				<div id="target">
-				</div>
-			</div>
-			<script>
-				$('#target').weekly_schedule();
-				$('.schedule').on('selectionmade', function() {
-					console.log("Selection Made");
-				}).on('selectionremoved', function() {
-					console.log("Selection Removed");
-				});
-			</script>
-		</body><script type="text/javascript">
-	
-	  var _gaq = _gaq || [];
-	  _gaq.push(['_setAccount', 'UA-36251023-1']);
-	  _gaq.push(['_setDomainName', 'jqueryscript.net']);
-	  _gaq.push(['_trackPageview']);
-	
-	  (function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	  })();
-	
-	</script>
-
 </body>
 
 
