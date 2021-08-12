@@ -66,9 +66,6 @@ const Create_Schedule = () => {
                 console.log('the counter is ', counter);
 
 
-
-
-
                 // Retunr a list of days
                 var daysSelected = window.$('.jqs').find('.jqs-day')
                 // Cvrt jquery -> JS
@@ -81,31 +78,31 @@ const Create_Schedule = () => {
 
                     // get time period per day
                     var period_array_per_day = elem.innerText.split('\n')
-                    
+
                     // If array size >1, and last 2
                     // elem are duplicate -> chop off last elem
-                    if(period_array_per_day.length>1){
+                    if (period_array_per_day.length > 1) {
 
                         var size = period_array_per_day.length
-                       if(check_time_duplicate(period_array_per_day
-                            [size-1], period_array_per_day[size-2])){
+                        if (check_time_duplicate(period_array_per_day
+                        [size - 1], period_array_per_day[size - 2])) {
                             period_array_per_day.pop()
-                            }
-                        
-                    }
-                      
-                      console.log('the time is basically ',period_array_per_day);
+                        }
 
-                      // Build an obj
-                      var period_per_day =new timeObj(weekdays[index], period_array_per_day)
-                      console.log('each time obj is',period_per_day);
+                    }
+
+                    console.log('the time is basically ', period_array_per_day);
+
+                    // Build an obj
+                    var period_per_day = new timeObj(weekdays[index], period_array_per_day)
+                    console.log('each time obj is', period_per_day);
                     //   periodArray.forEach(it=>{
                     //     console.log(it);
                     // })
                     // console.log('array ', periodArray);
-    
+
                 })
-              
+
             },
             onRemovePeriod: function () { },
             onDuplicatePeriod: function () { },
@@ -117,12 +114,12 @@ const Create_Schedule = () => {
 
 
     // A hack to avoid duplciate in the last 2 elem
-    var check_time_duplicate=(second_last_elem, last_elem)=>{
+    var check_time_duplicate = (second_last_elem, last_elem) => {
 
-        if(second_last_elem!= last_elem){
+        if (second_last_elem != last_elem) {
 
             return false
-        }else{
+        } else {
             return true
         }
     }
@@ -132,33 +129,55 @@ const Create_Schedule = () => {
 
 
 
-    // var saveSchedule = async () => {
+    var saveSchedule = async () => {
 
 
-    //     // Retunr a list of all days 
-    //     var daysSelected = window.$('.jqs').find('.jqs-day')
-    
-    //     console.log('date object', daysSelected);
+        //Based on counter value, look for the nth jqs-period-time
+        //   console.log('the event target is ', this);
 
-    //     // loop thru each day
-    //     daysSelected.each((index, elem) => {
+        var counter = this.counter
+        var type = typeof (this.counter)
+        console.log('the type is ', type);
+        console.log('the counter is ', counter);
 
-    //         // create day obj
-    //         var dayObj = new timeObj(weekdays[index])
-    //         // Return  an array of jqs-period-time (if >1 time-period selected)
-    //         var periodArray =elem.getElementsByClassName('jqs-period-time')
-            
 
-    //         // Loop thru period array
-    //         // {monday,[ start -end ]}
-    //         periodArray.forEach(period=>{
-    //             dayObj.period.append(period)
-    //             console.log('built obj is ', dayObj);
-                
-    //         })
+        // Retunr a list of days
+        var daysSelected = window.$('.jqs').find('.jqs-day')
+        // Cvrt jquery -> JS
+        console.log('date object', daysSelected);
 
-    //     })
-    // }
+        // Loop thru the 'jsq-period' inside each 'jqs-day'
+        // Here elem is an JS obj
+        daysSelected.each((index, elem) => {
+
+
+            // get time period per day
+            var period_array_per_day = elem.innerText.split('\n')
+
+            // If array size >1, and last 2
+            // elem are duplicate -> chop off last elem
+            if (period_array_per_day.length > 1) {
+
+                var size = period_array_per_day.length
+                if (check_time_duplicate(period_array_per_day
+                [size - 1], period_array_per_day[size - 2])) {
+                    period_array_per_day.pop()
+                }
+
+            }
+
+            console.log('the time is basically ', period_array_per_day);
+
+            // Build an obj
+            var period_per_day = new timeObj(weekdays[index], period_array_per_day)
+            console.log('each time obj is', period_per_day);
+            //   periodArray.forEach(it=>{
+            //     console.log(it);
+            // })
+            // console.log('array ', periodArray);
+
+        })
+    }
 
     var send_event_data = async (time) => {
 
@@ -197,7 +216,17 @@ const Create_Schedule = () => {
         console.log('the returned data is ', res);
     }
     return (
-        <div id="schedule"></div>
+
+        <div className="create-schedule">
+            <div id="schedule">
+
+
+            </div>
+            <div className="joseph">
+                <button className="btn">Save My Schedule</button>
+            </div>
+
+        </div>
     )
 
 
