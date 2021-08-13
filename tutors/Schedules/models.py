@@ -11,8 +11,8 @@ class daily_task(models.Model):
 
     # We need to restrcit this field
     title = models.CharField(max_length=100)
-    start_time = models.TimeField(auto_now_add=True, auto_now= False, blank =True)
-    end_time = models.TimeField(auto_now_add=True, auto_now= False, blank =True)
+    start_time = models.TimeField( auto_now= False, blank =True)
+    end_time = models.TimeField( auto_now= False, blank =True)
 
     # Will check for the tasks already created
     # WIll return no overlap if there is none
@@ -34,7 +34,7 @@ class daily_task(models.Model):
 #Ex: Monday -> only valid for each user once
 class Day(models.Model):
 
-    which_day = models.CharField(max_length=5, blank = True)
+    which_day = models.CharField(max_length=10, blank = True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="author")
     tasks = models.ManyToManyField(daily_task)
 
@@ -46,14 +46,4 @@ class Day(models.Model):
 
             self.tasks.add(task)
             self.save()
-
-
-
-
-
-
-
-
-
-
 

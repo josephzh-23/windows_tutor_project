@@ -382,13 +382,13 @@ const Header =() => {
 			// Otherwise not defined within scope as socket continnue
 			// to be passed around
 
-			console.log("this is ", window);
+
 	
 			var data = JSON.parse(message.data);
-			console.log("Got notification websocket message."+ data.general_msg_type);
-			console.log("Got notification websocket message."+ data.chat_msg_type);
+			// console.log("Got notification websocket message."+ data.general_msg_type);
+			// console.log("Got notification websocket message."+ data.chat_msg_type);
 
-			console.log("received socket message is", data);
+			// console.log("received socket message is", data);
 			/*
 			GENERAL NOTIFICATIONS
 		*/
@@ -544,7 +544,7 @@ const Header =() => {
 			notifications.forEach(notification => {
 
 
-				console.log("incoming time stamp", notification['timestamp'])
+				// console.log("incoming time stamp", notification['timestamp'])
 				submitGeneralNotificationToCache(notification)
 
 				setGeneralOldestTimestamp(notification['timestamp'])
@@ -755,7 +755,7 @@ const Header =() => {
 
 	function submitGeneralNotificationToCache(notification) {
 
-		console.log("the window ", this);
+		// console.log("the window ", this);
 		// Use this to make sure the notification does not already exist in the list 
 		var result = generalCachedNotifList.filter(function (n) {
 			return n['notification_id'] === notification['notification_id']
@@ -836,7 +836,7 @@ const Header =() => {
 				card = createFriendRequestElement(notification)
 				notificationContainer.appendChild(card)
 
-				console.log("friend request is found")
+				// console.log("friend request is found")
 				break;
 
 			case "FriendList":

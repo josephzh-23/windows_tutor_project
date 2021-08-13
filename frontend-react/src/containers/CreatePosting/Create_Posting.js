@@ -30,7 +30,7 @@ const Create_Posting = () => {
     
 
     // });
-    getSchedules()
+    
     // var calendar = new Calendar('#calendar', {
     //   defaultView: 'day',
     //   taskView: true,
@@ -110,20 +110,7 @@ const Create_Posting = () => {
 
   const noReminder = !postings || (postings && postings.length === 0);
 
-  const getSchedules = async () => {
-    const res = await axios.get("schedule/getschedule/",{
-      headers: {Authorization: `Token ${sessionStorage.getItem('token')}`
-    }, 'X-CSRFToken': csrfToken}).catch((err) => {
-      console.log("Error:", err);
-    });
-    if (res && res.data) {
-
-      // load_user_schedule(res)
-      console.log(res);
-
-    }
-  };
-
+ 
   // Fired when you hit "add" button 
   const add_posting = async (event) => {
     event.preventDefault();

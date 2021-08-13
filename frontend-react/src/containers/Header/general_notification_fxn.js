@@ -121,7 +121,7 @@ function appendBottomGeneralNotification(notification) {
 			card = createFriendRequestElement(notification)
 			notificationContainer.appendChild(card)
 
-			console.log("friend request is found")
+			// console.log("friend request is found")
 			break;
 
 		case "FriendList":

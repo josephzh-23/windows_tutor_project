@@ -21,68 +21,92 @@ from Schedules.serializer import DaySerializer
 @api_view(['POST'])
 def create_schedule(request):
     print(request.data)
+
     user = request.user
-    #Days will come in in an array
-    data = request.data
-    #
-    day_received = data['day']
-    title = data['title']
-    start_time = data['start']
-    end_time = data['end']
+    #Extract periods of each day
+    #For each period of day, need to create a task
+    #and save it to that day
+    for eachDay in request.data:
 
-    # Parse string to time
-    start_time =datetime.strptime(start_time, '%H:%M:%S').time()
-    end_time = datetime.strptime(end_time, '%H:%M:%S').time()
-    #Get day of the week
-    #Create a day with the user, if not exists
-    #
-    print(start_time)
-    the_day, created = Day.objects.get_or_create(user = user,which_day= day_received)
-    the_day.save()
-    print("Created boolean is ", created)
-    print("When already created boolean is ", created)
-    '''
-    We need to iterate thru each tasks in the day
-    and check make sure no overlapping time
-    
-    if nooverlapping  ->    will then add the task
-    '''
+        day_received = eachDay.get('which_day')
+        print('day received is ', day_received)
+        # Get day of the week
+        # Create a day with the user, if not exists
 
-    #If created for the frist time
-    if created == True:
-
-
-        task = daily_task(title =title, start_time=start_time,end_time= end_time)
-        task.save()
-        the_day.tasks.add(task)
+        the_day, created = Day.objects.get_or_create(user=user, which_day=day_received)
         the_day.save()
-        print(the_day.tasks.all())
-        res = {}
 
-    # If day already exists for a user
-    #Make sure there is no duplicate task
-    else:
-        for task in the_day.tasks.all():
-                print("Checking if duplicate")
-                overlap = task.check_no_overlap_task(start_time=start_time,end_time = end_time)
+        print("Created boolean is ", created)
+        '''
+        We need to iterate thru each tasks in the day
+        and check make sure no overlapping time
 
-                # No overlap
-                if overlap ==-1:
-                    print("no duplicate is found")
-                    #Create a task with the start and end time
-                    task = daily_task(title =title, start_time= start_time, end_time = end_time)
-                    task.save()
-                    the_day.tasks.add(task)
-                    the_day.save()
-                    print(task)
+        if nooverlapping  ->    will then add the task
+        '''
 
-                    return HttpResponse("task created", status = status.HTTP_200_OK)
+        time_period_list = eachDay.get('periodArray')
+        for period in time_period_list:
+            print('the period is ', period)
 
-                #If overlap
-                else:
-                    print("A duplicate is found already")
-                    data['error'] = "This new task overlaps with existing task"
-                    return HttpResponse(content="task made", status=status.HTTP_400_BAD_REQUEST)
+            if period != "":
+                time = period.split('-')
+                start = time[0].strip()
+                start_time = datetime.strptime(start, '%H:%M').time()
+                end = time[1].strip()
+                end_time = datetime.strptime(end, '%H:%M').time()
+
+                print('start and end time is', start, end)
+                #Create a task with the start and end time
+                # Duplicate issue has been prevented in the frontend
+                task = daily_task(title ="", start_time= start_time, end_time = end_time)
+
+                task.save()
+                print(task)
+                the_day.tasks.add(task)
+                the_day.save()
+            else:
+                pass
+            #Can create a task directly
+    # # Parse string to time
+    # start_time =datetime.strptime(start_time, '%H:%M:%S').time()
+    # end_time = datetime.strptime(end_time, '%H:%M:%S').time()
+    #
+    #
+    # #If created for the frist time
+    # if created == True:
+    #
+    #
+    #     task = daily_task(title =title, start_time=start_time,end_time= end_time)
+    #     task.save()
+    #     the_day.tasks.add(task)
+    #     the_day.save()
+    #     print(the_day.tasks.all())
+    #     res = {}
+    #
+    # # If day already exists for a user
+    # #Make sure there is no duplicate task
+    # else:
+    #     for task in the_day.tasks.all():
+    #             print("Checking if duplicate")
+    #             overlap = task.check_no_overlap_task(start_time=start_time,end_time = end_time)
+    #
+    #             # No overlap
+    #             if overlap ==-1:
+    #                 print("no duplicate is found")
+    #                 #Create a task with the start and end time
+    #                 task = daily_task(title =title, start_time= start_time, end_time = end_time)
+    #                 task.save()
+    #                 the_day.tasks.add(task)
+    #                 the_day.save()
+    #                 print(task)
+    #
+    #                 return HttpResponse("task created", status = status.HTTP_200_OK)
+    #
+    #             #If overlap
+    #             else:
+    #                 print("A duplicate is found already")
+    #                 data['error'] = "This new task overlaps with existing task"
+    #                 return HttpResponse(content="task made", status=status.HTTP_400_BAD_REQUEST)
 
     #Check if the query set is empty or not
     # if day_by_user.tasks.all().exists():
