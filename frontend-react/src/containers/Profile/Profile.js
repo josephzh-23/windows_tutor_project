@@ -14,10 +14,22 @@ import { backend_url_friend,frontend_url_account } from '../../Contants.js';
 import { UserContext } from '../../Reusable_React/UserContext.js';
 import { errorToast, successToast } from '../../Toaster.js';
 // import { readURL } from '../../scripts/croppingEditor.js';
+import { useHistory } from 'react-router-dom';
+require('jquery-schedule')
+
 
 //Based on what's here 
+
+/*
+- will load the user friends, profile + user schedule page 
+*/
 const Profile = (props) => {
 
+
+  
+	var $ = function (id) { return document.getElementById(id); };
+  var csrfToken = getCookie('csrftoken')
+  let history = useHistory();
   // here id :is the id of the friend clicked on 
   var userId = getQueryStrings("userId")
 
@@ -43,7 +55,7 @@ const Profile = (props) => {
     console.log(sessionStorage.getItem("token"));
     // console.log('userid ' , userId);
     fetchUserProfile(userId)
-
+    getSchedules()
   },[])
 
 
@@ -295,6 +307,126 @@ var showUserProfile = (data) => {
 }
 
 
+// Will be sending out 2nd async request here 
+const show_user_schedule = ()=>{
+
+    getSchedules()
+}
+
+
+const getSchedules = async () => {
+  const res = await axios.get("http://127.0.0.1:8000/schedule/getschedule/",{
+    headers: {Authorization: `Token ${sessionStorage.getItem('token')}`
+  }, 'X-CSRFToken': csrfToken}).catch((err) => {
+    console.log("Error:", err);
+  });
+  if (res && res.data) {
+
+    load_user_schedule(res.data, schedule_loading_array)
+    append_edit_btn()
+    console.log(res);
+
+  }
+};
+
+var load_user_schedule=(schedule)=>{
+
+  // 1. Parse the data coming back in 
+  schedule.forEach((eachDay, i)=>{
+
+      // Construct a day obj
+      var tasks_each_day = new day_tasks_per_day(i, [])
+  
+      // For 
+      eachDay["tasks"].forEach(eachPeriod=>{
+
+
+          // data: [
+          //     {
+          //       day: 0,
+          //       periods: [
+          //         ['20:00', '00:00'],
+          //         ['20:00', '22:00'], // Invalid period, not displayed
+          //         ['00:00', '02:00']
+          //       ]
+          //     }
+
+        var taskArray = []
+        // Time format must be below
+        //["14:00", "19:00"]
+        taskArray.push(eachPeriod.start_time.slice(0,5))
+        taskArray.push(eachPeriod.end_time.slice(0,5))
+          
+          // Add task array to the array of the tasks_per_day obj
+          tasks_each_day.periods.push(taskArray)
+          console.log('The existing tasks are ', tasks_each_day);
+      })
+
+      schedule_loading_array.push(tasks_each_day)
+      console.log('Complete schedule ',schedule_loading_array);
+
+
+  })
+
+  // Step 2: load the data into the plugin 
+            // Full options
+  window.$('#schedule').jqs({
+      mode: 'read',
+      hour: 24,
+      days: 7,
+      periodDuration: 60,
+      data: schedule_loading_array,
+      periodOptions: true,
+      periodColors: [],
+      periodTitle: '',
+      periodBackgroundColor: 'rgba(82, 155, 255, 0.5)',
+      periodBorderColor: '#2a3cff',
+      periodTextColor: '#000',
+      periodRemoveButton: 'Remove',
+      periodDuplicateButton: 'Duplicate',
+      periodTitlePlaceholder: 'Title',
+      daysList: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday'
+      ],
+      onInit: function () { },
+      onAddPeriod: function () {
+
+      
+
+      },
+      onRemovePeriod: function () { },
+      onDuplicatePeriod: function () { },
+      onClickPeriod: function () {
+          // console.log("I am added");
+      }
+  });
+
+ 
+}
+
+const append_edit_btn = (params) => {
+   // Add dynamic btn
+    
+    var button = document.createElement('button');
+    button.innerHTML = 'Edit schedule';
+  
+    var editMode = true
+    button.onclick = function(){
+  
+      console.log("I am clicked");
+      history.push(
+        '/create_edit_schedule',{
+        editMode
+      })
+    };
+    window.$('#schedule').append(button)
+}
 const sendFriendRequest =(e, receiverId, uiUpdateFunction)=>{
 
   e.preventDefault()
@@ -332,12 +464,45 @@ const sendFriendRequest =(e, receiverId, uiUpdateFunction)=>{
   
     
 }
+
+
+
+  // Contains an array of tasks_per_day 
+    //obj to be diplayed in frontend
+    var schedule_loading_array = [] 
+
+
+    // The data to be inserted into the plugin 
+                // data: [
+                //     {
+                //       day: 0,
+                //       periods: [
+                //         ['20:00', '00:00'],
+                //         ['20:00', '22:00'], // Invalid period, not displayed
+                //         ['00:00', '02:00']
+                //       ]
+                //     }
+    class day_tasks_per_day{
+        constructor(which_day, periodArray) {
+            this.day = which_day
+              this.periods = periodArray
+             
+          }
+    } 
+// The final return here for loading all user information
 return (
   <div>
 
     <div className="joseph"></div>
     {showUserProfile(data)}
+    <div className="create-schedule">
 
+          <div>My current schedule</div>
+            <div id="schedule"/>
+
+        </div>
+
+     
     </div>
 
 )

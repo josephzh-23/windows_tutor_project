@@ -260,6 +260,8 @@
       if (this.settings.data.length > 0) {
         var $this = this;
 
+
+        // Need to modify this 
         $.each(this.settings.data, function (index, data) {
           $.each(data.periods, function (index, period) {
 
@@ -616,6 +618,8 @@
     },
 
     /**
+     * This is called when you drag and select a time
+     * period position
      * Return a readable hour from a position
      * @param position
      * @returns {number}
@@ -659,7 +663,7 @@
       if (mn < 10) {
         mn = '0' + mn;
       }
-
+   
       return hour + ':' + mn;
     },
 
@@ -680,6 +684,7 @@
           ind = 'am';
         }
 
+        // Add an extra 5 hrs here 
         hour = parseInt(matches[1]);
         mn = parseInt(matches[2]);
 

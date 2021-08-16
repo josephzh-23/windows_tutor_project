@@ -151,50 +151,7 @@ const Create_Posting = () => {
   //   })
   // }
 
-  // var load_user_schedule = (days)=>{
-  //   let calendarApi = selectInfo.view.calendar
-  //   calendarApi.unselect() // clear date selection
-
-  //   // // Add the events to the calendar here 
-  //   days.forEach(day=>{
-
-  //     day.forEach(task=>{
-  //     calendarApi.addEvent({
-  //       id: eventId,
-  //       title:title,
-  //       start: task.start_time,
-  //       end: task.task_time,
-  //       allDay: selectInfo.allDay
-  //     })
-  //     })
-  //   })
-
-  // }
-  // var handleDateSelect = (selectInfo) => {
-
-  //   console.log(selectInfo);
-  //   let title = prompt('Please enter a new title for your event')
-  //   let calendarApi = selectInfo.view.calendar
-
-  //   calendarApi.unselect() // clear date selection
-
-  //   var eventId = createEventId()
-
-
-  //   if (title) {
-  //     calendarApi.addEvent({
-  //       id: eventId,
-  //       title: title,
-  //       start: selectInfo.startStr,
-  //       end: selectInfo.endStr,
-  //       allDay: selectInfo.allDay
-  //     })
-
-
-  //     // Also need to send data to backend 
-  //     send_event_data(eventId, title, selectInfo)
-  //   }
-  // }
+  
 
   var send_event_data = async(eventId,title, selectInfo)=>{
 

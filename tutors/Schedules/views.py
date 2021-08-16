@@ -66,98 +66,16 @@ def create_schedule(request):
                 the_day.save()
             else:
                 pass
-            #Can create a task directly
-    # # Parse string to time
-    # start_time =datetime.strptime(start_time, '%H:%M:%S').time()
-    # end_time = datetime.strptime(end_time, '%H:%M:%S').time()
-    #
-    #
-    # #If created for the frist time
-    # if created == True:
-    #
-    #
-    #     task = daily_task(title =title, start_time=start_time,end_time= end_time)
-    #     task.save()
-    #     the_day.tasks.add(task)
-    #     the_day.save()
-    #     print(the_day.tasks.all())
-    #     res = {}
-    #
-    # # If day already exists for a user
-    # #Make sure there is no duplicate task
-    # else:
-    #     for task in the_day.tasks.all():
-    #             print("Checking if duplicate")
-    #             overlap = task.check_no_overlap_task(start_time=start_time,end_time = end_time)
-    #
-    #             # No overlap
-    #             if overlap ==-1:
-    #                 print("no duplicate is found")
-    #                 #Create a task with the start and end time
-    #                 task = daily_task(title =title, start_time= start_time, end_time = end_time)
-    #                 task.save()
-    #                 the_day.tasks.add(task)
-    #                 the_day.save()
-    #                 print(task)
-    #
-    #                 return HttpResponse("task created", status = status.HTTP_200_OK)
-    #
-    #             #If overlap
-    #             else:
-    #                 print("A duplicate is found already")
-    #                 data['error'] = "This new task overlaps with existing task"
-    #                 return HttpResponse(content="task made", status=status.HTTP_400_BAD_REQUEST)
-
-    #Check if the query set is empty or not
-    # if day_by_user.tasks.all().exists():
-    #
-    #     for task in day_by_user.tasks.all():
-    #
-    #         overlap = task.check_no_overlap_task(start_time=start_time,end_time = end_time)
-    #
-    #         # No overlap
-    #         if overlap ==1:
-    #             #Create a task with the start and end time
-    #             task = daily_task(title, start_time, end_time)
-    #             day_by_user.tasks.add(task)
-    #             day_by_user.save()
-    #             print(task)
-    #
-    #             return HttpResponse("task created", status = status.HTTP_200_OK)
-    #
-    #         #If overlap
-    #         else:
-    #             data['error'] = "This new task overlaps with existing task"
-    #             return HttpResponse(content="task made", status=status.HTTP_400_BAD_REQUEST)
-
-    #If no tasks exists yet, create a new task and then save it
-    # else:
-    #     # Create a task with the start and end time
-    #     task = daily_task(title, start_time, end_time)
-    #     print("joseph")
-    #     day_by_user.tasks.add(task)
-    #     day_by_user.save()
-    #     print(task)
-    #     return HttpResponse(  "task made", status = status.HTTP_200_OK)
-
     return HttpResponse("task made", status=status.HTTP_200_OK)
 
 
-#Handles the get request for returning schedule views
-# class Schedule_Viewset(viewsets.ModelViewSet):
-#     permission_classes = [AllowAny]
-#
-#     serializer_class =DaySerializer
-#
-#     def get_queryset(self):
-#         postings = Day.objects.all()
-#         return postings
-
+# For retrieving all user schedules involved
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def get_user_schedule(request):
 
     #Return a user schedule
+    user = request.user
 
     serializer = DaySerializer
     qs = Day.objects.filter(user= request.user)
@@ -166,6 +84,83 @@ def get_user_schedule(request):
 
     s = serializer(qs, many=True)
 
-    # data = {}
-    # data['res'] = s.data
-    return Response(s.data)
+
+
+    scheduleExists = check_if_schedule_exists(user)
+    return Response({'data': s.data,'scheduleExists': scheduleExists})
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def replace_user_schedule(request):
+    print(request.data)
+
+    user = request.user
+
+    '''
+    Find the day passed in and replace all existing tasks
+        duplicate handled by the frontend 
+    '''
+    for eachDay in request.data:
+
+        day_received = eachDay.get('which_day')
+        print('day received is ', day_received)
+
+        # Get day of the week (7 days in total)
+        # Should already be created then
+        the_day, created = Day.objects.get_or_create(user=user, which_day=day_received)
+        the_day.save()
+        '''
+        Delete all the tasks for each day
+        before adding tasks to it 
+        '''
+        the_day.tasks.all().delete()
+
+
+        print("Created boolean is ", created)
+
+
+        '''
+        Task replacement:
+             We need to iterate thru each tasks in the day
+             and check make sure no overlapping time
+
+             if nooverlapping  ->    will then add the task
+        '''
+
+        time_period_list = eachDay.get('periodArray')
+        for period in time_period_list:
+            print('the period is ', period)
+
+            if period != "":
+                time = period.split('-')
+                start = time[0].strip()
+                print('start time is ', start)
+                start_time = datetime.strptime(start, '%H:%M').time()
+                end = time[1].strip()
+                end_time = datetime.strptime(end, '%H:%M').time()
+
+                print('start and end time is', start, end)
+
+                # Create a task with the start and end time
+                # Duplicate issue has been prevented in the frontend
+                task = daily_task(title="", start_time=start_time, end_time=end_time)
+
+                task.save()
+                print(task)
+                the_day.tasks.add(task)
+                the_day.save()
+            else:
+                pass
+
+
+    return HttpResponse("task made", status=status.HTTP_200_OK)
+
+
+def check_if_schedule_exists(user):
+    schedule = Day.objects.filter(user=user)
+    if schedule is not None:
+        print("the day  is", schedule)
+        return True
+
+    else:
+        return False
