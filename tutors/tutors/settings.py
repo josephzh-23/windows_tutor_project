@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'private_chat',
     'upload',
     'Util',
+    'payments',
 'crispy_forms'
 ]
 
@@ -258,3 +259,7 @@ CORS_ORIGIN_WHITELIST = [
 TEMP = os.path.join(BASE_DIR, 'media_cdn/temp')
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10mb = 10 * 1024 *1024
 BASE_URL = "http://127.0.0.1:8000"
+
+STRIPE_PUBLIC_KEY = ""
+STRIPE_SECRET_KEY = ""
+STRIPE_WEBHOOK_SECRET = ""

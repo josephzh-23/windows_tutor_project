@@ -322,7 +322,7 @@ const getSchedules = async () => {
   });
   if (res && res.data) {
 
-    load_user_schedule(res.data, schedule_loading_array)
+    load_user_schedule(res.data.data, schedule_loading_array)
     append_edit_btn()
     console.log(res);
 

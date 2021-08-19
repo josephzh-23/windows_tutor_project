@@ -19,7 +19,6 @@ export const UserContextProvider = (props) =>{
              csrfToken: getCookie("csrftoken"),
             //  isAuthenticated:sessionStorage.getItem("isAuthenticated"),
             isAuthenticated:true,
-
             username: sessionStorage.getItem("username")
             })
 

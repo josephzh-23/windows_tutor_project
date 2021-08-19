@@ -339,7 +339,7 @@ var load_user_schedule=(schedule)=>{
             //  await getReminders();
 
             if (res.status == 200) {
-                successToast("Your schedule has been created successfully")
+                successToast("Your schedule has been saved successfully")
             }
             else {
                 errorToast("Something went wrong, sorry post can't be created")
@@ -366,7 +366,7 @@ var load_user_schedule=(schedule)=>{
             //  await getReminders();
 
             if (res.status == 200) {
-                successToast("Your schedule has been created successfully")
+                successToast("Your schedule has been saved successfully")
             }
             else {
                 errorToast("Something went wrong, sorry post can't be created")
