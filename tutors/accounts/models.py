@@ -15,12 +15,12 @@ from friend.models import BuddyList
 # Token created here too
 
 class UserAccountManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, username, password=None, role = None):
         if not email:
             raise ValueError('Users must have an email address')
         
         email = self.normalize_email(email)
-        user = self.model(email=email, username = username)
+        user = self.model(email=email, username = username, role = role)
 
         user.set_password(password)
         user.save()
@@ -49,16 +49,14 @@ class Account(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
-
     # A new field for whether user is a tutor or a student
-    role = models.CharField(max_length= 30, blank = True)
+    role = models.CharField(max_length= 10, blank = True)
     hide_email= models.BooleanField(default=True)
     is_superuser = models.BooleanField(default = False)
     
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True, blank = True)
     profile_image= models.ImageField(max_length=255, upload_to=get_profile_image_filepath, null=True, blank=True, default=get_default_image)
-	
+
     # hide_email= models.BooleanField(default=True)
     last_login= models.DateTimeField(verbose_name='last login', auto_now=True)
    

@@ -14,9 +14,14 @@ const RegisterPage = (props) => {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
   const password2Ref = React.createRef();
+  const roleRef = React.createRef();
+
 
 
   const registerUser = (e) => {
+
+
+  
     // axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
     // axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -27,7 +32,9 @@ const RegisterPage = (props) => {
     const password2 = password2Ref.current.value;
     const email = emailRef.current.value;
     const password1 = passwordRef.current.value;
+    const role  = roleRef.current.value;
 
+    console.log('the role value is ', role)
     axios(
        {
         method: 'POST',
@@ -36,7 +43,8 @@ const RegisterPage = (props) => {
         username,
         email,
         password1,
-        password2
+        password2,
+        role
       },
         headers: {
           'Content-type':'application/json',
@@ -51,6 +59,9 @@ const RegisterPage = (props) => {
         console.log(res.data);
         console.log(res.data.email);
         sessionStorage.setItem("token", res.data.token)
+        
+        // THen direct user right here
+        history.push(`/profile?userId=${res.data.userId}`, { from: "RegisterPage" })
         }
       })
       .catch((err) => {
@@ -62,6 +73,7 @@ const RegisterPage = (props) => {
           err.response.data.message
         )
           makeToast("error", err.response.data.message);
+        
       });
       };
 
@@ -109,6 +121,16 @@ const RegisterPage = (props) => {
           placeholder="Confirm Password"
           ref={password2Ref}
         />
+      </div>
+
+      <div className="inputGroup">
+        <label htmlFor="role">Are you a student or tutor </label>
+
+
+    <select  ref={roleRef} id="role">
+      <option value="tutor">Tutor</option>
+      <option value="student">Student</option>
+    </select> 
       </div>
       
       <div style={{flex: 1}}>

@@ -1,6 +1,6 @@
 // import Head from "next/head";
-// import styled from "@emotion/styled";
-// import GlobalStyles from "./prebuilt/GlobalStyles";
+import styled from "@emotion/styled";
+import GlobalStyles from "./prebuilt/GlobalStyles";
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -29,7 +29,7 @@ const Layout = ({ children, title }) => {
 
         // todo: change the price to price as per appointment 
         // price={getDonutPrice(numDonuts)}
-        onSuccessfulCheckout={() => Router.push("/success")}
+        // onSuccessfulCheckout={() => Router.push("/success")}
       />
       </Elements>
     

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import styled from "@emotion/styled";
 import axios from "axios";
 
 import Row from "./prebuilt/Row";
 import BillingDetailsFields from "./prebuilt/BillingDetailsFields";
+
 import SubmitButton from "./prebuilt/SubmitButton";
 import CheckoutError from "./prebuilt/CheckoutError";
+import { getCookie } from "../../getCookie";
 
 const CardElementContainer = styled.div`
   height: 40px;
@@ -19,12 +21,21 @@ const CardElementContainer = styled.div`
 `;
 
 const CheckoutForm = ({ price, onSuccessfulCheckout }) => {
+
+
+    var apptId = 1
+  var csrfToken = getCookie('csrftoken')
   const [isProcessing, setProcessingTo] = useState(false);
   const [checkoutError, setCheckoutError] = useState();
 
   const stripe = useStripe();
   const elements = useElements();
 
+
+  useEffect(()=>{
+
+    console.log('csrf is',csrfToken);
+  },[])
   // TIP
   // use the cardElements onChange prop to add a handler
   // for setting any errors:
@@ -36,30 +47,36 @@ const CheckoutForm = ({ price, onSuccessfulCheckout }) => {
   const handleFormSubmit = async ev => {
     ev.preventDefault();
 
-    const billingDetails = {
-      name: ev.target.name.value,
-      email: ev.target.email.value,
-      address: {
-        city: ev.target.city.value,
-        line1: ev.target.address.value,
-        state: ev.target.state.value,
-        postal_code: ev.target.zip.value
-      }
-    };
+    // const billingDetails = {
+    //   name: ev.target.name.value,
+    //   email: ev.target.email.value,
+    //   address: {
+    //     city: ev.target.city.value,
+    //     line1: ev.target.address.value,
+    //     state: ev.target.state.value,
+    //     postal_code: ev.target.zip.value
+    //   }
+    // };
 
     setProcessingTo(true);
 
     const cardElement = elements.getElement("card");
 
+    var userId = sessionStorage.getItem("auth_userId")
+    var data = {'amount': price*100, 
+    'userId': userId,
+    'apptId': apptId}
     try {
-      const { data: clientSecret } = await axios.post("/api/payment_intents", {
-        amount: price * 100
-      });
+      const { data: clientSecret } = await axios.post(
+        "http://127.0.0.1:8000/payments/payment-intent/", 
+     data, 
+      {headers:{'X-CSRFToken': csrfToken}});
 
       const paymentMethodReq = await stripe.createPaymentMethod({
         type: "card",
         card: cardElement,
-        billing_details: billingDetails
+        // billing_details: billingDetails
+
       });
 
       if (paymentMethodReq.error) {
@@ -123,7 +140,7 @@ const CheckoutForm = ({ price, onSuccessfulCheckout }) => {
   return (
     <form onSubmit={handleFormSubmit}>
       <Row>
-        <BillingDetailsFields />
+        {/* <BillingDetailsFields/> */}
       </Row>
       <Row>
         <CardElementContainer>

@@ -48,6 +48,7 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 		print("ChatConsumer: receive_json")
 		command = content.get("command", None)
 		try:
+			print("the command is", command)
 			if command == "join":
 				print("joining room: " + str(content['room']))
 				await self.join_room(content["room"])
@@ -229,13 +230,12 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 			# Here we are doing it for both users
 			# If they are not in connected list, create unread msg notify
 
-			#Increase the count
+			#Increase the unread message count
 			append_unread_msg_if_not_connected(room, room.user1, connected_users, message),
 			append_unread_msg_if_not_connected(room, room.user2, connected_users, message),
 			create_room_chat_message(room, self.scope["user"], message)
 		])
 
-		await create_room_chat_message(room, self.scope["user"], message)
 
 		await self.channel_layer.group_send(
 			room.group_name,
@@ -319,7 +319,7 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 			self.channel_name		)
 
 		#Instruct client to finish  closing the room
-
+		#Checked
 	async def send_messages_payload(self, messages, new_page_number):
 		"""
 		Send a payload of messages to the ui
@@ -355,10 +355,12 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 			errorData['message'] = e.message
 			await self.send_json(errorData)
 		return
-		
+
+		#Checked
 	async def chat_message(self, event):
 		"""
 		Called when someone has messaged our chat.
+		or when they enter a message
 		"""
 		# Send a message down to the client
 		print("ChatConsumer: chat_message")
@@ -367,6 +369,7 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 		
 		timestamp = calculate_timestamp(timezone.now())
 
+		print('message type is ', MSG_TYPE_MESSAGE)
 		await self.send_json(
 			{
 				"msg_type": MSG_TYPE_MESSAGE,

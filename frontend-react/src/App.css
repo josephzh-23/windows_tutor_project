@@ -98,6 +98,17 @@ button {
   border-radius: 3px;
   padding: .3rem 1rem;
   margin-left: .5rem;
+
+  margin: 20px 15px;
+}
+
+button.btn{
+  margin: 20px 15px !important;
+
+}
+input{
+  margin: 10px 15px !important;
+
 }
 
 .button-default {

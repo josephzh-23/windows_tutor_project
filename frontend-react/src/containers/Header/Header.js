@@ -32,6 +32,9 @@ import { preloadImage } from '../../Reusable_Vanilla/Async_image_loader.js';
 import ImportScript from '../../Reusable_React/ImportScript.js';
 import {  handleChatNotificationsData,  handleNewChatNotificationsData,  setChatInitialTimestamp,  setChatNotificationsCount,  setChatPaginationExhausted,  setupChatNotificationsMenu } from '../Chat_Notifications/Chat_Notifications.js';
 import { submitNewChatNotificationToCache, setChatNewestTimestamp} from './../Chat_Notifications/Chat_Notifications';
+import { axios } from './../../Reusable_React/react-axios-master/src/axios';
+import { errorToast, successToast } from '../../Toaster.js';
+import { getCookie } from './../../Utilities/Util';
 
 var List = require("collections/list");
 
@@ -138,6 +141,13 @@ const Header =() => {
 			setChatInitialTimestamp()
 		   });
 
+
+		document.getElementById('log-out').onclick = function(e){
+			e.preventDefault()
+			logout()
+		}
+	
+
 	
 		console.log("the list is", generalCachedNotifList)
 
@@ -151,6 +161,34 @@ const Header =() => {
 
 
 
+	var logout = ()=>{
+
+		var csrfToken = getCookie('csrfToken')
+		axios.defaults.headers = {
+			'X-CSRFToken': csrfToken,
+			"Content-Type": "application/json",
+			Authorization: `Token ${sessionStorage.getItem('token')}`
+			
+		};
+		    // formData is the data
+			var res = axios.post("accounts/logout/").catch((err) => {
+				console.log("Error: ", err);
+			  });
+		
+			  // If a response comes back
+			  if (res)
+				//  await getReminders();
+		
+				if (res.status == 200) {
+				  successToast("Logged out successfully")
+
+				
+				}
+				else {
+				  errorToast("User can't log out")
+				}
+			  console.log('the returned data is ', res);
+	}
 	return (
 
 		// We can include the js as a module here 
@@ -216,8 +254,13 @@ const Header =() => {
 
 						</div>
 						: <div>
-							<a className="p-2 text-dark" href="{% url 'login' %}">Login</a>
+							<a className="p-2 text-dark" href="">Login</a>
 							<a className="btn btn-outline-primary" href="{% url 'register' %}">Register</a>
+						</div>
+							<button className="p-2 text-dark" id="log-out">Log out </button>
+						
+						<div>
+
 						</div>
 						{/* } */}
 					</nav>

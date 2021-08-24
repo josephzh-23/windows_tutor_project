@@ -5,24 +5,21 @@ from django.db import models
 # Will contain the appointment model for each tutor and student
 from tutors import settings
 
-User = get_user_model()
+
 class Appointment(models.Model):
 
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="apptSender")
-    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="apptReceiver")
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="appt_sender")
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="appt_receiver")
 
-    name = models.CharField(max_length=100)
     # We need to restrcit this field
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, null= True)
     start_time = models.TimeField(auto_now=False, blank=True)
     end_time = models.TimeField(auto_now=False, blank=True)
 
     price = models.IntegerField(default=0)  # cents
-    file = models.FileField(upload_to="product_files/", blank=True, null=True)
-    url = models.URLField()
 
     def __str__(self):
-        return self.name
+        return self.title
 
     def get_display_price(self):
         return "{0:.2f}".format(self.price / 100)

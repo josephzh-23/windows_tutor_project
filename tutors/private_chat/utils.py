@@ -1,5 +1,5 @@
 
-from private_chat.constants import MSG_TYPE_ENTER
+from private_chat.constants import MSG_TYPE_ENTER, MSG_TYPE_MESSAGE
 from private_chat.models import PrivateChatRoom
 from django.contrib.humanize.templatetags.humanize import naturalday
 from django.core.serializers.python import Serializer
@@ -43,8 +43,8 @@ def calculate_timestamp(timestamp):
 class LazyRoomChatMessageEncoder(Serializer):
     def get_dump_object(self, obj):
         dump_object = {}
-
-        dump_object.update({'msg_type': MSG_TYPE_ENTER})
+		#Found the bug here
+        dump_object.update({'msg_type': MSG_TYPE_MESSAGE})
         dump_object.update({'msg_id': str(obj.id)})
         dump_object.update({'user_id': str(obj.user.id)})
         dump_object.update({'username': str(obj.user.username)})

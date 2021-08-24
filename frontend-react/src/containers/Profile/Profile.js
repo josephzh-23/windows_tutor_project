@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { connect } from 'react-redux';
 // Will work on this page for now 
 import axios from 'axios';
+import $ from 'jquery'
 import "./Profile.css"
 import { getQueryStrings } from '../../Reusable_Vanilla/Utilities/getQueryStrings.js';
 
@@ -15,6 +16,7 @@ import { UserContext } from '../../Reusable_React/UserContext.js';
 import { errorToast, successToast } from '../../Toaster.js';
 // import { readURL } from '../../scripts/croppingEditor.js';
 import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 require('jquery-schedule')
 
 
@@ -27,7 +29,7 @@ const Profile = (props) => {
 
 
   
-	var $ = function (id) { return document.getElementById(id); };
+	// var $ = function (id) { return document.getElementById(id); };
   var csrfToken = getCookie('csrftoken')
   let history = useHistory();
   // here id :is the id of the friend clicked on 
@@ -39,6 +41,7 @@ const Profile = (props) => {
 
   //   const userId = match.params.id;
 
+  const { authUser } = useContext(UserContext)
   const [data, setData] = React.useState({
     account: {
     },
@@ -51,6 +54,10 @@ const Profile = (props) => {
 
   React.useEffect(()=>{
 
+
+    $('.joseph-zh').on('click', '#book-appt', function() {
+      console.log( "Handler for .click() called." );
+    });
     var userId = getQueryStrings("userId")
     console.log(sessionStorage.getItem("token"));
     // console.log('userid ' , userId);
@@ -81,7 +88,7 @@ const Profile = (props) => {
             friendRequestSent: res.data.requestSent,
           friends: res.data.friends})
 
-         
+      
     
 
         }).catch(err => {
@@ -126,8 +133,8 @@ const Profile = (props) => {
     // if ((!data.isSelf) && (!data.isFriend)) {
   
       return(
-      <div className="joseph">
-     
+      <div className="joseph-zh">
+      
      {/* A request has already been sent  */}
       {(data.friendRequestSent == 1) &&
         <div className="d-flex flex-column pt-4">
@@ -150,6 +157,11 @@ const Profile = (props) => {
 							</button>
         </div>}
 
+
+{/*  Make sure not looking at own account */}
+          {((data.account.role=="tutor")&&(data.isSelf==false))&&
+             <Link id="book-appt"to="/payment"> Book an appointment</Link> 
+          }
 
         {/* If this user is already a friend */}
      { (data.isFriend&&!data.isSelf) &&
@@ -185,8 +197,12 @@ const Profile = (props) => {
             message
 					</span>
           <span className="message-btn-text m-auto pl-2">Message</span>
+
         </div>
+
+       
   }
+
 
       </div>
         
@@ -248,7 +264,10 @@ var showUserProfile = (data) => {
     
     <div className="row">
         <div className="col-sm-4 ">
+
+     
           <div className="card">
+   
             {/* Don't change this to profile-image for now */}
             <img className="profile-image" 
             src={`http://localhost:8000${data.account.profile_image}`}
@@ -263,7 +282,7 @@ var showUserProfile = (data) => {
         </div>
 
         <div className="col-sm-4">
-
+      
       {/* When you click friends  */}
           <div className="card d-flex flex-column pt-4">
             {/* If you clicked on stella */}
@@ -285,10 +304,17 @@ var showUserProfile = (data) => {
                 <span className="material-icons mr-2 person-add-icon">person_add</span>
   
                 <span className="friend-text">Friend Requests ({data.friendRequests.length})</span>
+              
+              
               </div>
+
+             
             </a>
           </div>
+    
           </div>
+
+             
       }
       </div>
     
@@ -315,7 +341,7 @@ const show_user_schedule = ()=>{
 
 
 const getSchedules = async () => {
-  const res = await axios.get("http://127.0.0.1:8000/schedule/getschedule/",{
+  const res = await axios.get(`http://127.0.0.1:8000/schedule/getschedule?=${authUser.userId}`,{
     headers: {Authorization: `Token ${sessionStorage.getItem('token')}`
   }, 'X-CSRFToken': csrfToken}).catch((err) => {
     console.log("Error:", err);
@@ -503,6 +529,7 @@ return (
         </div>
 
      
+       
     </div>
 
 )

@@ -61,13 +61,13 @@ const LoginPage = (props) => {
         
         setUser({...authUser, username: res.data.username })
         console.log('the username is ',authUser.username);
-        sessionStorage.setItem("token", res.data.token);
-        sessionStorage.setItem("username", res.data.username);
-        sessionStorage.setItem("isAuthenticated", true);
 
-        sessionStorage.setItem("auth_userId",res.data.userId )
 
-        // history.push("/updateAccount")
+
+          init_auth_user(res)
+     
+          
+        history.push(`/profile?userId=${res.data.userId}`, {from: "LoginPage"})
 
         // setTimeout(()=>{
         // window.location.reload();
@@ -120,6 +120,15 @@ const LoginPage = (props) => {
       </div>
     </div>
   );
+
+  function init_auth_user(res){
+    sessionStorage.setItem("token", res.data.token);
+    sessionStorage.setItem("username", res.data.username);
+    sessionStorage.setItem("isAuthenticated", true);
+
+    sessionStorage.setItem("auth_userId",res.data.userId )
+
+  }
 };
 
 export default withRouter(LoginPage);

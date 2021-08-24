@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react"
 import React from "react";
 import axios from "axios";
 import 'whatwg-fetch'
-import '../assets/common.css'
+// import '../assets/common.css'
+import '../App.css'
 import { UserContext } from "../Reusable_React/UserContext";
 // Right now focused on buidling the user search page 
 
@@ -173,14 +174,16 @@ const SearchFriends= (props) => {
 
       <form onSubmit={searchUser} id="form">
         <div className="inputGroup">
-          <label htmlFor="username">Please enter user name</label>
+          <label htmlFor="username">Please enter user name or email to
+          search for people</label>
+          <div>
           <input
             type="text"
             name="username"
             id="username"
             placeholder="abc@example.com"
             ref={usernameRef}
-          />
+          /></div>
         </div>
 
         <div style={{ flex: 1 }}>

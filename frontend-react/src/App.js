@@ -14,7 +14,7 @@ import { useHistory } from "react-router-dom";
 // import SidePanel from "./containers/SidePanel.js";
 import Profile from "./containers/Profile/Profile.js";
 import Chat from "./containers/chat.js";
-
+import './App.css'
 import FriendList from "./containers/FriendList.js"
 import SearchFriends from "./containers/SearchFriends.js"
 import RegisterPage from './containers/Login/RegisterPage.js';

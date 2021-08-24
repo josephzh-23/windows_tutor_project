@@ -1,3 +1,5 @@
+import json
+
 import stripe
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
@@ -6,12 +8,16 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 from requests import Response
+from rest_framework import permissions
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+
+from tutors import settings
 
 User = get_user_model()
 from payments.models import Appointment
 
-
-
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create checkout session from the product_id attached
 #Here
@@ -50,6 +56,8 @@ class CreateCheckoutSessionView(View):
 
 # get user appointment (all appointments user has
 # made) based on user id
+
+
 def get_user_appointment(request):
     sender = request.user
 
@@ -63,4 +71,50 @@ def get_user_appointment(request):
     return Response(appointment)
 
 
+# Step 1 in the process
+# @api_view(('POST',))
+# This is for creating the payment intent return the client secret id
+class StripeIntentView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def post(self, request, *args, **kwargs):
 
+
+
+        req_json = json.loads(request.body)
+        print(req_json)
+        id = req_json['userId']
+        print(id)
+        user = User.objects.get(id = id)
+        print(user)
+
+        '''
+        Here create a stripe customer
+        - then create an appt based on student and tutor
+        '''
+        customer = stripe.Customer.create(email=user.email)
+
+        #Here appointment equivalent to product
+        #find the appointment based on the user and the id
+
+        # product_id = self.kwargs["pk"]
+        appt_id= self.kwargs["apptId"]
+
+
+        appointment = Appointment.objects.get(user = user, id=appt_id)
+
+
+        intent = stripe.PaymentIntent.create(
+            amount=appointment.price,
+            currency='usd',
+            # customer=customer['id'],
+            customer = customer['id'],
+            metadata={
+                "product_id": appointment.id
+            }
+        )
+        print(intent)
+        return JsonResponse({
+            'clientSecret': intent['client_secret']
+        })
+    # except Exception as e:
+    #     return JsonResponse({ 'error': str(e) })

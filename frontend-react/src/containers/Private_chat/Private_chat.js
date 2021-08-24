@@ -43,9 +43,6 @@ const Private_Chat = (params) => {
 
 				// Call this fxn here 
 
-
-
-				// setupChatDropdownHeader()
 			}).catch(err => {
 				console.log(err)
 			})
@@ -63,7 +60,7 @@ const Private_Chat = (params) => {
 		}));
 	}
 
-
+		// Checked the message here 
 	function getRoomChatMessages(){
 	var pageNumber = document.getElementById("id_page_number").innerHTML
 	if(pageNumber != "-1"){
@@ -109,7 +106,7 @@ function setPageNumber(pageNumber){
 			}
 		}).then((res) => {
 
-			console.log(res)
+			console.log('create or return private chat', res)
 			if (res.data['response'].includes("Successfully got the chat")) {
 
 				// successToast(res.data['response'])
@@ -141,7 +138,7 @@ function setPageNumber(pageNumber){
 					onClick={(e) => onSelectFriend(e, x.friend.id)}
 					id={`id_friend_container_${x.friend.id}`}
 				>
-					<img className="profile-image rounded-circle img-fluid" id={`id_friend_img_${x.friend.id}`} src="http://localhost:8000/media/dummy_image.jpeg" />
+					<img className="profile-image rounded-circle img-fluid" id={`id_friend_img_${x.friend.id}`}  />
 					<div className="d-flex flex-column">
 						<span className="username-span">{x.friend.username}</span>
 						<span className="friend-message-span">{x.message}</span>
@@ -200,8 +197,6 @@ function setPageNumber(pageNumber){
 		chatSocket.onmessage = function (message) {
 			// Decode the JSON
 
-
-
 			// document.cookie = "authorization= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
 			console.log("Got chat websocket message " + message.data);
 			console.log("Got websocket message.");
@@ -213,6 +208,7 @@ function setPageNumber(pageNumber){
 			// Handle errors (ClientError)
 			if (data.error) {
 				console.error(data.error + ": " + data.message)
+				showClientErrorModal(data.message)
 				return;
 			}
 			// Handle joining (Client perspective)
@@ -243,6 +239,7 @@ function setPageNumber(pageNumber){
 			// SO if a a standard new message, 
 			// true: is for maintaining position (so you don't go to the bottom)
 			if (data.msg_type == 0 || data.msg_type == 1 || data.msg_type == 2) {
+				console.log('msg type is ', data.msg_type);
 				appendChatMessage(data, false, true)
 			}
 
@@ -313,6 +310,10 @@ function setPageNumber(pageNumber){
 
 
 	
+	function showClientErrorModal(message){
+		document.getElementById("id_client_error_modal_body").innerHTML = message
+		document.getElementById("id_trigger_client_error_modal").click()
+	}
 
 	// Will load the actual user profile image once they are retrieved 
 	function onStart() {
@@ -327,7 +328,10 @@ function setPageNumber(pageNumber){
 
 			console.log(`${x.friend.profile_image}`);
 
-			preloadImage(`${x.friend.profile_image}`, `id_friend_img_${x.friend.id}`)
+			// Default image url 
+			// http://localhost:8000/media/pickachu.png
+			// id is "id_friend_img_3"
+			preloadImage(`http://localhost:8000${x.friend.profile_image}`, `id_friend_img_${x.friend.id}`)
 		})
 	}
 
@@ -372,17 +376,6 @@ function setPageNumber(pageNumber){
 
 		$("id_chat_log").addEventListener("scroll", chatLogScrollListener)
 	}
-	function getRoomChatMessages(){
-		var pageNumber = document.getElementById("id_page_number").innerHTML
-		if(pageNumber != "-1"){
-			setPageNumber("-1") // loading in progress
-			chatSocket.send(JSON.stringify({
-				"command": "get_room_chat_messages",
-				"room_id": roomId,
-				"page_number": pageNumber,
-			}));
-		}}
-	
 
 	function clearHighlightedFriend(){
 

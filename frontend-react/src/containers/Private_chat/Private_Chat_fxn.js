@@ -11,6 +11,10 @@ import { displayChatroomLoadingSpinner } from "../../Reusable_Vanilla/display_ch
 import { errorToast, successToast } from "../../Toaster.js"
 
 
+var messageType
+var msg_id
+var message, uName, user_id, profile_image, timestamp
+
 function $(element) {
 	return document.getElementById(element);
 	}
@@ -26,14 +30,14 @@ function $(element) {
 
 		var profileImage = document.createElement("img")
 		profileImage.addEventListener("click", function(e){
-			// selectUser(user_id)
+			selectUser(user_id)
 		})
 		profileImage.classList.add("profile-image")
 		profileImage.classList.add("rounded-circle")
 		profileImage.classList.add("img-fluid")
 
 
-		profileImage.src = ""
+		profileImage.src = "http://localhost:8000/media/dummy_image.jpeg"
 		var profile_image_id = "id_profile_image_" + msg_id
 		profileImage.id = profile_image_id
 		newMessageDiv.appendChild(profileImage)
@@ -50,8 +54,9 @@ function $(element) {
 		usernameSpan.innerHTML = username
 		usernameSpan.classList.add("username-span")
 		usernameSpan.addEventListener("click", function(e){
-			// selectUser(user_id)
+			selectUser(user_id)
 		})
+		console.log('here debugging is called');
 		div2.appendChild(usernameSpan)
 
 		var timestampSpan = document.createElement("span")
@@ -88,15 +93,17 @@ function $(element) {
 		preloadImage(profile_image, profile_image_id)
     }
     
-
+	// Used to hadnle the incoming existing messages from 
+	// the backend
     export function appendChatMessage(data, maintainPosition, isNewMessage){
-		var messageType = data['msg_type']
+		console.log('the appended message is', data)
+		 messageType = data['msg_type']
 		  msg_id = data['msg_id']
-		var message = data['message']
-		var uName = data['username']
-		var user_id = data['user_id']
-		var profile_image = data['profile_image']
-		var timestamp = data['natural_timestamp']
+		 message = data['message']
+		 uName = data['username']
+		 user_id = data['user_id']
+		 profile_image = data['profile_image']
+		 timestamp = data['natural_timestamp']
 		console.log("append chat message: " + messageType)
 		
 		var username = uName + ": "
@@ -238,6 +245,7 @@ export function handleMessagesPayload(messages, new_page_number){
 	if(messages != null && messages != "undefined" && messages != "None"){
 		setPageNumber(new_page_number)
 		messages.forEach(function(message){
+			// false-> not a new msg 
 			appendChatMessage(message, true, false)
 		})
 	}

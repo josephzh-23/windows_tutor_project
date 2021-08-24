@@ -1,4 +1,5 @@
-   
+from django.contrib.postgres.search import SearchVector
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from os.path import isabs
 from django.core import serializers
@@ -33,8 +34,7 @@ def account_search_view(request, *args, **kwargs):
         print(search_query)
         if len(search_query) > 0:
             
-            search_results = Account.objects.filter(email__icontains=search_query).filter(username__icontains=search_query).distinct()
-            
+            search_results = Account.objects.filter(Q(email__icontains=search_query)|Q(username__icontains=search_query))
             user = request.user
             print(user)
             accounts = [] # [(account1, True), (account2, False), ...]
@@ -77,6 +77,7 @@ class SignupView(APIView):
         email = data.get('email')
         password = data.get('password1')
         password2 = data.get('password2')
+        role = data.get('role')
 
         if password == password2:
             if User.objects.filter(email=email).exists():
@@ -87,19 +88,24 @@ class SignupView(APIView):
                 else:
 
                     #create_user is a native function
-                    user = User.objects.create_user(email=email, password=password, username=username)
+                    user = User.objects.create_user(email=email, password=password,
+                                                    username=username,role =role)
                     
                     #Returning the token created 
                     token = Token.objects.get(user=user).key
 
                     #Also show that the message user created successfully
+                    data['userId'] = user.id
                     data['token'] = token
-                    data.update({'success':'user successfully created'})
+                    data.update({'message':'user successfully created'})
                     user.save()
                     return Response(data)
         else:
             return Response({'error': 'Passwords do not match'})
 
+
+#Here an account
+# Calls the login() fxn on request
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def login_view(request, *args, **kwargs):
@@ -202,11 +208,13 @@ def login_view(request, *args, **kwargs):
     # else:
     # 	return Response({'error' : err})
 
-
-
+@api_view(['POST'])
 def logout_view(request):
+    print('user is', request.user)
     logout(request)
-    return redirect("home")
+
+    # return redirect("home")
+    return Response('ok')
 
 
 # This allows user to get to whereeve he wants to go 
@@ -347,6 +355,9 @@ def account_view(request, *args, **kwargs):
         data['baseURL'] =settings.BASE_URL
         data['friendRequests'] = requests
         data['requestSent'] = request_sent
+
+
+        #Add role data
 
         return Response(data)
         # return render(request, "account/account.html", context)

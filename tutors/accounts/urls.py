@@ -14,7 +14,7 @@ urlpatterns= [
     # Send an email and password to this 
      path('gettoken', obtain_auth_token),
      path('login/', login_view),
-     path('logout', logout_view, name="logout"),
+     path('logout/', logout_view, name="logout"),
      path('search/', account_search_view, name ="register"),
      path('accountView/', account_view, name="view"),
     path('<user_id>/accountUpdate/',edit_account_view, name="edit"),
