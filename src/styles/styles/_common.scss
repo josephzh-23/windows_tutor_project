@@ -1,0 +1,42 @@
+.card {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);;
+  border-radius: 4px;
+  padding: 2rem;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 400px;
+  transform: translate(-50%, -50%);
+
+  .cardHeader {
+    @include leftCornerHeader; 
+  }
+  
+  .cardBody { 
+    margin: 2rem 0;
+  
+    .inputGroup { 
+      margin-bottom: 1rem;
+  
+      label { 
+        font-size: 0.9rem;
+      }
+  
+      input {
+        @include singleInputColumn;
+        margin: 0.5rem 0;
+      }
+    }
+
+    button {
+      @include fullWidthButton;
+      margin-top: 1rem;
+    }
+
+    .switch {
+      font-size: 1rem;
+      padding: 1.5rem 0 0 0;
+      text-align: center;
+    }
+  }
+}

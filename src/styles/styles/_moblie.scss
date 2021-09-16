@@ -1,0 +1,17 @@
+@media screen and (max-width:$moblie) {
+  .card {
+    box-shadow: none;
+    width: 100vw;
+
+    .cardHeader {
+      transform: skewY(0);
+      background: none;
+      color: $primaryColor;
+      position: none;
+      width: 100vw;
+      text-align: center;
+      top: 0rem;
+      left: 0rem;
+    }
+  }
+}

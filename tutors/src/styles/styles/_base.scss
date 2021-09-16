@@ -1,0 +1,56 @@
+$primaryFont: 'Montserrat', sans-serif;
+$primaryColor: #f7c52a;
+$moblie: 480px;
+
+* {
+  box-sizing: border-box;
+  color: #333;
+}
+
+body {
+  font-family: $primaryFont;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+@mixin leftCornerHeader {
+  background: $primaryColor;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  transform: skewY(-4deg);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: inline-block;
+  position: absolute;
+  top: -1rem;
+  left: -0.75rem;
+}
+
+@mixin singleInputColumn {
+  border: none;
+  padding: 1rem;
+  width: 100%;
+  border-radius: 2px;
+  border: 1px solid #e4ebf0;
+  background-color: #f6f8fa;
+  transition: all 0.5s;
+      
+  ::placeholder { color: #b7c8cb; }
+      
+  :focus {
+    border: 1px solid $primaryColor;
+    outline: none;
+  }
+}
+
+@mixin fullWidthButton {
+  font-size: 1rem;
+  font-weight: 700;
+  background: $primaryColor;
+  border: none;
+  padding: 1rem;
+  border-radius: 4px;
+  width: 100%;
+  text-transform: uppercase;
+}
