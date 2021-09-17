@@ -84,7 +84,9 @@ const SearchFriends= (props) => {
       var pageNumber = document.getElementById("id_page_number").innerHTML
       if(pageNumber == "-1"){
         setPageNumber("1") // loading in progress
+        
 
+        console.log('page number is',pageNumber)
 
     axios.defaults.headers = {
       "Content-Type": "application/json",
@@ -152,9 +154,13 @@ const SearchFriends= (props) => {
       "Content-Type": "application/json",
       Authorization: `Token ${token}`
   };
-
+ // This is the page number to send to the backend
+ var pageNumber = document.getElementById("id_page_number").innerHTML
+ if(pageNumber == "-1"){
+   setPageNumber("1") // loading in progress
+ }
     // Make a get request instead
-    axios.get(`http://127.0.0.1:8000/accounts/search/?q=${username}`).then(
+    axios.get(`http://127.0.0.1:8000/accounts/search/?q=${username}&pageNum=${pageNumber}`).then(
       res => {
         console.log(res);
         setFilteredUsers(res.data)

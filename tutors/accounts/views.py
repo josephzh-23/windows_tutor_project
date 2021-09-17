@@ -49,7 +49,7 @@ def account_search_view(request, *args, **kwargs):
             # and
             p = Paginator(searchResults, per_page =1)
 
-
+            print(pageNum)
             '''Need to send back the new page number '''
             if int(pageNum) <=p.num_pages:
                 # Return item starting at the 1st page
