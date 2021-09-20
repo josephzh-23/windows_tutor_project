@@ -21,6 +21,7 @@ import { getCookie } from '../../Reusable_Vanilla/Utilities/Util';
 //Code for using the calendar library here
 const Create_Posting = () => {
   var csrfToken = getCookie('csrftoken')
+  var token = sessionStorage.getItem("token")
 
   useEffect(() => {
 
@@ -122,13 +123,15 @@ const Create_Posting = () => {
 
       console.log(formData);
 
-
-      // formData is the data
+      axios.defaults.headers = {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`
+      };
+  
       const res = await axios.post("tutor/postings/", formData).catch((err) => {
         console.log("Error: ", err);
       });
 
-      // If a response comes back
       if (res)
         //  await getReminders();
 

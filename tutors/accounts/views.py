@@ -51,14 +51,15 @@ def account_search_view(request, *args, **kwargs):
 
             print(pageNum)
             '''Need to send back the new page number '''
+            print('total page', p.num_pages)
             if int(pageNum) <=p.num_pages:
                 # Return item starting at the 1st page
                 # and it gets incremented
 
                 search_results = p.page(pageNum)
-                print(search_results)
+                print("single page results is", search_results)
                 user = request.user
-                print(user)
+
                 accounts = [] # [(account1, True), (account2, False), ...]
 
                 if user.is_authenticated:
@@ -69,6 +70,11 @@ def account_search_view(request, *args, **kwargs):
 
                         accounts.append((serializer.data, auth_user_friend_list.is_mutual_friend(account)))
                     data['accounts'] = accounts
+
+                    #Return the new page number
+                    new_page_number = int(pageNum) + 1
+                    data['accounts'] = accounts
+                    data['new_page_number'] = new_page_number
                 else:
                     for account in search_results:
 
@@ -82,10 +88,13 @@ def account_search_view(request, *args, **kwargs):
 
                     new_page_number = int(pageNum)+1
                     data['accounts'] = accounts
-                    data['new_page_nubmer'] = new_page_number
+                    data['new_page_number'] = new_page_number
             else:
-                return None
-    return Response(accounts)
+                print('coming thru')
+
+                data['exhausted'] = True
+                print(data)
+    return Response(data)
 
 
 
@@ -141,7 +150,7 @@ def login_view(request, *args, **kwargs):
     print(user)
     if user.is_authenticated: 
         print('right here')
-        return redirect("home")
+        # return redirect("home")
 
     destination = get_redirect_if_exists(request)
     print("destination: " + str(destination))

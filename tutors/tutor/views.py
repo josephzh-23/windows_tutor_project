@@ -109,6 +109,7 @@ def search_posting(request):
     if is_valid_queryparam(title_contains_query):
         qs = qs.filter(title__icontains=title_contains_query)
         print(qs)
+
     #This checks for both the title or author query here
     elif is_valid_queryparam(title_or_author_query):
         qs = qs.filter(Q(title__icontains=title_or_author_query)
@@ -385,11 +386,14 @@ class Postings_Viewset(viewsets.ModelViewSet):
         data = request.data
         #Data here is actually
         print(request.data)
+
+        print(request.user)
+        email = request.user.email
         print(data['name'])
         #Get the author as well
 
-        # ORM : a way of writing sql query in python
-        author = Account.objects.get(username =data["name"])
+        # ORM : get the author by the email instead to be unique
+        author = Account.objects.get(email =email)
         for key in request.data:
             print(key)
 

@@ -1,6 +1,5 @@
 
 import logo from './logo.svg';
-// import './App.css';
 
 // export default App;
 import React, { useContext, useState } from "react";
@@ -86,7 +85,7 @@ function App() {
           <li><NavLink to="/create_posting/">Create Tutor Posting</NavLink></li>
           <li><NavLink to="/create_edit_schedule/">Create or Edit Tutor Schedule</NavLink></li>
 
-          <li><NavLink to="/searchFilter/">Search Filtering</NavLink></li>
+          <li><NavLink to="/searchFilter/">Search Tutor postings</NavLink></li>
 
           <br />
           

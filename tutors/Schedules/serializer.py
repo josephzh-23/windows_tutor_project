@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from Schedules.models import Day, daily_task
-from tutor.serializers import StringSerializer
 
 
 

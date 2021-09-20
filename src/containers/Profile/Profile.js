@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import $ from 'jquery'
 import "./Profile.css"
-import { getQueryStrings } from '../../Reusable_Vanilla/Utilities/getQueryStrings.js';
+import { getQueryStrings } from '../../Reusable_Vanilla/getQueryStrings.js';
 
 import { makeToast } from "../../Toaster"
 // import { makeToast } from "../../Toaster"

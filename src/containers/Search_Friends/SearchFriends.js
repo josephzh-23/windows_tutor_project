@@ -2,6 +2,9 @@ import { useContext, useEffect, useState } from "react"
 import React from "react";
 import axios from "axios";
 
+
+import './SearchFriend.css'
+
 import $ from "jquery"
 import 'whatwg-fetch'
 // import '../assets/common.css'
@@ -10,15 +13,15 @@ import { UserContext } from "../../Reusable_React/UserContext";
 import { scroll_to_bottom } from "../../Reusable_Vanilla/Scroll_to_bottom";
 // Right now focused on buidling the user search page 
 
-const SearchFriends= (props) => {
+const SearchFriends = (props) => {
 
 
 
 
-  
-  
+
+
   var token = sessionStorage.getItem("token")
-  const {authUser} = useContext(UserContext)
+  const { authUser } = useContext(UserContext)
   const getCookie = (name) => {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -38,142 +41,187 @@ const SearchFriends= (props) => {
   const [loading, setLoading] = useState(false);
 
 
-  const [query, setQuery] = useState("")                                                                                                                                                                                                                     
+  const [query, setQuery] = useState("")
   const [filteredUsers, setFilteredUsers] = useState([])
   var csrfToken = getCookie('csrftoken')
-  useEffect(() => {
 
+  var token = sessionStorage.getItem("token")
 
-  
+  // if($('#storeQuery').innerHTML!=""){
 
-    $(window).scroll(function() {   
-      console.log($(window).scrollTop(),$(window).height(), $(document).height());
-     
-      //100 to account for the offset
-      if($(window).scrollTop() + $(window).height() +100> $(document).height()) {
-            // alert("bottom!");
-            console.log("the object", query);
-          if(document.getElementById('id_page_number').innerHTML!="-1"){
+  //   setQuery($('#storeQuery').innerHTML)
+  // }
 
-            console.log("load tutor fired");
-            load_more_tutors(query)
-          }
-        }
-     });
-    setLoading(true);
-  }, []);
+  var pageNum= 0
+  $( document ).ready(function() {
+   pageNum= document.getElementById('id_page_number').innerHTML 
+  })
+ // We need a hack to prevent multiple firing of searchUser fxn
+ // using this tracker 
+ var fired = 1
+  $(window).scroll(function () {
 
-  function setPageNumber(pageNumber){
-    document.getElementById("id_page_number").innerHTML = pageNumber
-  }
-  
-  // Same as the search tutos function called when user scrolls to bottom
-
-  //      c   c                    c              vv                    
-
-
-  function load_more_tutors(query){
-
-
-    toggleSpinner()
     
-    if(document.getElementById('profile-link')!=null){
-    // This means there is already some data returned
-   if(document.getElementById('profile-link').innerHTML!="")
-    // This is the page number to send to the backend
-      var pageNumber = document.getElementById("id_page_number").innerHTML
-      if(pageNumber == "-1"){
-        setPageNumber("1") // loading in progress
+
+    //100 to account for the offset
+    if ($(window).scrollTop() + $(window).height() + 100 > $(document).height()) {
+      console.log('reached bottom');
+      
+
+      if(pageNum==="-1"){}
+      else if (pageNum === "1"){}
+      else if (pageNum!=="-1") {
+
+  
+
+        // THis fxn only fires if some data already returned from the functions
+        //Check if a new page number is returned means >1, otherwise
+        // nothing is loaded yet so don't fire this function
+
+        if(fired<pageNum){
+        setTimeout(function(){
+          $('#submit').trigger("click")
+
+          console.log('fired is', fired)
+          fired++
+        })
+          // Fire an automatic click event
+      //  searchUser(undefined)
+       
+      }
         
+      
+      }
+    }
+  });
+  // If pag number set to -1, means exhuasted
+  // usually start with 1 as the default 
+  function setPageNumber(pageNumber) {
 
-        console.log('page number is',pageNumber)
-
-    axios.defaults.headers = {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`
-  };
-
-    // Make a get request instead
-    axios.get(`http://127.0.0.1:8000/accounts/search/?q=${query}&pageNum=${pageNumber}`).then(
-      res => {
-        console.log(res);
-
-
-        toggleSpinner()
-        // Add to the exiting users 
-        setFilteredUsers([...filteredUsers, res.data])
-
-        
-      }).catch(err => {
-        console.log(err)
-      })
-
-    console.log(csrfToken);
-    var csrftoken = getCookie('csrftoken')
-    var url = `http://127.0.0.1:8000/accounts/search`
+    // Once exhuatsed can't reset it 
+    if(document.getElementById("id_page_number").innerHTML!="-1"){
+    document.getElementById("id_page_number").innerHTML = pageNumber
     }
   }
-}
 
 
-
-  function handle_incoming_data(data){
-      
-    setPageNumber(data.pageNumber)
-
-    // Add each user to the current var 
-    data.user.forEach((user)=>{
-
-    })
+  /*
+      Sets the pagination page number.
+    */
+  function setGeneralPageNumber(pageNumber) {
+    document.getElementById("id_general_page_number").innerHTML = pageNumber
   }
-/*
-		Sets the pagination page number.
-	*/
-	function setGeneralPageNumber(pageNumber) {
-		document.getElementById("id_general_page_number").innerHTML = pageNumber
+
+  /*
+    Called when pagination is exhausted and there is no more notifications.
+  */
+  function setGeneralPaginationExhausted() {
+    console.log("general pagination exhausted.")
+    setGeneralPageNumber("-1")
   }
-  
-  	/*
-			Called when pagination is exhausted and there is no more notifications.
-		*/
-	function setGeneralPaginationExhausted() {
-		console.log("general pagination exhausted.")
-		setGeneralPageNumber("-1")
-	}
+
 
 
 
 
   const searchUser = (e) => {
-    e.preventDefault()
-    var username = query
 
-    // setQuery("filled")
-    console.log('username is ', username);
+    if (typeof e !== 'undefined') {
+      e.preventDefault()
+    }
+  
+
+    toggleSpinner(true)
+
+  
+// loading in progress
+    var pageNumber =document.getElementById("id_page_number").innerHTML 
+  
+
+    // Set header
     axios.defaults.headers = {
       "Content-Type": "application/json",
       Authorization: `Token ${token}`
-  };
- // This is the page number to send to the backend
- var pageNumber = document.getElementById("id_page_number").innerHTML
- if(pageNumber == "-1"){
-   setPageNumber("1") // loading in progress
- }
+    };
+
+    var username =""
+    
+    if(query!=""){
+      username = query
+      $('#storeQuery').html(query)
+      console.log('query is',   $('#storeQuery').html() )
+    }else{
+     username = $('#storeQuery').html()
+    }
+
+
+    console.log('username is ', username);
+
+
+  
     // Make a get request instead
+  
+    if(fired<=pageNum){
+
+      setTimeout(function(){
     axios.get(`http://127.0.0.1:8000/accounts/search/?q=${username}&pageNum=${pageNumber}`).then(
       res => {
-        console.log(res);
-        setFilteredUsers(res.data)
+        console.log(res.data);
+        // setFilteredUsers(res.data.accounts)
+        toggleSpinner(false)
+
+        
+        // WHy is exhuasted not returned
+        console.log('exhausted is', res.data.exhausted);
+        // Make sure data is not exhuasted
+        if(res.data.exhausted===undefined){
+          
+          setFilteredUsers(
+            
+            [...filteredUsers,
+          {
+            id: res.data.accounts[0][0].id,
+            username: res.data.accounts[0][0].username,
+            image: res.data.accounts[0][0].profile_image
+          }
+        ]
+        )
+          console.log("new page number", res.data.new_page_number, fired);
+          setPageNumber(res.data.new_page_number)
+
+          console.log(filteredUsers);
+
+        
+    
+        // Also store the query in html
+        
+        }else{
+
+          setPageNumber(-1)
+          console.log("the search is exhuasted");
+        }
       }).catch(err => {
         console.log(err)
       })
-
-    console.log(csrfToken);
-    var csrftoken = getCookie('csrftoken')
-    var url = `http://127.0.0.1:8000/accounts/search`
-
+  
+    fired++
+      
+    },200)
+  }
   }
 
+  var toggleSpinner = (mode) => {
+
+    if (mode == true) {
+
+
+      document.getElementById('loader').style.display = "block"
+    } else {
+      document.getElementById('loader').style.display = "none"
+
+    }
+
+  }
 
   const foundFriends = filteredUsers.map((friend, index) => {
 
@@ -183,23 +231,23 @@ const SearchFriends= (props) => {
 
     return (
 
-      
+
       <div key={index} className="card flex-row flex-grow-1 p-2 mx-2 my-2 align-items-center">
-       
-       
-        <a className ="profile-link"  id="profile-link"
-          href = {`http://localhost:3000/profile/?userId=${friend[0].id}`}>
+
+
+        <a className="profile-link" id="profile-link"
+          href={`http://localhost:3000/profile/?userId=${friend.id}`}>
           <div className="card-image m-2">
             <img className="img-fluid profile-image"
-             src= {`http://localhost:8000${friend[0].profile_image}`} alt="" />
+              src={`http://localhost:8000${friend.image}`} alt="" />
           </div>
         </a>
         <a className="profile-link"
-        //  href="{% url 'account:view' user_id=account.0.id %}"
-          href = {`http://localhost:3000/profile/?userId=${friend[0].id}`}
+          //  href="{% url 'account:view' user_id=account.0.id %}"
+          href={`http://localhost:3000/profile/?userId=${friend.id}`}
         >
           <div className="card-center px-2">
-            <h4 className="card-title">{friend[0].username}</h4>
+            <h4 className="card-title">{friend.username}</h4>
             {/* {% if account.1 %}
                 <p className="card-text"><a href="#" onclick="createOrReturnPrivateChat('{{account.0.id}}')">Send a Message</a></p>
                 {% endif %}
@@ -211,29 +259,29 @@ const SearchFriends= (props) => {
             <div className="d-flex flex-row friends-text-container p-3">
               <p className="friends-text m-auto">
                 Friends
-                  </p>
+              </p>
               <span className="material-icons checkmark-icon m-auto pl-2">
                 check_circle_outline
-                  </span>
+              </span>
             </div> :
             // Else if this is not you 
-              (friend[0].id != authUser.userId) &&
+            (friend.id != authUser.userId) &&
             <div className="d-flex flex-row friends-text-container p-3">
               <p className="friends-text m-auto">
                 Not Friends
-                    </p>
+              </p>
               <span className="material-icons cancel-icon m-auto pl-2">cancel</span>
             </div>
           }
           {/* IF this this you  */}
-          {(friend[0].id == authUser.userId) &&
+          {(friend.id == authUser.userId) &&
             <div className="d-flex flex-row friends-text-container p-3">
               <p className="friends-text m-auto">
                 This is you
-                  </p>
+              </p>
               <span className="material-icons m-auto pl-2">
                 person_pin
-                  </span>
+              </span>
             </div>
 
 
@@ -251,72 +299,42 @@ const SearchFriends= (props) => {
   })
 
 
-    // No need to delete this sectino; can be reused later 
-        // const foundUsers = filteredUsers.map((user, index) => {
-
-        //   return (
-
-        //       <div className= "userBox" key={index}>
-        //         <div>
-        //           <p><b>User Email:   </b>
-        //            {user.email}</p>
-
-
-        //         <p> <b>My name is </b>
-        //          {user.username}</p>
-
-        //           <img className="img-fluid profile-image" src=
-        //           {`http://localhost:8000${user.imageUrl}`} alt=""/>
-
-
-        //           <a href={`http://localhost:3000/profile/?userId=${user.id}`}>Click on user</a>
-        //           </div>
-
-
-
-        //     </div>
-        //   )
-        //   }
-      // )
   
-      
-      var toggleSpinner=()=>{
-
-        var spinner = document.getElementById("loader")
-        if(spinner.style.display = "block"){
-            spinner.style.display="none"
-        }else{
-          spinner.style.display="block"
-        }
-      }
-    return (
 
 
-     
+
+
+
+
+  return (
+
+
+
     <div>
 
 
 
-<div className ="loader" id="loader">
-</div>
-    <span className="page-number" id="id_page_number">1</span>
+      {/* The number will start at 1 initially and 
+      1 is for starting pagination
+      -1 when exhausted */}
+      <span className="page-number" id="id_page_number">1</span>
 
 
       <form onSubmit={searchUser} id="form">
         <div className="inputGroup">
           <label htmlFor="username">Please enter user name or email to
-          search for people</label>
+            search for people</label>
           <div>
-          <input
-            type="text"
-            name="username"
-            id="username"
+            <input
+              type="text"
+              name="username"
+              id="username"
 
-            value = {query}
-            placeholder="abc@example.com"
-          onChange={(e) => setQuery(e.target.value)}
-          
-          /></div>
+              value={query}
+              placeholder="abc@example.com"
+              onChange={(e) => setQuery(e.target.value)}
+
+            /></div>
         </div>
 
         <div style={{ flex: 1 }}>
@@ -324,11 +342,22 @@ const SearchFriends= (props) => {
         </div>
       </form>
       {foundFriends}
+
+      <div id="loader"></div>
+
+      <div id="storeQuery" style={{display:"none"}}></div>
     </div>
 
-  )
-  
+      
 
+
+
+
+  )
+
+
+
+  
 }
 
 

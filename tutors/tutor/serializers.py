@@ -1,6 +1,7 @@
   
 from rest_framework import serializers
 
+from Schedules import serializer
 from accounts.models import Account
 from .models import Tutor, Posting, Subject
 
@@ -41,11 +42,20 @@ class StringSerializer(serializers.StringRelatedField):
     def to_internal_value(self, value):
         return value
 
+
+
+#Note here we are using special serializer for the string and the author
+# Because they are special
 class PostingSerializer(serializers.ModelSerializer):
+
+    image = serializers.SerializerMethodField('get_user_image')
 
     # these 2 should match the names of the 2 serializers
     author = StringSerializer(many=False)
     subject = StringSerializer(many=True)
+
+    #Add 1 more field for sending back the author's image as well
+
 
     class Meta:
         model = Posting
@@ -53,3 +63,10 @@ class PostingSerializer(serializers.ModelSerializer):
 
         #Using the depth 1 is important here
         depth= 1
+
+    # Get the user image url as well
+    # Do not get the image, but the url
+    def get_user_image(self, posting):
+        image = posting.author.profile_image.url
+        print(image)
+        return image
