@@ -1,4 +1,9 @@
-from collections import dict_items
+# from collections import dict_items
+
+# Basic list consturcting
+data = {}
+data['message']= "failed"
+
 
 thislist = ["apple", "banana", "cherry"]
 print(thislist)

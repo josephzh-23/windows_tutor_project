@@ -26,10 +26,9 @@ import ClientErrorModal from './containers/Public_chat/clientErrorModal';
 import Search_Posting from './containers/Search_Posting/Search_Posting.js';
 import Create_Posting from './containers/CreatePosting/Create_Posting.js';
 import Create_Schedule from './containers/CreateSchedule/Create_Schedule';
-import PaymentForm from './containers/Payment/PaymentForm.js';
-import StripeContainer from './containers/Payment/StripeContainer';
-import Layout from './containers/Payment/Layout';
+
 import { Create_Appointment } from './containers/Create_Appointment';
+import CreatePayment from './containers/Payment/Create_Payment';
 
 
 
@@ -189,7 +188,7 @@ function App() {
 
 
             <Route path="/create_posting" component={Create_Posting} exact />
-            <Route path="/payment" component={Layout} title="Tutoring page" exact />
+            <Route path="/payment" component={CreatePayment} title="Tutoring page" exact />
 
             <Route path="/create_edit_schedule" component={Create_Schedule}  exact />
             <Route path="/create_appointment" component={Create_Appointment} exact />
