@@ -227,7 +227,8 @@ MEDIA_URL = '/media/'
 # THis is for configuring where the images will be served
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_cdn')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_cdn')
-
+STRIPE_PUBLIC_KEY = "pk_test_51JPZJwIvBgnSRqw7iiT5nhzf1YSRVWUslcmBaYtOsLVsoxuXPpiYgCTFvIYPxKx5Da0xIT5u4539kP3N4ERbdT1c00t7yuWSkI"
+STRIPE_SECRET_KEY = "sk_test_51JPZJwIvBgnSRqw7hXKQnEH310RYaEFr7sq8nucn15frevg72UKuy8sCf4oXdkT5G2ynMBmYk5w8FOHJbKrIJnOA00Js3CGUeP"
 
 
 # Where pictures will be saved then 

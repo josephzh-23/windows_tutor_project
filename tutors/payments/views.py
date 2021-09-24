@@ -14,11 +14,12 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 
 from tutors import settings
+from tutors.settings import STRIPE_SECRET_KEY
 
 User = get_user_model()
 from payments.models import Appointment
 
-# stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create checkout session from the product_id attached
 #Here
@@ -80,11 +81,10 @@ class StripeIntentView(APIView):
     def post(self, request, *args, **kwargs):
 
 
-
         req_json = json.loads(request.body)
         print(req_json)
+
         id = req_json['userId']
-        print(id)
         user = User.objects.get(id = id)
         print(user)
 
@@ -97,28 +97,34 @@ class StripeIntentView(APIView):
         #Here appointment equivalent to product
         #find the appointment based on the user and the id
 
-        # product_id = self.kwargs["pk"]
-        appt_id= self.kwargs["apptId"]
+        # from the appointment id
+        appt_id= self.kwargs["pk"]
+
+        appointment = Appointment.objects.get(id=appt_id)
 
 
-        appointment = Appointment.objects.get(user = user, id=appt_id)
+        data ={}
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=appointment.price,
+                currency='usd',
+                customer = customer['id'],
+                metadata={
+                    "product_id": appointment.id
+                }
+            )
 
+            data['message'] = "payment successful"
+            print(intent)
+            return JsonResponse(data)
+        except Exception as e:
+            print("exception: " + str(e))
+            data['message'] = "not successful"
+            return JsonResponse(data)
 
-        intent = stripe.PaymentIntent.create(
-            amount=appointment.price,
-            currency='usd',
-            # customer=customer['id'],
-            customer = customer['id'],
-            metadata={
-                "product_id": appointment.id
-            }
-        )
-        print(intent)
-        return JsonResponse({
-            'clientSecret': intent['client_secret']
-        })
-    # except Exception as e:
-    #     return JsonResponse({ 'error': str(e) })
+        # return JsonResponse({
+        #     'clientSecret': intent['client_secret']
+        # })
 
 @api_view(['POST'])
 def createAppointment(request):
