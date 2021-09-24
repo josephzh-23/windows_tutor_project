@@ -147,23 +147,17 @@ function App() {
 
   // Switch makes sure only 1 component shown at any time. 
   return (
-    <div >
-
-
+    <div className="page">
       <div>
         <Header />
-        {display_user()}
-
       </div>
       <BrowserRouter>
-
-      var location = useLocation()
-        <div>
+        <div className="left-sidebar p-3">
           <ClientErrorModal />
+          {display_user()}
           <Top_section />
         </div>
-        <div>
-
+        <div className="content p-3 d-flex justify-content-center">
           <Switch>
             <Route path="/search/" >
               <SearchFriends />
@@ -179,14 +173,10 @@ function App() {
               <RegisterPage />
             </Route>
 
-
             <Route path="/profile" render={() => <Profile user={authUser} />} exact />
             <Route path="/updateAccount" component={UpdateAccount} exact />
             <Route path="/login" component={LoginPage} exact />
             <Route path="/account/friendRequests" component={FriendRequests} exact />
-
-
-
 
             <Route path="/create_posting" component={Create_Posting} exact />
             <Route path="/payment" component={Layout} title="Tutoring page" exact />
@@ -195,13 +185,10 @@ function App() {
             <Route path="/create_appointment" component={Create_Appointment} exact />
 
             <Route path="/public_chat" component={Public_Chat} exact />
-            <Route path="/account/friend_list_view"
-              render={() => <FriendList user={authUser} />} exact />
-
+            <Route path="/account/friend_list_view" render={() => <FriendList user={authUser} />} exact />
           </Switch>
         </div>
       </BrowserRouter>
-
     </div>
   );
 

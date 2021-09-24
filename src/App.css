@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -6,9 +6,6 @@
   height: 40vmin;
   pointer-events: none;
 }
-
-
-
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -44,7 +41,7 @@
 .App {
   text-align: center;
   padding-top: 2rem;
-}
+} */
 
 .modal-overlay {
   position: fixed;
@@ -101,17 +98,6 @@ button {
   border-radius: 3px;
   padding: .3rem 1rem;
   margin-left: .5rem;
-
-  margin: 20px 15px;
-}
-
-button.btn{
-  margin: 20px 15px !important;
-
-}
-input{
-  margin: 10px 15px !important;
-
 }
 
 .button-default {
@@ -119,13 +105,215 @@ input{
   color: #fff;
 }
 
-/* For the loading symbol */
+/* ============================================= */
 
-#loading-image {
+.btn.focus, .btn:focus, .form-control:focus {
+  outline: 0;
+  box-shadow: none;
+}
+.btn-close {
+  cursor: pointer;
+}
+.page, .content, .mobile-nav-menu-container {
+  position: relative;
+}
+.page::after {
+  content: " ";
+  clear: both;
+  display: block;
+}
+.left-sidebar, .content {
+  width: 100%;
+}
+.left-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+}
+.page-cover, .content-cover {
   position: absolute;
-  top: 100px;
-  left: 240px;
-  z-index: 100;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.page-cover {
+  z-index: 999;
+}
+.content-cover {
+  z-index: 9;
+}
+.cover-active {
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .left-sidebar {
+    float: left;
+    width: 250px;
+  }
+  .content {
+    float: right;
+    width: calc(100% - 250px);
+  }
+}
+.desktop-nav-menu-container, .mobile-nav-menu-container, .mobile-nav-menu {
+  background: #eaf9ff;
+}
+.desktop-nav-menu-container .welcome-text {
+  margin: 0 0 1rem;
+}
+.menu-list {
+  padding: 0;
+}
+.menu-list li {
+  list-style-type: none;
+  margin: 0 0 1rem;
+}
+.menu-list li:last-child {
+  margin-bottom: 0;
+}
+/* mobile nav */
+.mobile-nav-menu-container .welcome-text {
+  flex-grow: 1;
+}
+.mobile-menu-btn i {
+  cursor: pointer;
+  width: 60px;
+  text-align: center;
+  border: 2px solid #32465a;
+}
+.mobile-nav-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  padding: 0 1rem 1rem;
 }
 
+/* form */
+label {
+  text-align: left;
+  display: block;
+  margin-bottom: 0;
+}
+.hide-label {
+  visibility: hidden;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  display: block;
+}
 
+/* login & signup */
+.login-container, .signup-container {
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+}
+.login-btn, .signup-btn {
+  margin-top: 30px;
+}
+@media (max-width: 767px) {
+  .login-container, .signup-container {
+    width: 100%;
+  }
+}
+
+/* profile */
+.profile-container {
+  width: 80%;
+  max-width: 400px;
+}
+.profile-info {
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+}
+.profile-pic {
+  width: 80px;
+}
+.profile-pic-mr {
+  margin-right: 50px;
+}
+.profile-tab {
+  width: 48%;
+}
+.profile-tab:only-child {
+  width: 100%;
+}
+@media (max-width: 767px) {
+  .profile-container {
+    width: 100%;
+  }
+  .profile-pic {
+    width: 60px;
+  }
+  .profile-pic-mr {
+    margin-right: 30px;
+  }
+}
+
+/* friend list */
+.friendlist-container {
+  width: 100%;
+}
+.friend-pic {
+  width: 80px;
+}
+.friend-row:last-child .border-bottom {
+  border: none!important;
+}
+
+/* Search */
+.search-tutor-student-container {
+  width: 100%;
+  max-width: 1060px;
+}
+.filter-component {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+@media (max-width: 767px) {
+  .filter-component {
+    /* need to deal with height change */
+    top: 60px;
+  }
+}
+.filter-form-container {
+  position: absolute;
+  top: 16px;
+}
+.search-result-card {
+  cursor: pointer;
+}
+.search-result-card .card-img-top {
+  position: relative;
+  overflow: hidden;
+}
+.search-result-card img {
+  width: 100%;
+}
+.card-img-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+.search-result-card, .search-result-card img, .card-img-cover {
+  transition: all 0.3s ease-in-out;
+}
+.search-result-card:hover {
+  transform: translateY(-1%);
+}
+.search-result-card:hover img {
+  transform: scale3d(1.1, 1.1, 1.1);
+}
+.search-result-card:hover .card-img-cover {
+  background-color: rgba(0,0,0,0.25);
+}

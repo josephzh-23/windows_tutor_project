@@ -196,7 +196,7 @@ const Header =() => {
 
 		// Conditinoal rendering here 
 		// <!-- Header -->
-		<div className="d-flex flex-column flex-lg-row p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+		<div className="d-flex flex-column flex-lg-row p-3 px-md-4 bg-white border-bottom shadow-sm">
 			<p className="d-none" id="id_chat_newest_timestamp"></p>
 	
 <p className="d-none" id="id_chat_page_number">1</p>
