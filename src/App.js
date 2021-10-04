@@ -29,6 +29,7 @@ import Create_Schedule from './containers/CreateSchedule/Create_Schedule';
 
 import { Create_Appointment } from './containers/Create_Appointment';
 import CreatePayment from './containers/Payment/Create_Payment';
+import useComponentVisible from './Reusable_React/Custom_hook/useComponentVisible';
 
 
 
@@ -41,8 +42,6 @@ import CreatePayment from './containers/Payment/Create_Payment';
 // export const UserContext = React.createContext()
 
 function App() {
-
-
   var csrfToken = getCookie('csrftoken')
 
   // const [user, setUser] = useState(
@@ -50,56 +49,64 @@ function App() {
   const { authUser } = useContext(UserContext)
   
   console.log(authUser.csrfToken);
+
+
+
+  const DesktopNavMenu = () => {
+    return (
+      <div className="desktop-nav-menu-container p-3 d-none d-md-block">
+        {display_user()}
+        <Top_section />
+      </div>
+    )
+  }
+
+  const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+
+  const MobileNavMenu = () => {
+    return (
+      <div className="mobile-nav-menu-container d-flex d-md-none" ref={ ref }>
+        {display_user()}
+        { !isComponentVisible ? 
+          <div className="mobile-menu-btn" onClick={ () => setIsComponentVisible(true) }>
+            <i className="fa fa-bars p-3 d-flex justify-content-center align-items-center"></i>
+          </div> :
+          <div className="mobile-menu-btn" onClick={ () => setIsComponentVisible(false) }>
+            <i className="fa fa-times p-3 d-flex justify-content-center align-items-center"></i>
+          </div>
+        }
+        { isComponentVisible && 
+          <div className="mobile-nav-menu">
+            <Top_section />
+          </div>
+        }
+      </div>
+    )
+  }
+
   const Top_section = () => {
 
     return (
-
-      <header style={{ marginBottom: "20px" }}>
-
+      <ul className="menu-list p-0">
         {/* // Only show the following if authenticated is true  */}
         {/* {(sessionStorage.getItem('token')!=null)&& */}
 
-
-        <div>
-
-          <li><NavLink to="/">Home Page
-          </NavLink>
-          </li>
-          <li><NavLink to="/">Home Page
-          </NavLink>
-          </li>
-
-          <li><NavLink to="/search">Search the user here</NavLink></li>
-
-
-          <li><NavLink to={`/profile?userId=${authUser.userId}`}>Check out my own profile </NavLink></li>
-          <li><NavLink to="/register">Register the user </NavLink></li>
-
-          <li><NavLink to="/public_chat">Public Chat Page </NavLink></li>
-
-          <li><NavLink to="/UpdateAccount">Update the account (Only testing with
-            user id 1)</NavLink></li>
-
-          <li><NavLink to="/private_chat/">Private Chat</NavLink></li>
-          <li><NavLink to="/create_posting/">Create Tutor Posting</NavLink></li>
-          <li><NavLink to="/create_edit_schedule/">Create or Edit Tutor Schedule</NavLink></li>
-
-          <li><NavLink to="/searchFilter/">Search Tutor postings</NavLink></li>
-
-          <br />
-          
-          <li><NavLink to="/payment/">Create Payment</NavLink></li>
-
-          <li><NavLink to="/create_appointment/">Create Tutor Appointment</NavLink></li>
-
-
-
-          <br />
-          <br />
-          <li><NavLink to="/login">Logging In</NavLink></li>
-        </div>
+        <li><NavLink to="/" onClick={ () => setIsComponentVisible(false) }>Home Page</NavLink></li>
+        <li><NavLink to="/search" onClick={ () => setIsComponentVisible(false) }>Search the user here</NavLink></li>
+        <li><NavLink to={`/profile?userId=${authUser.userId}`} onClick={ () => setIsComponentVisible(false) }>Check out my own profile </NavLink></li>
+        <li><NavLink to="/register" onClick={ () => setIsComponentVisible(false) }>Register the user </NavLink></li>
+        <li><NavLink to="/public_chat" onClick={ () => setIsComponentVisible(false) }>Public Chat Page </NavLink></li>
+        <li><NavLink to="/UpdateAccount" onClick={ () => setIsComponentVisible(false) }>Update the account (Only testing with user id 1)</NavLink></li>
+        <li><NavLink to="/private_chat/" onClick={ () => setIsComponentVisible(false) }>Private Chat</NavLink></li>
+        <li><NavLink to="/create_posting/" onClick={ () => setIsComponentVisible(false) }>Create Tutor Posting</NavLink></li>
+        <li><NavLink to="/create_edit_schedule/" onClick={ () => setIsComponentVisible(false) }>Create or Edit Tutor Schedule</NavLink></li>
+        <li><NavLink to="/searchFilter/" onClick={ () => setIsComponentVisible(false) }>Search Tutor postings</NavLink></li>
+        <li><NavLink to="/payment/" onClick={ () => setIsComponentVisible(false) }>Create Payment</NavLink></li>
+        <li><NavLink to="/create_appointment/" onClick={ () => setIsComponentVisible(false) }>Create Tutor Appointment</NavLink></li>
+        <li><NavLink to="/login" onClick={ () => setIsComponentVisible(false) }>Logging In</NavLink></li>
+        
         {/* } */}
-      </header>
+      </ul>
     )
   }
 
@@ -137,9 +144,7 @@ function App() {
   const display_user = () => {
 
     return (
-      <div className="user-name" style={{ color: "green" }}>
-        <p className="mr-5"><b>LOGGED IN USER</b>: {authUser.username}</p>
-      </div>
+      <div className="user-name welcome-text">Welcome back, {authUser.username}</div>
     )
   }
 
@@ -147,16 +152,18 @@ function App() {
   // Switch makes sure only 1 component shown at any time. 
   return (
     <div className="page">
+      <div className="page-cover"></div>
       <div>
         <Header />
       </div>
       <BrowserRouter>
-        <div className="left-sidebar p-3">
+        <div className="left-sidebar p-0 p-md-3">
           <ClientErrorModal />
-          {display_user()}
-          <Top_section />
+          <DesktopNavMenu />
+          <MobileNavMenu />
         </div>
         <div className="content p-3 d-flex justify-content-center">
+          <div className="content-cover"></div>
           <Switch>
             <Route path="/search/" >
               <SearchFriends />

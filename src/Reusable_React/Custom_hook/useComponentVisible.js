@@ -5,16 +5,29 @@ export default function useComponentVisible(initialIsVisible) {
     const ref = useRef(null);
 
     const handleClickOutside = (event) => {
-        if (ref.current && !ref.current.contains(event.target)) {
-            setIsComponentVisible(false);
-        }
+      if (ref.current && !ref.current.contains(event.target)) {
+        setIsComponentVisible(false);
+      }
     };
 
     useEffect(() => {
-        document.addEventListener('click', handleClickOutside, true);
-        return () => {
-            document.removeEventListener('click', handleClickOutside, true);
-        };
+      const filterFormContainer = document.querySelector('.filter-form-container');
+      const contentCover = document.querySelector('.content-cover');
+      if (ref.current.contains(filterFormContainer)) {
+        isComponentVisible ? contentCover.classList.add('cover-active') : contentCover.classList.remove('cover-active');
+        isComponentVisible ? ref.current.classList.add('filter-component-hidden') : ref.current.classList.remove('filter-component-hidden');
+      }
+
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const pageCover = document.querySelector('.page-cover');
+      if (ref.current.contains(mobileMenuBtn)) {
+        isComponentVisible ? pageCover.classList.add('cover-active') : pageCover.classList.remove('cover-active');
+      }
+
+      document.addEventListener('click', handleClickOutside, true);
+      return () => {
+        document.removeEventListener('click', handleClickOutside, true);
+      };
     });
 
     return { ref, isComponentVisible, setIsComponentVisible };

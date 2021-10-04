@@ -259,23 +259,24 @@ const validate_info = (values)=>{
           </div>
       </nav> */}
     
-      <main role="main" className="">
+      <main role="main" style={ {height: '200vh'} }>
   
         <h3>Filter Tutors</h3>
-        <div className="filter-component" ref= { ref }>
+
+        <div className="filter-component py-3" ref= { ref }>
           <button className="btn btn-secondary m-0" onClick={ () => setIsComponentVisible(true) }>Filter</button>
           <div className="filter-form-container">
             { isComponentVisible && <FilterForm /> }
           </div>
         </div>
         
-        <form onSubmit={handleSubmit} method="post" >
+        <form onSubmit={handleSubmit} method="post" className="mt-5">
           <div className="search">
             <div className="row">
-              <div className="col-md-5">
+              <div className="col-lg-5">
                 <div className="search-1"> <i className="fa fa-search"></i> <input type="text" placeholder="Subject" /> </div>
               </div>
-              <div className="col-md-7">
+              <div className="col-lg-7">
                 <div>
                   <div className="search-2"> <i className="fa fa-map-marker"></i> <input type="text" placeholder="Address" /> <button type="submit" className="btn btn-primary">Search</button> </div>
                 </div>
