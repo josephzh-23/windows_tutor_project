@@ -259,16 +259,16 @@ const validate_info = (values)=>{
           </div>
       </nav> */}
     
-      <main role="main" style={ {height: '200vh'} }>
-  
-        <h3>Filter Tutors</h3>
-
-        <div className="filter-component py-3" ref= { ref }>
-          <button className="btn btn-secondary m-0" onClick={ () => setIsComponentVisible(true) }>Filter</button>
+      <div className="filter-component py-3 m-auto" ref= { ref }>
+        <div className="filter-content m-auto">
+          <button className="btn btn-secondary m-0" onClick={ () => isComponentVisible ? setIsComponentVisible(false) : setIsComponentVisible(true) }>Filter</button>
           <div className="filter-form-container">
             { isComponentVisible && <FilterForm /> }
           </div>
         </div>
+      </div>
+
+      <main role="main" className="m-auto" style={ {height: '200vh'} }>
         
         <form onSubmit={handleSubmit} method="post" className="mt-5">
           <div className="search">
@@ -310,6 +310,9 @@ const validate_info = (values)=>{
           </div> */}
           {/* */} 
       
+        <div className="d-flex">
+          
+        </div>
       </main>
     </div>
   )

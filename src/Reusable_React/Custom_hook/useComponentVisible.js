@@ -15,7 +15,6 @@ export default function useComponentVisible(initialIsVisible) {
       const contentCover = document.querySelector('.content-cover');
       if (ref.current.contains(filterFormContainer)) {
         isComponentVisible ? contentCover.classList.add('cover-active') : contentCover.classList.remove('cover-active');
-        isComponentVisible ? ref.current.classList.add('filter-component-hidden') : ref.current.classList.remove('filter-component-hidden');
       }
 
       const mobileMenuBtn = document.querySelector('.mobile-menu-btn');

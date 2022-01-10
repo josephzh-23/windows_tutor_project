@@ -134,7 +134,7 @@ button {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .page-cover {
   z-index: 999;
@@ -191,6 +191,9 @@ button {
 /* Search */
 .search-tutor-student-container {
   width: 100%;
+}
+.filter-component .filter-content, .search-tutor-student-container main {
+  width: calc(100% - 2rem);
   max-width: 1060px;
 }
 .filter-component, .filter-form-container {
@@ -200,14 +203,13 @@ button {
   position: sticky;
   top: 0;
   z-index: 99;
-}
-.filter-component-hidden, .filter-form-container {
-  max-width: 400px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 .filter-form-container {
   position: absolute;
-  top: 0;
+  top: 54px;
   left: 0;
+  max-width: 400px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
@@ -216,7 +218,7 @@ button {
     /* need to deal with height change */
     top: 56px;
   }
-  .filter-component-hidden, .filter-form-container {
+  .filter-form-container {
     max-width: 250px;
   }
 }

@@ -157,12 +157,12 @@ function App() {
         <Header />
       </div>
       <BrowserRouter>
-        <div className="left-sidebar p-0 p-md-3">
+        <div className="left-sidebar">
           <ClientErrorModal />
           <DesktopNavMenu />
           <MobileNavMenu />
         </div>
-        <div className="content p-3 d-flex justify-content-center">
+        <div className="content d-flex justify-content-center">
           <div className="content-cover"></div>
           <Switch>
             <Route path="/search/" >
