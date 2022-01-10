@@ -54,9 +54,12 @@ function App() {
 
   const DesktopNavMenu = () => {
     return (
-      <div className="desktop-nav-menu-container p-3 d-none d-md-block">
-        {display_user()}
-        <Top_section />
+      <div className="desktop-nav-menu-container d-none d-lg-flex flex-column justify-content-between">
+        <div className="branding p-3">LOGO</div>
+        <div className="desktop-nav-menu p-3">
+          {display_user()}
+          <Top_section />
+        </div>
       </div>
     )
   }
@@ -65,7 +68,7 @@ function App() {
 
   const MobileNavMenu = () => {
     return (
-      <div className="mobile-nav-menu-container d-flex d-md-none" ref={ ref }>
+      <div className="mobile-nav-menu-container d-flex d-lg-none" ref={ ref }>
         {display_user()}
         { !isComponentVisible ? 
           <div className="mobile-menu-btn" onClick={ () => setIsComponentVisible(true) }>
@@ -153,7 +156,7 @@ function App() {
   return (
     <div className="page">
       <div className="page-cover"></div>
-      <div>
+      <div className="page-header">
         <Header />
       </div>
       <BrowserRouter>
@@ -162,7 +165,7 @@ function App() {
           <DesktopNavMenu />
           <MobileNavMenu />
         </div>
-        <div className="content d-flex justify-content-center">
+        <div className="content bg-white">
           <div className="content-cover"></div>
           <Switch>
             <Route path="/search/" >

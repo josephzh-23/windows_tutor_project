@@ -259,10 +259,10 @@ const validate_info = (values)=>{
           </div>
       </nav> */}
     
-      <div className="filter-component py-3 m-auto" ref= { ref }>
+      <div className="filter-component bg-white py-3" ref= { ref }>
         <div className="filter-content m-auto">
           <button className="btn btn-secondary m-0" onClick={ () => isComponentVisible ? setIsComponentVisible(false) : setIsComponentVisible(true) }>Filter</button>
-          <div className="filter-form-container">
+          <div className="filter-form-container bg-white">
             { isComponentVisible && <FilterForm /> }
           </div>
         </div>

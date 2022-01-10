@@ -117,6 +117,9 @@ button {
 .page, .content, .mobile-nav-menu-container {
   position: relative;
 }
+.page {
+  min-height: 100vh;
+}
 .page::after {
   content: " ";
   clear: both;
@@ -124,6 +127,9 @@ button {
 }
 .left-sidebar, .content {
   width: 100%;
+}
+.left-sidebar, .mobile-nav-menu {
+  background: #eaf9ff;
 }
 .left-sidebar {
   position: sticky;
@@ -146,23 +152,31 @@ button {
   width: 100%;
   height: 100%;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .left-sidebar {
-    float: left;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
     width: 250px;
   }
-  .content {
-    float: right;
+  .page-header, .content {
     width: calc(100% - 250px);
+    margin-left: auto;
   }
 }
-.desktop-nav-menu-container, .mobile-nav-menu-container, .mobile-nav-menu {
-  background: #eaf9ff;
+.desktop-nav-menu-container {
+  height: 100%;
 }
-.desktop-nav-menu-container .welcome-text {
-  margin: 0 0 1rem;
+.branding {
+  font-size: 2rem;
+  background-color: #e8f0fe;
 }
-.menu-list li {
+.desktop-nav-menu {
+  height: calc(100% - 100px);
+  overflow-y: auto;
+}
+.desktop-nav-menu-container .welcome-text, .menu-list li {
   margin: 0 0 1rem;
 }
 .menu-list li:last-child {
@@ -192,18 +206,18 @@ button {
 .search-tutor-student-container {
   width: 100%;
 }
-.filter-component .filter-content, .search-tutor-student-container main {
+.filter-content, .search-tutor-student-container main {
   width: calc(100% - 2rem);
   max-width: 1060px;
-}
-.filter-component, .filter-form-container {
-  background-color: #fff;
 }
 .filter-component {
   position: sticky;
   top: 0;
   z-index: 99;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.filter-content {
+  position: relative;
 }
 .filter-form-container {
   position: absolute;
@@ -213,7 +227,7 @@ button {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-@media (max-width: 767px) {
+@media (max-width: 991px) {
   .filter-component {
     /* need to deal with height change */
     top: 56px;
@@ -345,14 +359,6 @@ label {
 .hide-label {
   visibility: hidden;
 }
-input, textarea, select {
-  width: 100%;
-  padding: 6px 10px;
-  /* margin-bottom: 10px; */
-  border: 1px solid #ddd;
-  box-sizing: border-box;
-  display: block;
-}
 
 /* login & signup */
 .login-container, .signup-container {
@@ -362,11 +368,6 @@ input, textarea, select {
 }
 .login-btn, .signup-btn {
   margin-top: 30px;
-}
-@media (max-width: 767px) {
-  .login-container, .signup-container {
-    width: 100%;
-  }
 }
 
 /* profile */

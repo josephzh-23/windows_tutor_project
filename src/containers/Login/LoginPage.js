@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import axios from "axios";
 import { useHistory, withRouter } from "react-router-dom";
@@ -86,38 +86,55 @@ const LoginPage = (props) => {
       });
   };
 
-  return (
+  const resetPassword = (e) => {
+    e.preventDefault();
+    alert('should send a email to user.');
+  }
+  const {isLostPassword, setIsLostPassword} = useState(false);
 
-    <div className="card">
-      <div className="cardHeader">Login</div>
-      <div className="cardBody">
-        <form onSubmit = {loginUser}>
-        <div className="inputGroup">
+  return (
+    <div className="login-container py-3 m-auto">
+      <h3>{ !isLostPassword ? "Log in" : "Reset my password" }</h3>
+      { !isLostPassword ? 
+      <form onSubmit = {loginUser}>
+        <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
             id="email"
-            placeholder="abc@example.com"
+            placeholder="Email address"
+            className="form-control"
             ref={emailRef}
           />
         </div>
-        <div className="inputGroup">
+        <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
             id="password"
-            placeholder="Your Password"
+            placeholder="Password"
+            className="form-control"
             ref={passwordRef}
           />
         </div>
-
-        <div style={{ flex: 1 }}>
-          <input id="submit" className="btn btn-warning" type="submit" name="Add" />
+        <input id="submit" className="btn btn-primary btn-block" type="submit" name="Add" value="Log in" />
+      </form>
+      :
+      <form onSubmit = {resetPassword}>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Email address"
+            className="form-control"
+          />
         </div>
-        </form>
-      </div>
+        <input id="submit" className="btn btn-primary btn-block" type="submit" name="Add" value="Send" />
+      </form> }
     </div>
   );
 
