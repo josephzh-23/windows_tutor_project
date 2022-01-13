@@ -18,9 +18,9 @@
 #id_cancel{
     color: red;
 }
-.material-icons{
+/* .material-icons{
     font-size: 30px;
-}
+} */
 .material-icons:hover{
     cursor: pointer;
 }

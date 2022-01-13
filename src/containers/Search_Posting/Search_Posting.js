@@ -156,7 +156,7 @@ const validate_info = (values)=>{
                         />
                       <span className="input-group-append">
                           <div className="input-group-text bg-transparent">
-                              <i className="fa fa-search"></i>
+                              <i className="material-icons">search</i>
                           </div>
                       </span>
                   </div>
@@ -171,7 +171,7 @@ const validate_info = (values)=>{
                       value= {formData.id_exact}/>
                       <span className="input-group-append">
                           <div className="input-group-text bg-transparent">
-                              <i className="fa fa-search"></i>
+                              <i className="material-icons">search</i>
                           </div>
                       </span>
                   </div>
@@ -183,7 +183,7 @@ const validate_info = (values)=>{
                       <input className="form-control py-2 border-right-0 border" type="search" name="title_or_author" placeholder="Title or author..." />
                       <span className="input-group-append">
                           <div className="input-group-text bg-transparent">
-                              <i className="fa fa-search"></i>
+                              <i className="material-icons">search</i>
                           </div>
                       </span>
                   </div>
@@ -274,11 +274,11 @@ const validate_info = (values)=>{
           <div className="search">
             <div className="row">
               <div className="col-lg-5">
-                <div className="search-1"> <i className="fa fa-search"></i> <input type="text" placeholder="Subject" /> </div>
+                <div className="search-1"> <i className="material-icons">search</i> <input type="text" placeholder="Subject" /> </div>
               </div>
               <div className="col-lg-7">
                 <div>
-                  <div className="search-2"> <i className="fa fa-map-marker"></i> <input type="text" placeholder="Address" /> <button type="submit" className="btn btn-primary">Search</button> </div>
+                  <div className="search-2"> <i className="material-icons">place</i> <input type="text" placeholder="Address" /> <button type="submit" className="btn btn-primary">Search</button> </div>
                 </div>
               </div>
             </div>

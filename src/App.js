@@ -15,6 +15,7 @@ import FriendList from "./containers/FriendList.js"
 import SearchFriends from "./containers/Search_Friends/SearchFriends.js"
 import RegisterPage from './containers/Login/RegisterPage.js';
 import LoginPage from './containers/Login/LoginPage.js';
+import LostPasswordPage from './containers/Login/LostPasswordPage.js';
 import UpdateAccount from './containers/UpdateAccount/UpdateAccount.js'
 import { UserContext, UserContextProvider } from './Reusable_React/UserContext';
 import { FriendRequests } from './containers/FriendRequests.js';
@@ -185,6 +186,7 @@ function App() {
             <Route path="/profile" render={() => <Profile user={authUser} />} exact />
             <Route path="/updateAccount" component={UpdateAccount} exact />
             <Route path="/login" component={LoginPage} exact />
+            <Route path="/reset_password" component={LostPasswordPage} exact />
             <Route path="/account/friendRequests" component={FriendRequests} exact />
 
             <Route path="/create_posting" component={Create_Posting} exact />

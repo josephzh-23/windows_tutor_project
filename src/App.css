@@ -107,6 +107,10 @@ button {
 
 /* ============================================= */
 
+.link-unstyled, .link-unstyled:link, .link-unstyled:hover {
+  color: inherit;
+  text-decoration: inherit;
+}
 .btn.focus, .btn:focus, .form-control:focus {
   outline: 0;
   box-shadow: none;
@@ -169,8 +173,9 @@ button {
   height: 100%;
 }
 .branding {
-  font-size: 2rem;
-  background-color: #e8f0fe;
+  font-size: 34px;
+  line-height: 38px;
+  border-bottom: 1px solid #e8f0fe;
 }
 .desktop-nav-menu {
   height: calc(100% - 100px);
@@ -242,48 +247,41 @@ button {
   border-radius: 5px;
   box-shadow: 0 5px 20px 0 rgb(34 34 32 / 20%);
 }
-.search-1 {
+.search-1, .search-2 {
   position: relative;
   width: 100%;
 }
-.search-1 input {
+.search-1 i, .search-2 i {
+  position: absolute;
+  top: 12px;
+}
+.search-1 input, .search-2 input {
   height: 45px;
   border: none;
   width: 100%;
-  padding-left: 40px;
-  padding-right: 10px;
-  border-right: 2px solid #dee2e6;
 }
-.search-1 input:focus {
+.search-1 input:focus, .search-2 input:focus {
   border-color: none;
   box-shadow: none;
   outline: none;
 }
 .search-1 i {
-  position: absolute;
-  top: 12px;
-  left: 10px;
+  left: 14px;
 }
-.search-2 {
-  position: relative;
-  width: 100%;
+.search-1 input {
+  padding-left: 40px;
+  padding-right: 10px;
+  border-right: 2px solid #dee2e6;
+}
+.search-2 i {
+  left: -4px;
 }
 .search-2 input {
   height: 45px;
   border: none;
   width: 100%;
-  padding-left: 18px;
+  padding-left: 22px;
   padding-right: 100px;
-}
-.search-2 input:focus {
-  border-color: none;
-  box-shadow: none;
-  outline: none;
-}
-.search-2 i {
-  position: absolute;
-  top: 12px;
-  left: -4px;
 }
 .search-2 button {
   position: absolute;
@@ -298,24 +296,21 @@ button {
   .search {
     padding: 4px;
   }
+  .search-1 i, .search-2 i {
+    left: 8px;
+  }
+  .search-1 input, .search-2 input {
+    padding-left: 36px;
+  }
   .search-1 input {
-      border-right: none;
-      border-bottom: 1px solid #dee2e6;
-      padding-left: 36px;
-  }
-  .search-1 i {
-      left: 4px;
-  }
-  .search-2 i {
-      left: 8px;
-  }
-  .search-2 input {
-      padding-left: 36px;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    padding-left: 36px;
   }
   .search-2 button {
-      height: 38px;
-      width: 80px;
-      top: 5px;
+    height: 38px;
+    width: 80px;
+    top: 5px;
   }
 }
 /* search result */
@@ -365,9 +360,6 @@ label {
   width: 80%;
   max-width: 400px;
   text-align: center;
-}
-.login-btn, .signup-btn {
-  margin-top: 30px;
 }
 
 /* profile */
