@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 
-import {useHistory} from 'react-router-dom'
+import {useHistory, Link} from 'react-router-dom'
 
 
 import { makeToast } from "../../Toaster";
@@ -78,68 +78,67 @@ const RegisterPage = (props) => {
       };
 
   return (
-    <div className="card">
-      <div className="cardHeader">Registration</div>
-      <div className="cardBody">
-        <form onSubmit = {registerUser}>
-        <div className="inputGroup">
+    <div className="login-container py-5 m-auto">
+      <h3 className="mb-4">Sign up</h3>
+      <form onSubmit = {registerUser}>
+        <div className="form-group">
           <label htmlFor="name">Name</label>
           <input
             type="text"
             name="username"
             id="name"
             placeholder="John Doe"
+            className="form-control"
             ref={nameRef}
           />
-          </div>
-          <div className="inputGroup">
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="abc@example.com"
-          ref={emailRef}
-        />
-      </div>
-      <div className="inputGroup">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          name="password1"
-          id="password"
-          placeholder="Your Password"
-          ref={passwordRef}
-        />
         </div>
-         <div className="inputGroup">
-        <label htmlFor="password">Password2</label>
-        <input
-          type="password"
-          name="password2"
-          id="password2"
-          placeholder="Confirm Password"
-          ref={password2Ref}
-        />
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="abc@example.com"
+            className="form-control"
+            ref={emailRef}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            name="password1"
+            id="password"
+            placeholder="Your Password"
+            className="form-control"
+            ref={passwordRef}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password2</label>
+          <input
+            type="password"
+            name="password2"
+            id="password2"
+            placeholder="Confirm Password"
+            className="form-control"
+            ref={password2Ref}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="role">Are you a student or tutor </label>
+          <select  ref={roleRef} id="role" className="form-select">
+            <option value="tutor">Tutor</option>
+            <option value="student">Student</option>
+          </select> 
+        </div>
+        <input id="submit" className="btn btn-primary btn-block" type="submit" name="Add" value="Sign up" />
+      </form>
+      <div className="mt-4">
+        <span>You already have an account? </span>
+        <Link to="/login" className="link-primary text-decoration-none">Log in</Link>
       </div>
-
-      <div className="inputGroup">
-        <label htmlFor="role">Are you a student or tutor </label>
-
-
-    <select  ref={roleRef} id="role">
-      <option value="tutor">Tutor</option>
-      <option value="student">Student</option>
-    </select> 
-      </div>
-      
-      <div style={{flex: 1}}>
-                            <input id="submit" className="btn btn-warning" type="submit" name="Add" />
-                          </div>
-    </form>
     </div>
-    </div>
-   
   );
 };
 
