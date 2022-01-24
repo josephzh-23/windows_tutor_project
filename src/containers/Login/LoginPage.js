@@ -67,7 +67,7 @@ const LoginPage = (props) => {
           init_auth_user(res)
      
           
-        history.push(`/profile?userId=${res.data.userId}`, {from: "LoginPage"})
+        history.push(`/admin/profile?userId=${res.data.userId}`, {from: "LoginPage"})
 
         // setTimeout(()=>{
         // window.location.reload();

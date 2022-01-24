@@ -13,7 +13,7 @@ export default function useComponentVisible(initialIsVisible) {
     useEffect(() => {
       const filterFormContainer = document.querySelector('.filter-form-container');
       const contentCover = document.querySelector('.content-cover');
-      if (ref.current.contains(filterFormContainer)) {
+      if (ref.current.contains(filterFormContainer) && contentCover) {
         isComponentVisible ? contentCover.classList.add('cover-active') : contentCover.classList.remove('cover-active');
       }
 
