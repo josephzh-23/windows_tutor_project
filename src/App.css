@@ -118,6 +118,17 @@ button {
 .btn-close {
   cursor: pointer;
 }
+/* form */
+label {
+  text-align: left;
+  display: block;
+  margin-bottom: 0;
+}
+.hide-label {
+  visibility: hidden;
+}
+
+/* Admin Page Layout */
 .page, .content, .mobile-nav-menu-container {
   position: relative;
 }
@@ -133,7 +144,7 @@ button {
   width: 100%;
 }
 .left-sidebar, .mobile-nav-menu {
-  background: #eaf9ff;
+  background-color: #eaf9ff;
 }
 .left-sidebar {
   position: sticky;
@@ -155,19 +166,6 @@ button {
 .cover-active {
   width: 100%;
   height: 100%;
-}
-@media (min-width: 992px) {
-  .left-sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    height: 100vh;
-    width: 250px;
-  }
-  .page-header, .content {
-    width: calc(100% - 250px);
-    margin-left: auto;
-  }
 }
 .desktop-nav-menu-container {
   height: 100%;
@@ -207,7 +205,30 @@ button {
   padding: 0 1rem 1rem;
 }
 
-/* Search */
+/* footer */
+.admin-footer {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+}
+
+@media (min-width: 992px) {
+  .left-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 250px;
+  }
+  .page-header, .content {
+    width: calc(100% - 250px);
+    margin-left: auto;
+  }
+  .admin-footer {
+    left: 250px;
+  }
+}
+
+/* search */
 .search-tutor-student-container {
   width: 100%;
 }
@@ -345,23 +366,6 @@ button {
   background-color: rgba(0,0,0,0.25);
 }
 
-/* form */
-label {
-  text-align: left;
-  display: block;
-  margin-bottom: 0;
-}
-.hide-label {
-  visibility: hidden;
-}
-
-/* login & signup */
-.login-container, .signup-container {
-  width: 80%;
-  max-width: 400px;
-  text-align: center;
-}
-
 /* profile */
 .profile-container {
   width: 80%;
@@ -395,7 +399,7 @@ label {
   }
 }
 
-/* friend list */
+/* friends list */
 .friendlist-container {
   width: 100%;
 }
@@ -404,4 +408,44 @@ label {
 }
 .friend-row:last-child .border-bottom {
   border: none!important;
+}
+
+/* Front Page Layout */
+.front-page {
+  min-height: 100vh;
+}
+.offcanvas-body .btn-primary {
+  background-color: #0d6efd!important;
+  border-color: #0d6efd!important;
+}
+.offcanvas-body .btn-primary:hover {
+  background-color: #0b5ed7!important;
+  border-color: #0a58ca!important;
+}
+.offcanvas-body .btn-primary:focus {
+  box-shadow: none!important;
+}
+.offcanvas-body .btn-outline-primary {
+  color: #0d6efd!important;
+  background-color: transparent!important;
+  border-color: #0d6efd!important;
+}
+.offcanvas-body .btn-outline-primary:hover {
+  color: #fff!important;
+  background-color: #0d6efd!important;
+}
+.offcanvas-body .btn-outline-primary:focus {
+  box-shadow: none!important;
+}
+@media(max-width: 991px) {
+  .offcanvas-body .btn {
+    display: block;
+  }
+}
+/* login */
+.login-container {
+  width: 90%;
+  max-width: 500px;
+  background-color: #eaf9ff;
+  text-align: center;
 }

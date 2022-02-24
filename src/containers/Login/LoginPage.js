@@ -87,7 +87,7 @@ const LoginPage = (props) => {
   };
 
   return (
-    <div className="login-container py-5 m-auto">
+    <div className="login-container p-5 rounded mx-auto my-5">
       <h3 className="mb-4">Log in</h3>
       <form onSubmit = {loginUser}>
         <div className="form-group">

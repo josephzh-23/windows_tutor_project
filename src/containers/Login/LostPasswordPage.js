@@ -8,7 +8,7 @@ const LostPasswordPage = () => {
   }
   const [email, setEmail] = useState('');
   return (
-    <div className="login-container py-5 m-auto">
+    <div className="login-container p-5 rounded mx-auto my-5">
       <h3 className="mb-4">Reset my password</h3>
       <p className="mb-5">To retrieve your password, please enter the e-mail address associated with your account below.</p>
       <form onSubmit = {resetPassword}>

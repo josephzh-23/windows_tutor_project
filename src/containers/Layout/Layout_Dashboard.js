@@ -135,6 +135,7 @@ const Layout_Dashboard = ({children}) => {
         <div className="content-cover"></div>
         {children}
       </div>
+      <div className="admin-footer text-center py-2 border-top">&copy; Copyright 2022</div>
     </div>
   );
 

@@ -78,7 +78,7 @@ const RegisterPage = (props) => {
       };
 
   return (
-    <div className="login-container py-5 m-auto">
+    <div className="login-container p-5 rounded mx-auto my-5">
       <h3 className="mb-4">Sign up</h3>
       <form onSubmit = {registerUser}>
         <div className="form-group">
