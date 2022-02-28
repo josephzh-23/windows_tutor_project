@@ -442,6 +442,9 @@ label {
     display: block;
   }
 }
+.front-page > footer a {
+  text-decoration: none;
+}
 /* login */
 .login-container {
   width: 90%;

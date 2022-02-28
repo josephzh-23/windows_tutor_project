@@ -43,7 +43,68 @@ const Layout_Frontpage = ({children}) => {
 
   const Footer = () => {
     return (
-      <div className="">Footer</div>
+      <footer className="text-center text-lg-start bg-dark text-white mt-5">
+        <section className="">
+          <div className="container text-center text-lg-start mt-5 py-4">
+            <div className="row">
+              <div className="col-lg-4 col-xl-3 col-xxl-3 mx-auto mb-4">
+                <h6 className="text-uppercase fw-bold mb-4">
+                <i class="fas fa-graduation-cap me-3"></i>Company name
+                </h6>
+                <p>
+                  Here you can use rows and columns to organize your footer content. Lorem ipsum
+                  dolor sit amet, consectetur adipisicing elit.
+                </p>
+              </div>
+
+              <div className="col-lg-2 col-xl-1 col-xxl-1 mx-auto mb-4">
+                <h6 className="text-uppercase fw-bold mb-4">
+                  Links
+                </h6>
+                <p>
+                  <NavLink className="text-reset" to="/about">About</NavLink>
+                </p>
+                <p>
+                  <NavLink className="text-reset" to="/searchFilter">Search</NavLink>
+                </p>
+              </div>
+
+              <div className="col-lg-2 col-xl-2 col-xxl-1 mx-auto mb-4">
+                <h6 className="text-uppercase fw-bold mb-4">
+                  Help
+                </h6>
+                <p>
+                  <NavLink className="text-reset" to="/help-centre">Help Centre</NavLink>
+                </p>
+                <p>
+                  <NavLink className="text-reset" to="/contact">Contact</NavLink>
+                </p>
+              </div>
+
+              <div className="col-lg-2 col-xl-2 col-xxl-2 mx-auto mb-4">
+                <h6 className="text-uppercase fw-bold mb-4">
+                  Follow Us
+                </h6>
+                <p>
+                  <a href="#" className="me-4 text-reset">
+                    <i className="fab fa-facebook-f fa-lg"></i>
+                  </a>
+                  <a href="#" className="me-4 text-reset">
+                    <i className="fab fa-instagram fa-lg"></i>
+                  </a>
+                  <a href="https://github.com/josephzh-23/windows_tutor_project/tree/mac" target="_blank" className="text-reset">
+                    <i className="fab fa-github fa-lg"></i>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="text-center p-4" style={{backgroundColor: 'rgba(0, 0, 0, 0.05)'}}>
+          © 2022 Copyright: <NavLink className="text-reset fw-bold" to="/">Company Name</NavLink>
+        </div>
+      </footer>
     )
   }
 
